@@ -1,0 +1,22 @@
+<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+  <div
+    class="p-5 rounded shadow-lg text-center"
+    style="background: #ffc107; color: black; width: 360px"
+  >
+    <img src="assets/logos/tlc.png" width="60" class="mb-3" />
+    <h3 class="fw-bold mb-4">RECUPERAR CONTRASEÑA</h3>
+    <form (ngSubmit)="onRecover()">
+      <mat-form-field appearance="fill" class="w-100 mb-3">
+        <mat-label>Correo electrónico</mat-label>
+        <input matInput [(ngModel)]="email" name="email" required />
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" class="w-100" type="submit">
+        Enviar enlace de recuperación
+      </button>
+      <a class="d-block text-dark mt-3" routerLink="/"
+        >¿Recordaste tu contraseña? Iniciar sesión</a
+      >
+    </form>
+  </div>
+</div>

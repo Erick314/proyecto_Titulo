@@ -1,0 +1,49 @@
+<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+  <div
+    class="p-5 rounded shadow-lg text-center"
+    style="background: #2196f3; color: white; width: 360px"
+  >
+    <img src="assets/logos/tlc.png" width="60" class="mb-3" />
+    <h3 class="fw-bold mb-4">REGISTRO DE USUARIO</h3>
+    <form (ngSubmit)="onRegister()">
+      <mat-form-field appearance="fill" class="w-100 mb-2">
+        <mat-label>Email</mat-label>
+        <input matInput [(ngModel)]="email" name="email" required />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-100 mb-2">
+        <mat-label>Contraseña</mat-label>
+        <input
+          matInput
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          required
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-100 mb-2">
+        <mat-label>Repetir contraseña</mat-label>
+        <input
+          matInput
+          type="password"
+          [(ngModel)]="repeatPassword"
+          name="repeatPassword"
+          required
+        />
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="w-100 mb-2"
+        type="submit"
+      >
+        Registrarse
+      </button>
+      <a class="d-block text-white mt-2" routerLink="/"
+        >¿Ya tienes cuenta? Iniciar sesión</a
+      >
+    </form>
+  </div>
+</div>
