@@ -1,0 +1,18 @@
+.main-content {
+  transition: margin-left 0.3s ease;
+
+  &.with-navbar {
+    margin-left: 200px; // mismo ancho del sidebar
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content.with-navbar {
+    margin-left: 60px; // ancho del sidebar cerrado
+  }
+}
+
+body {
+  margin: 0;
+  background-color: #fef9c3; // el color pastel que estás usando
+}

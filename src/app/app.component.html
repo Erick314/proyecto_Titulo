@@ -1,2 +1,5 @@
-<app-navbar *ngIf="showNavbar"></app-navbar>
-<router-outlet />
+<app-navbar *ngIf="showNavbar" (menuState)="menuOpen = $event"></app-navbar>
+
+<div [class.with-navbar]="showNavbar && menuOpen" class="main-content">
+  <router-outlet></router-outlet>
+</div>

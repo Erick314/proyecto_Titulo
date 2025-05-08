@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-navbar',
@@ -12,7 +13,9 @@ import { RouterModule } from '@angular/router';
 export class NavbarComponent {
   menuOpen = true;
 
+  @Output() menuState = new EventEmitter<boolean>();
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
+    this.menuState.emit(this.menuOpen); // emite el estado
   }
 }
