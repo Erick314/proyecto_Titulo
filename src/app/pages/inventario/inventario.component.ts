@@ -20,4 +20,35 @@ export class InventarioComponent {
     { nombre: '', stock: '', detalles: '' },
     { nombre: '', stock: '', detalles: '' },
   ];
+
+  selectedProducto: any = null;
+  validationError = '';
+
+  abrirEditor(producto: any) {
+    this.selectedProducto = { ...producto }; // copia
+    this.validationError = '';
+  }
+
+  cerrarEditor() {
+    this.selectedProducto = null;
+    this.validationError = '';
+  }
+
+  guardarProducto() {
+    if (!this.selectedProducto.nombre || this.selectedProducto.stock === '') {
+      this.validationError =
+        'Todos los campos obligatorios deben estar completos.';
+      return;
+    }
+
+    const index = this.productos.findIndex(
+      (p) => p.nombre === this.selectedProducto.nombre
+    );
+
+    if (index !== -1) {
+      this.productos[index] = { ...this.selectedProducto };
+    }
+
+    this.cerrarEditor();
+  }
 }

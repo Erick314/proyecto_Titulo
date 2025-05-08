@@ -56,7 +56,12 @@
           </td>
           <td>{{ producto.detalles }}</td>
           <td>
-            <span class="material-symbols-outlined mx-1">settings</span>
+            <span
+              class="material-symbols-outlined mx-1"
+              style="cursor: pointer"
+              (click)="abrirEditor(producto)"
+              >settings</span
+            >
             <span class="material-symbols-outlined mx-1">save</span>
             <span class="material-symbols-outlined text-danger mx-1"
               >delete</span
@@ -65,5 +70,55 @@
         </tr>
       </tbody>
     </table>
+  </div>
+  <!-- Tarjeta de edición -->
+  <div class="overlay" *ngIf="selectedProducto" (click)="cerrarEditor()">
+    <div class="edit-card" (click)="$event.stopPropagation()">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="m-0">Editar Producto</h5>
+        <button
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="cerrarEditor()"
+        ></button>
+      </div>
+
+      <div *ngIf="validationError" class="alert alert-danger py-1">
+        {{ validationError }}
+      </div>
+
+      <div>
+        <label class="form-label"
+          >Nombre <span class="text-danger">*</span></label
+        >
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="selectedProducto.nombre"
+          required
+        />
+
+        <label class="form-label"
+          >Stock <span class="text-danger">*</span></label
+        >
+        <input
+          type="number"
+          class="form-control mb-2"
+          [(ngModel)]="selectedProducto.stock"
+          required
+        />
+
+        <label class="form-label">Detalles</label>
+        <textarea
+          class="form-control mb-3"
+          rows="2"
+          [(ngModel)]="selectedProducto.detalles"
+        ></textarea>
+
+        <button class="btn btn-success w-100" (click)="guardarProducto()">
+          Guardar
+        </button>
+      </div>
+    </div>
   </div>
 </div>
