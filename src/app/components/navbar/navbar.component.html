@@ -1,0 +1,16 @@
+<div class="sidebar" [class.closed]="!menuOpen" [class.open]="menuOpen">
+  <div class="hamburger" [class.active]="menuOpen" (click)="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <nav>
+    <a routerLink="/inventario" class="btn btn-inventario">INVENTARIO</a>
+    <a routerLink="/facturas" class="btn btn-seccion">FACTURAS</a>
+    <a routerLink="/proveedores" class="btn btn-seccion">PROVEEDORES</a>
+    <a routerLink="/sucursales" class="btn btn-seccion">SUCURSALES</a>
+    <a routerLink="/configuracion" class="btn btn-seccion">CONFIGURACIÓN</a>
+    <a routerLink="/contacto" class="btn btn-seccion">CONTACTO</a>
+  </nav>
+</div>
