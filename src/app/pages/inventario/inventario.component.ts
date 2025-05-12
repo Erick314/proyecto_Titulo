@@ -240,4 +240,22 @@ export class InventarioComponent {
   cerrarHistorial() {
     this.productoSeleccionado = null;
   }
+
+  //Método para filtrar
+
+  searchTerm: string = '';
+  productosFiltrados: ProductoConHistorial[] = [...this.productos]; // Inicialmente, muestra todos los productos
+
+  applyFilter() {
+    this.productosFiltrados = this.productos.filter(
+      (producto) =>
+        producto.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        producto.detalles
+          ?.toLowerCase()
+          .includes(this.searchTerm.toLowerCase()) ||
+        producto.descripcion
+          .toLowerCase()
+          .includes(this.searchTerm.toLowerCase())
+    );
+  }
 }
