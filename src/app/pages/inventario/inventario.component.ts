@@ -51,4 +51,35 @@ export class InventarioComponent {
 
     this.cerrarEditor();
   }
+
+  incrementarStock(producto: any) {
+    producto.stock++;
+  }
+
+  decrementarStock(producto: any) {
+    if (producto.stock > 0) {
+      producto.stock--;
+    }
+  }
+  //esto guarda la variables de forma local pero tengo mis dudas al respecto ******************* modificar con BD
+
+  guardarProductofila(productoParaGuardar: any) {
+    // Encontramos el índice del producto en el array 'productos'
+    const index = this.productos.findIndex(
+      (p) => p.nombre === productoParaGuardar.nombre
+    );
+
+    if (index !== -1) {
+      // Actualizamos el objeto en el array 'productos' con los valores del
+      // 'productoParaGuardar'. Esto simula la persistencia local.
+      this.productos[index] = { ...productoParaGuardar };
+      console.log(
+        `Producto "${productoParaGuardar.nombre}" guardado localmente.`
+      );
+    } else {
+      console.log(
+        `No se encontró el producto "${productoParaGuardar.nombre}" para guardar.`
+      );
+    }
+  }
 }

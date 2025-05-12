@@ -46,12 +46,24 @@
       </thead>
       <tbody>
         <tr *ngFor="let producto of productos">
-          <td class="fw-semibold">{{ producto.nombre }}</td>
+          <td class="fw-semibold">
+            {{ producto.nombre }}
+          </td>
           <td>
             <div class="d-flex justify-content-center align-items-center gap-2">
-              <span class="text-danger fs-4">➖</span>
+              <span
+                class="text-danger fs-4"
+                style="cursor: pointer"
+                (click)="decrementarStock(producto)"
+                >➖</span
+              >
               {{ producto.stock }}
-              <span class="text-success fs-4">➕</span>
+              <span
+                class="text-success fs-4"
+                style="cursor: pointer"
+                (click)="incrementarStock(producto)"
+                >➕</span
+              >
             </div>
           </td>
           <td>{{ producto.detalles }}</td>
@@ -62,7 +74,12 @@
               (click)="abrirEditor(producto)"
               >settings</span
             >
-            <span class="material-symbols-outlined mx-1">save</span>
+            <span
+              style="cursor: pointer"
+              class="material-symbols-outlined mx-1"
+              (click)="guardarProductofila(producto)"
+              >save</span
+            >
             <span class="material-symbols-outlined text-danger mx-1"
               >delete</span
             >
