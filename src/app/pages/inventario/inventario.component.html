@@ -75,9 +75,9 @@
               >settings</span
             >
             <span
-              style="cursor: pointer"
               class="material-symbols-outlined mx-1"
-              (click)="guardarProductofila(producto)"
+              style="cursor: pointer"
+              (click)="solicitarConfirmacionGuardado(producto)"
               >save</span
             >
             <span class="material-symbols-outlined text-danger mx-1"
@@ -87,6 +87,20 @@
         </tr>
       </tbody>
     </table>
+  </div>
+  <!-- POPUP DE CONFIRMACIÓN -->
+  <div class="overlay" *ngIf="mostrarModalConfirmacion">
+    <div class="edit-card">
+      <h2>¿DESEA CONFIRMAR LOS CAMBIOS EN {{ productoAConfirmar?.nombre }}?</h2>
+      <div class="modal-buttons">
+        <button class="confirm-button" (click)="confirmarGuardado()">
+          CONFIRMAR
+        </button>
+        <button class="cancel-button" (click)="cerrarModalConfirmacion()">
+          CANCELAR
+        </button>
+      </div>
+    </div>
   </div>
   <!-- Tarjeta de edición -->
   <div class="overlay" *ngIf="selectedProducto" (click)="cerrarEditor()">

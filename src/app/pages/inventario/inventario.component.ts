@@ -12,15 +12,13 @@ import { RouterModule } from '@angular/router';
 })
 export class InventarioComponent {
   productos = [
-    {
-      nombre: 'COLA DE MONO CAPEL',
-      stock: 25,
-      detalles: '',
-    },
-    { nombre: '', stock: '', detalles: '' },
-    { nombre: '', stock: '', detalles: '' },
+    { id: 1, nombre: 'COLA DE MONO CAPEL', stock: 25, detalles: '' },
+    { id: 2, nombre: 'PISCO BAUZA', stock: 15, detalles: '750cc' },
+    { id: 3, nombre: 'RON PAMPERO', stock: 30, detalles: 'Carta Oro' },
   ];
-
+  //flags para el popup de confirmación
+  mostrarModalConfirmacion = false;
+  productoAConfirmar: any = null;
   selectedProducto: any = null;
   validationError = '';
 
@@ -81,5 +79,29 @@ export class InventarioComponent {
         `No se encontró el producto "${productoParaGuardar.nombre}" para guardar.`
       );
     }
+  }
+
+  solicitarConfirmacionGuardado(producto: any) {
+    this.productoAConfirmar = { ...producto }; // Guarda una copia para no modificar directamente la lista
+    this.mostrarModalConfirmacion = true;
+  }
+
+  confirmarGuardado() {
+    if (this.productoAConfirmar) {
+      const index = this.productos.findIndex(
+        (p) => p.id === this.productoAConfirmar.id
+      );
+      if (index !== -1) {
+        this.productos[index] = { ...this.productoAConfirmar }; // Actualiza con la copia
+        console.log(`Producto "${this.productoAConfirmar.nombre}" guardado.`);
+        this.cerrarModalConfirmacion();
+        // Aquí podrías llamar a tu servicio para guardar en el backend si lo tuvieras
+      }
+    }
+  }
+
+  cerrarModalConfirmacion() {
+    this.mostrarModalConfirmacion = false;
+    this.productoAConfirmar = null;
   }
 }

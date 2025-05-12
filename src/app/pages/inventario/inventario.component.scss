@@ -45,3 +45,27 @@ button.form-control {
   max-width: 500px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
+
+.modal-buttons {
+  margin-top: 20px;
+}
+
+.confirm-button,
+.cancel-button {
+  padding: 10px 20px;
+  margin: 0 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.confirm-button {
+  background-color: #4caf50; /* Verde */
+  color: white;
+}
+
+.cancel-button {
+  background-color: #f44336; /* Rojo */
+  color: white;
+}
