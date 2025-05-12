@@ -69,3 +69,25 @@ button.form-control {
   background-color: #f44336; /* Rojo */
   color: white;
 }
+
+.detalle-producto-card {
+  /* ... tus estilos generales para la tarjeta ... */
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  text-align: left; /* Alinea el texto a la izquierda para mejor lectura en tarjetas más anchas */
+}
+
+.historial-modal-content {
+  width: 70%; /* Ajusta el ancho según necesites */
+  max-width: 800px; /* Establece un ancho máximo si es necesario */
+  /* height: 60%; /* También puedes ajustar la altura si lo deseas */
+  /* max-height: 500px; */
+  padding: 30px; /* Aumenta el padding para dar más espacio interior */
+}
+.historial-tabla {
+  width: 100%; /* Asegura que la tabla intente ocupar el 100% del ancho de su contenedor */
+  border-collapse: collapse;
+  margin-top: 15px;
+}

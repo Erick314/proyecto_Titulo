@@ -47,7 +47,11 @@
       <tbody>
         <tr *ngFor="let producto of productos">
           <td class="fw-semibold">
-            {{ producto.nombre }}
+            <a
+              style="cursor: pointer"
+              (click)="mostrarHistorial(producto.id)"
+              >{{ producto.nombre }}</a
+            >
           </td>
           <td>
             <div class="d-flex justify-content-center align-items-center gap-2">
@@ -151,5 +155,51 @@
         </button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Tarjeta de datos y movimientos -->
+<div class="overlay" *ngIf="productoSeleccionado" (click)="cerrarHistorial()">
+  <div
+    class="detalle-producto-card edit-card historial-modal-content"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h2>{{ productoSeleccionado.nombre | uppercase }}</h2>
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Cerrar"
+        (click)="cerrarHistorial()"
+      ></button>
+    </div>
+    <p class="descripcion">{{ productoSeleccionado.descripcion }}</p>
+
+    <table class="historial-tabla">
+      <thead>
+        <tr>
+          <th>STOCK AL MOVIMIENTO</th>
+          <th>MOVIMIENTO</th>
+          <th>FECHA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let movimiento of productoSeleccionado.historialMovimientos"
+        >
+          <td>{{ movimiento.cantidad }}</td>
+          <td>
+            <span *ngIf="movimiento.tipo === 'ENTRADA'" class="text-success"
+              >▶</span
+            >
+            <span *ngIf="movimiento.tipo === 'SALIDA'" class="text-danger"
+              >◀</span
+            >
+            {{ movimiento.tipo }}
+          </td>
+          <td>{{ movimiento.fecha | date : "dd/MM/yyyy" }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>

@@ -3,6 +3,21 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
+interface Movimiento {
+  cantidad: number;
+  tipo: 'ENTRADA' | 'SALIDA';
+  fecha: Date;
+}
+
+interface ProductoConHistorial {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  historialMovimientos: Movimiento[];
+  stock?: number; // Añadimos '?' para indicar que es opcional en la interfaz, pero lo definiremos en los objetos
+  detalles?: string; // Añadimos '?' para indicar que es opcional en la interfaz, pero lo definiremos en los objetos
+}
+
 @Component({
   selector: 'app-inventario',
   standalone: true,
@@ -11,12 +26,40 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./inventario.component.scss'],
 })
 export class InventarioComponent {
-  productos = [
-    { id: 1, nombre: 'COLA DE MONO CAPEL', stock: 25, detalles: '' },
-    { id: 2, nombre: 'PISCO BAUZA', stock: 15, detalles: '750cc' },
-    { id: 3, nombre: 'RON PAMPERO', stock: 30, detalles: 'Carta Oro' },
+  productos: ProductoConHistorial[] = [
+    {
+      id: 1,
+      nombre: 'COLA DE MONO CAPEL',
+      descripcion:
+        'El Campanario Cola de Mono 700cc es una deliciosa bebida navideña típica de Chile...',
+      historialMovimientos: [
+        { cantidad: 20, tipo: 'ENTRADA', fecha: new Date('2025-05-10') },
+        { cantidad: 50, tipo: 'ENTRADA', fecha: new Date('2025-05-05') },
+        { cantidad: 30, tipo: 'SALIDA', fecha: new Date('2025-05-11') },
+      ],
+      stock: 25, // Añadimos la propiedad stock
+      detalles: '', // Añadimos la propiedad detalles
+    },
+    {
+      id: 2,
+      nombre: 'PISCO BAUZA',
+      descripcion: 'Pisco chileno de alta calidad, ideal para cócteles.',
+      historialMovimientos: [],
+      stock: 15, // Añadimos la propiedad stock
+      detalles: '750cc', // Añadimos la propiedad detalles
+    },
+    {
+      id: 3,
+      nombre: 'RON PAMPERO',
+      descripcion:
+        'Ron venezolano añejo, perfecto para disfrutar solo o en mezclas.',
+      historialMovimientos: [],
+      stock: 30, // Añadimos la propiedad stock
+      detalles: 'Carta Oro', // Añadimos la propiedad detalles
+    },
   ];
   //flags para el popup de confirmación
+  productoSeleccionado: ProductoConHistorial | null = null;
   mostrarModalConfirmacion = false;
   productoAConfirmar: any = null;
   selectedProducto: any = null;
@@ -103,5 +146,17 @@ export class InventarioComponent {
   cerrarModalConfirmacion() {
     this.mostrarModalConfirmacion = false;
     this.productoAConfirmar = null;
+  }
+
+  mostrarHistorial(productoId: number) {
+    this.productoSeleccionado =
+      this.productos.find((p) => p.id === productoId) || null;
+    console.log(
+      'Producto seleccionado para historial:',
+      this.productoSeleccionado
+    ); // Agrega esto para debugging
+  }
+  cerrarHistorial() {
+    this.productoSeleccionado = null;
   }
 }
