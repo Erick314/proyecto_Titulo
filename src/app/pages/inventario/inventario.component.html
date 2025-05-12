@@ -84,7 +84,10 @@
               (click)="solicitarConfirmacionGuardado(producto)"
               >save</span
             >
-            <span class="material-symbols-outlined text-danger mx-1"
+            <span
+              class="material-symbols-outlined text-danger mx-1"
+              style="cursor: pointer"
+              (click)="solicitarConfirmacionEliminar(producto)"
               >delete</span
             >
           </td>
@@ -95,9 +98,9 @@
   <!-- POPUP DE CONFIRMACIÓN -->
   <div class="overlay" *ngIf="mostrarModalConfirmacion">
     <div class="edit-card">
-      <h2>¿DESEA CONFIRMAR LOS CAMBIOS EN {{ productoAConfirmar?.nombre }}?</h2>
+      <h2>{{ mensajeConfirmacion }}</h2>
       <div class="modal-buttons">
-        <button class="confirm-button" (click)="confirmarGuardado()">
+        <button class="confirm-button" (click)="confirmarAccion()">
           CONFIRMAR
         </button>
         <button class="cancel-button" (click)="cerrarModalConfirmacion()">

@@ -74,6 +74,8 @@ export class InventarioComponent {
   productoAConfirmar: any = null;
   selectedProducto: any = null;
   validationError = '';
+  mensajeConfirmacion = ''; // Nuevo mensaje para el popup
+  productoAEliminar: any = null; // Producto a eliminar
 
   displayedColumns: string[] = ['cantidad', 'tipo', 'fecha'];
   dataSource: MatTableDataSource<Movimiento> =
@@ -122,14 +124,10 @@ export class InventarioComponent {
   //esto guarda la variables de forma local pero tengo mis dudas al respecto ******************* modificar con BD
 
   guardarProductofila(productoParaGuardar: any) {
-    // Encontramos el índice del producto en el array 'productos'
     const index = this.productos.findIndex(
       (p) => p.nombre === productoParaGuardar.nombre
     );
-
     if (index !== -1) {
-      // Actualizamos el objeto en el array 'productos' con los valores del
-      // 'productoParaGuardar'. Esto simula la persistencia local.
       this.productos[index] = { ...productoParaGuardar };
       console.log(
         `Producto "${productoParaGuardar.nombre}" guardado localmente.`
@@ -142,8 +140,10 @@ export class InventarioComponent {
   }
 
   solicitarConfirmacionGuardado(producto: any) {
-    this.productoAConfirmar = { ...producto }; // Guarda una copia para no modificar directamente la lista
+    this.productoAConfirmar = { ...producto };
+    this.mensajeConfirmacion = `¿DESEA CONFIRMAR LOS CAMBIOS EN ${producto.nombre}?`;
     this.mostrarModalConfirmacion = true;
+    this.productoAEliminar = null;
   }
 
   confirmarGuardado() {
@@ -156,6 +156,64 @@ export class InventarioComponent {
         console.log(`Producto "${this.productoAConfirmar.nombre}" guardado.`);
         this.cerrarModalConfirmacion();
         // Aquí podrías llamar a tu servicio para guardar en el backend si lo tuvieras
+      }
+    }
+  }
+
+  solicitarConfirmacionEliminar(producto: any) {
+    this.productoAEliminar = { ...producto };
+    this.mensajeConfirmacion = `¿DESEA ELIMINAR EL PRODUCTO "${producto.nombre}"?`;
+    this.mostrarModalConfirmacion = true;
+    this.productoAConfirmar = null;
+  }
+
+  confirmarAccion() {
+    if (this.productoAConfirmar) {
+      this.guardarCambiosConfirmados();
+    } else if (this.productoAEliminar) {
+      this.eliminarProductoConfirmado();
+    }
+  }
+
+  guardarCambiosConfirmados() {
+    if (this.productoAConfirmar) {
+      const index = this.productos.findIndex(
+        (p) => p.id === this.productoAConfirmar.id
+      );
+      if (index !== -1) {
+        this.productos[index] = { ...this.productoAConfirmar };
+        console.log(`Producto "${this.productoAConfirmar.nombre}" guardado.`);
+        this.cerrarModalConfirmacion();
+      }
+    }
+  }
+
+  eliminarProductoConfirmado() {
+    if (this.productoAEliminar) {
+      const index = this.productos.findIndex(
+        (p) => p.id === this.productoAEliminar.id
+      );
+      if (index !== -1) {
+        this.productos.splice(index, 1);
+        console.log(`Producto "${this.productoAEliminar.nombre}" eliminado.`);
+        if (this.productoSeleccionado?.id === this.productoAEliminar.id) {
+          this.cerrarHistorial();
+        }
+      }
+    }
+    this.cerrarModalConfirmacion();
+  }
+
+  eliminarProducto(productoAEliminar: any) {
+    const index = this.productos.findIndex(
+      (p) => p.id === productoAEliminar.id
+    );
+    if (index !== -1) {
+      this.productos.splice(index, 1);
+      console.log(`Producto "${productoAEliminar.nombre}" eliminado.`);
+      // Si la tabla de historial está abierta para el producto eliminado, la cerramos
+      if (this.productoSeleccionado?.id === productoAEliminar.id) {
+        this.cerrarHistorial();
       }
     }
   }
