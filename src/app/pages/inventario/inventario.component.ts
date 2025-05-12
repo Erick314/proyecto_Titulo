@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 
 interface Movimiento {
   cantidad: number;
@@ -14,14 +17,21 @@ interface ProductoConHistorial {
   nombre: string;
   descripcion: string;
   historialMovimientos: Movimiento[];
-  stock?: number; // Añadimos '?' para indicar que es opcional en la interfaz, pero lo definiremos en los objetos
-  detalles?: string; // Añadimos '?' para indicar que es opcional en la interfaz, pero lo definiremos en los objetos
+  stock?: number;
+  detalles?: string;
 }
 
 @Component({
   selector: 'app-inventario',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+  ],
   templateUrl: './inventario.component.html',
   styleUrls: ['./inventario.component.scss'],
 })
@@ -31,7 +41,7 @@ export class InventarioComponent {
       id: 1,
       nombre: 'COLA DE MONO CAPEL',
       descripcion:
-        'El Campanario Cola de Mono 700cc es una deliciosa bebida navideña típica de Chile...',
+        'El Campanario Cola de Mono 700cc es una deliciosa bebida navideña típica de Chile, perfecta para compartir en familia y amigos durante las fiestas de fin de año. Esta bebida se elabora con pisco chileno, leche condensada, canela y café, lo que le da un sabor único y delicioso.Con su tamaño de 700cc, el Campanario Cola de Mono es ideal para compartir en reuniones y celebraciones. Además, su presentación en una botella de vidrio con un diseño elegante y festivo lo convierte en un regalo perfecto para cualquier amante de las bebidas navideñas.Sorprende a tus seres queridos con el delicioso sabor del Campanario Cola de Mono 700cc y disfruta de una Navidad llena de alegría y sabor.',
       historialMovimientos: [
         { cantidad: 20, tipo: 'ENTRADA', fecha: new Date('2025-05-10') },
         { cantidad: 50, tipo: 'ENTRADA', fecha: new Date('2025-05-05') },
@@ -64,6 +74,13 @@ export class InventarioComponent {
   productoAConfirmar: any = null;
   selectedProducto: any = null;
   validationError = '';
+
+  displayedColumns: string[] = ['cantidad', 'tipo', 'fecha'];
+  dataSource: MatTableDataSource<Movimiento> =
+    new MatTableDataSource<Movimiento>([]);
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   abrirEditor(producto: any) {
     this.selectedProducto = { ...producto }; // copia
@@ -151,11 +168,17 @@ export class InventarioComponent {
   mostrarHistorial(productoId: number) {
     this.productoSeleccionado =
       this.productos.find((p) => p.id === productoId) || null;
-    console.log(
-      'Producto seleccionado para historial:',
-      this.productoSeleccionado
-    ); // Agrega esto para debugging
+    if (this.productoSeleccionado?.historialMovimientos) {
+      this.dataSource = new MatTableDataSource<Movimiento>(
+        this.productoSeleccionado.historialMovimientos
+      );
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    } else {
+      this.dataSource = new MatTableDataSource<Movimiento>([]); // Especificamos el tipo genérico
+    }
   }
+
   cerrarHistorial() {
     this.productoSeleccionado = null;
   }
