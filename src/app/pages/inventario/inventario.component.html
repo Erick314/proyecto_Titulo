@@ -1,38 +1,50 @@
 <div class="container-fluid bg-warning-subtle min-vh-100 py-4">
-  <h2 class="text-center fw-bold mb-4">INVENTARIO</h2>
+  <div class="row">
+    <h2 class="text-center fw-bold mb-4">INVENTARIO</h2>
 
-  <div class="row justify-content-center mb-4 gap-2 px-3 flex-wrap text-center">
-    <div class="col-auto">
-      <button
-        class="form-control rounded-pill px-4 py-2 d-flex align-items-center justify-content-between gap-2"
-      >
-        <span>Sucursal</span>
-        <span class="material-symbols-outlined">expand_more</span>
-      </button>
-    </div>
-
-    <div class="col-auto">
-      <div class="input-group rounded-pill">
-        <span class="input-group-text bg-white border-end-0">
-          <span class="material-symbols-outlined">search</span>
-        </span>
-        <input
-          type="text"
-          class="form-control border-start-0"
-          placeholder="Buscar un producto"
-          [(ngModel)]="searchTerm"
-          (input)="applyFilter()"
-        />
+    <div
+      class="row justify-content-center mb-4 gap-2 px-3 flex-wrap text-center"
+    >
+      <div class="col-auto">
+        <button
+          class="form-control rounded-pill px-4 py-2 d-flex align-items-center justify-content-between gap-2"
+        >
+          <span>Sucursal</span>
+          <span class="material-symbols-outlined">expand_more</span>
+        </button>
       </div>
-    </div>
 
-    <div class="col-auto">
-      <button
-        class="form-control rounded-pill px-4 py-2 d-flex align-items-center gap-2 bg-success-subtle"
-      >
-        <span class="material-symbols-outlined text-success">add</span>
-        Nuevo Producto
-      </button>
+      <div class="col-auto">
+        <div class="input-group rounded-pill d-flex align-items-center">
+          <span
+            class="input-group-text bg-white border-end-0"
+            style="line-height: 1"
+          >
+            <span
+              class="material-symbols-outlined"
+              style="font-size: 24px; vertical-align: middle"
+              >search</span
+            >
+          </span>
+          <input
+            type="text"
+            class="form-control border-start-0"
+            placeholder="Buscar un producto"
+            [(ngModel)]="searchTerm"
+            (input)="applyFilter()"
+          />
+        </div>
+      </div>
+
+      <div class="col-auto">
+        <button
+          class="form-control rounded-pill px-4 py-2 d-flex align-items-center gap-2 bg-success-subtle"
+          (click)="abrirModalNuevoProducto()"
+        >
+          <span class="material-symbols-outlined text-success">add</span>
+          Nuevo Producto
+        </button>
+      </div>
     </div>
   </div>
 
@@ -214,5 +226,48 @@
       [pageSizeOptions]="[5, 10, 25, 100]"
       [pageSize]="5"
     ></mat-paginator>
+  </div>
+</div>
+
+<!-- Tarjeta de nuevo producto -->
+
+<div class="overlay" *ngIf="mostrarModalNuevoProducto">
+  <div class="nuevo-producto-card">
+    <h2>NUEVO PRODUCTO</h2>
+    <div class="form-group">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Nombre Producto"
+        [(ngModel)]="nuevoProducto.nombre"
+      />
+    </div>
+    <div class="form-group">
+      <input
+        type="number"
+        class="form-control"
+        placeholder="Cantidad"
+        [(ngModel)]="nuevoProducto.stock"
+      />
+    </div>
+    <div class="form-group">
+      <textarea
+        class="form-control"
+        placeholder="Descripción"
+        [(ngModel)]="nuevoProducto.descripcion"
+      ></textarea>
+    </div>
+    <button
+      class="btn btn-primary agregar-button"
+      (click)="agregarNuevoProducto()"
+    >
+      AGREGAR
+    </button>
+    <button
+      class="btn btn-secondary cancelar-button"
+      (click)="cerrarModalNuevoProducto()"
+    >
+      CANCELAR
+    </button>
   </div>
 </div>

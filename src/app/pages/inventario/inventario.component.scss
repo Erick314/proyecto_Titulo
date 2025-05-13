@@ -100,3 +100,68 @@ button.form-control {
 .mat-table {
   width: 100%;
 }
+
+.nuevo-producto-card {
+  background-color: #f8f9fa; /* Un fondo claro para la tarjeta */
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 80%; /* Ajusta el ancho según necesites */
+  max-width: 400px;
+}
+
+.nuevo-producto-card h2 {
+  margin-bottom: 20px;
+  color: #28a745; /* Un color que combine con el botón de "Nuevo Producto" */
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 5px;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.agregar-button {
+  background-color: #ffc107; /* Un color amarillo como en el mockup */
+  color: #212529;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+
+.agregar-button:hover {
+  background-color: #e0a800;
+}
+
+.cancelar-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.cancelar-button:hover {
+  background-color: #5a6268;
+}

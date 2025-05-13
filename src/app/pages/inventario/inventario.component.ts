@@ -76,6 +76,9 @@ export class InventarioComponent {
   validationError = '';
   mensajeConfirmacion = ''; // Nuevo mensaje para el popup
   productoAEliminar: any = null; // Producto a eliminar
+  nuevoProducto: { nombre: string; stock: number | null; descripcion: string } =
+    { nombre: '', stock: null, descripcion: '' };
+  mostrarModalNuevoProducto = false; // Nueva propiedad para controlar el modal de nuevo producto
 
   displayedColumns: string[] = ['cantidad', 'tipo', 'fecha'];
   dataSource: MatTableDataSource<Movimiento> =
@@ -83,6 +86,18 @@ export class InventarioComponent {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+
+  //Funciones de incrementar y decrementar con los simbolos
+
+  incrementarStock(producto: any) {
+    producto.stock++;
+  }
+
+  decrementarStock(producto: any) {
+    if (producto.stock > 0) {
+      producto.stock--;
+    }
+  }
 
   abrirEditor(producto: any) {
     this.selectedProducto = { ...producto }; // copia
@@ -95,32 +110,24 @@ export class InventarioComponent {
   }
 
   guardarProducto() {
-    if (!this.selectedProducto.nombre || this.selectedProducto.stock === '') {
+    if (
+      !this.selectedProducto.nombre ||
+      this.selectedProducto.stock === null ||
+      this.selectedProducto.stock === undefined
+    ) {
       this.validationError =
         'Todos los campos obligatorios deben estar completos.';
       return;
     }
-
-    const index = this.productos.findIndex(
-      (p) => p.nombre === this.selectedProducto.nombre
-    );
-
-    if (index !== -1) {
-      this.productos[index] = { ...this.selectedProducto };
-    }
-
-    this.cerrarEditor();
+    this.productoAConfirmar = {
+      id: this.selectedProducto.id,
+      ...this.selectedProducto,
+    }; // Guardamos el id y los cambios
+    this.mensajeConfirmacion = `¿DESEA CONFIRMAR LOS CAMBIOS EN ${this.selectedProducto.nombre}?`;
+    this.mostrarModalConfirmacion = true;
+    this.cerrarEditor(); // Cerramos el editor después de solicitar la confirmación
   }
 
-  incrementarStock(producto: any) {
-    producto.stock++;
-  }
-
-  decrementarStock(producto: any) {
-    if (producto.stock > 0) {
-      producto.stock--;
-    }
-  }
   //esto guarda la variables de forma local pero tengo mis dudas al respecto ******************* modificar con BD
 
   guardarProductofila(productoParaGuardar: any) {
@@ -139,6 +146,7 @@ export class InventarioComponent {
     }
   }
 
+  //Esto es para el botón de guardar pero al no tener bd no se si funciona
   solicitarConfirmacionGuardado(producto: any) {
     this.productoAConfirmar = { ...producto };
     this.mensajeConfirmacion = `¿DESEA CONFIRMAR LOS CAMBIOS EN ${producto.nombre}?`;
@@ -152,26 +160,50 @@ export class InventarioComponent {
         (p) => p.id === this.productoAConfirmar.id
       );
       if (index !== -1) {
-        this.productos[index] = { ...this.productoAConfirmar }; // Actualiza con la copia
+        this.productos[index] = { ...this.productoAConfirmar };
+        this.productosFiltrados = [...this.productos]; // Actualiza la lista filtrada
         console.log(`Producto "${this.productoAConfirmar.nombre}" guardado.`);
         this.cerrarModalConfirmacion();
-        // Aquí podrías llamar a tu servicio para guardar en el backend si lo tuvieras
+      } else {
+        console.log(
+          `No se encontró el producto con ID ${this.productoAConfirmar.id} para actualizar.`
+        );
       }
     }
   }
+
+  //Funciones de eliminar
 
   solicitarConfirmacionEliminar(producto: any) {
     this.productoAEliminar = { ...producto };
     this.mensajeConfirmacion = `¿DESEA ELIMINAR EL PRODUCTO "${producto.nombre}"?`;
     this.mostrarModalConfirmacion = true;
-    this.productoAConfirmar = null;
+    this.productoAConfirmar = null; // Aseguramos que la variable de guardar esté nula
+  }
+
+  confirmarEliminar() {
+    if (this.productoAEliminar) {
+      const index = this.productos.findIndex(
+        (p) => p.id === this.productoAEliminar.id
+      );
+      if (index !== -1) {
+        this.productos.splice(index, 1);
+        this.productosFiltrados = [...this.productos]; // Actualiza la lista filtrada
+        console.log(`Producto "${this.productoAEliminar.nombre}" eliminado.`);
+        if (this.productoSeleccionado?.id === this.productoAEliminar.id) {
+          this.cerrarHistorial();
+        }
+      }
+    }
+    this.cerrarModalConfirmacion();
+    this.productoAEliminar = null; // Limpiamos la variable después de la acción
   }
 
   confirmarAccion() {
     if (this.productoAConfirmar) {
-      this.guardarCambiosConfirmados();
+      this.confirmarGuardado();
     } else if (this.productoAEliminar) {
-      this.eliminarProductoConfirmado();
+      this.confirmarEliminar(); // Llama al nuevo método de eliminación
     }
   }
 
@@ -218,6 +250,8 @@ export class InventarioComponent {
     }
   }
 
+  //Método para ver movimientos
+
   cerrarModalConfirmacion() {
     this.mostrarModalConfirmacion = false;
     this.productoAConfirmar = null;
@@ -257,5 +291,47 @@ export class InventarioComponent {
           .toLowerCase()
           .includes(this.searchTerm.toLowerCase())
     );
+  }
+
+  //Nuevo producto
+
+  abrirModalNuevoProducto() {
+    this.mostrarModalNuevoProducto = true;
+    this.nuevoProducto = { nombre: '', stock: null, descripcion: '' }; // Resetear el formulario
+  }
+
+  cerrarModalNuevoProducto() {
+    this.mostrarModalNuevoProducto = false;
+  }
+
+  agregarNuevoProducto() {
+    if (this.nuevoProducto.nombre && this.nuevoProducto.stock !== null) {
+      const nuevoId =
+        this.productos.length > 0
+          ? Math.max(...this.productos.map((p) => p.id)) + 1
+          : 1;
+      const nuevoProductoConHistorial: ProductoConHistorial = {
+        id: nuevoId,
+        nombre: this.nuevoProducto.nombre,
+        descripcion: '', // Puedes dejar la descripción vacía o pedirla en otro campo si es necesario
+        historialMovimientos: [
+          {
+            cantidad: this.nuevoProducto.stock,
+            tipo: 'ENTRADA',
+            fecha: new Date(),
+          },
+        ],
+        stock: this.nuevoProducto.stock,
+        detalles: this.nuevoProducto.descripcion, // Asignamos la descripción del modal a la propiedad 'detalles'
+      };
+      console.log('Nuevo producto a agregar:', nuevoProductoConHistorial);
+      this.productos.push(nuevoProductoConHistorial);
+      this.productosFiltrados = [...this.productos];
+      this.cerrarModalNuevoProducto();
+      console.log('Nuevo producto agregado:', nuevoProductoConHistorial);
+      // Aquí podrías llamar a tu servicio para guardar en el backend
+    } else {
+      alert('Por favor, ingrese el nombre y la cantidad del producto.');
+    }
   }
 }
