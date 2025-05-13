@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'Inventario';
+  title = 'inventario';
   menuOpen = true; // por defecto el menú está abierto
 
   constructor(public router: Router) {}
