@@ -168,7 +168,7 @@ export class InventarioComponent implements OnInit, AfterViewInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-
+  //uso de los incrementadores y decrementadores
   incrementarStock(producto: any) {
     producto.stock++;
   }
@@ -178,7 +178,7 @@ export class InventarioComponent implements OnInit, AfterViewInit {
       producto.stock--;
     }
   }
-
+  //Edición de productos
   abrirEditor(producto: any) {
     this.selectedProducto = { ...producto };
     this.validationError = '';
@@ -249,7 +249,7 @@ export class InventarioComponent implements OnInit, AfterViewInit {
       }
     }
   }
-
+  //Eliminar
   solicitarConfirmacionEliminar(producto: any) {
     this.productoAEliminar = { ...producto };
     this.mensajeConfirmacion = `¿DESEA ELIMINAR EL PRODUCTO "${producto.nombre}"?`;
@@ -331,7 +331,7 @@ export class InventarioComponent implements OnInit, AfterViewInit {
     this.mostrarModalConfirmacion = false;
     this.productoAConfirmar = null;
   }
-
+  //Tabla de historial
   mostrarHistorial(productoId: number) {
     this.productoSeleccionado =
       this.productos.find((p) => p.id === productoId) || null;

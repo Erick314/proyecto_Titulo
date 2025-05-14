@@ -1,0 +1,187 @@
+<div class="container-fluid bg-warning-subtle min-vh-100 py-4">
+  <div class="row">
+    <h2 class="text-center fw-bold mb-4">FACTURAS</h2>
+
+    <div
+      class="row justify-content-center mb-4 gap-2 px-3 flex-wrap text-center"
+    >
+      <div class="col-auto">
+        <mat-form-field>
+          <mat-label>Sucursal</mat-label>
+          <mat-select>
+            <mat-option value="todas">Todas</mat-option>
+            <mat-option value="sucursal1">Sucursal 1</mat-option>
+            <mat-option value="sucursal2">Sucursal 2</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-auto">
+        <div class="input-group rounded-pill d-flex align-items-center">
+          <span
+            class="input-group-text bg-white border-end-0"
+            style="line-height: 1"
+          >
+            <span
+              class="material-symbols-outlined"
+              style="font-size: 24px; vertical-align: middle"
+              >search</span
+            >
+          </span>
+          <input
+            type="text"
+            class="form-control border-start-0"
+            placeholder="Buscar factura"
+            [(ngModel)]="searchTerm"
+            (input)="applyFilter()"
+          />
+        </div>
+      </div>
+
+      <div class="col-auto">
+        <button
+          class="form-control rounded-pill px-4 py-2 d-flex align-items-center gap-2 bg-success-subtle"
+          (click)="abrirModalNuevaFactura()"
+        >
+          <span class="material-symbols-outlined text-success">add</span>
+          Nueva Factura
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive px-3">
+    <table
+      mat-table
+      [dataSource]="dataSourceFacturas"
+      class="mat-elevation-z8"
+      matSort
+    >
+      <ng-container matColumnDef="factura">
+        <th mat-header-cell *matHeaderCellDef matSortHeader>Factura</th>
+        <td mat-cell *matCellDef="let factura">{{ factura.numeroFactura }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="proveedor">
+        <th mat-header-cell *matHeaderCellDef matSortHeader>Proveedor</th>
+        <td mat-cell *matCellDef="let factura">
+          {{ factura.nombreProveedor }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="monto">
+        <th mat-header-cell *matHeaderCellDef matSortHeader>Monto</th>
+        <td mat-cell *matCellDef="let factura">
+          {{ factura.monto | currency : "CLP" : "$" : "1.0-0" }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fechaEmision">
+        <th mat-header-cell *matHeaderCellDef matSortHeader>Fecha</th>
+        <td mat-cell *matCellDef="let factura">
+          {{ factura.fechaEmision | date : "dd-MM-yyyy" }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="opciones">
+        <th mat-header-cell *matHeaderCellDef>OPCIONES</th>
+        <td mat-cell *matCellDef="let factura">
+          <span
+            class="material-symbols-outlined mx-1"
+            style="cursor: pointer"
+            (click)="abrirEditorFactura(factura)"
+            >settings</span
+          >
+          <span
+            class="material-symbols-outlined mx-1"
+            style="cursor: pointer"
+            (click)="solicitarConfirmacionGuardadoFactura(factura)"
+            >save</span
+          >
+          <span
+            class="material-symbols-outlined text-danger mx-1"
+            style="cursor: pointer"
+            (click)="solicitarConfirmacionEliminarFactura(factura)"
+            >delete</span
+          >
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsFacturas"></tr>
+      <tr
+        mat-row
+        *matRowDef="let factura; columns: displayedColumnsFacturas"
+      ></tr>
+    </table>
+
+    <mat-paginator
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      showFirstLastButtons
+    ></mat-paginator>
+  </div>
+
+  <div class="overlay" *ngIf="mostrarModalConfirmacion">
+    <div class="edit-card">
+      <h2>{{ mensajeConfirmacion }}</h2>
+      <div class="modal-buttons">
+        <button class="confirm-button" (click)="confirmarAccionFactura()">
+          CONFIRMAR
+        </button>
+        <button class="cancel-button" (click)="cerrarModalConfirmacion()">
+          CANCELAR
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" *ngIf="selectedFactura" (click)="cerrarEditorFactura()">
+    <div class="edit-card" (click)="$event.stopPropagation()">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="m-0">Editar Factura</h5>
+        <button
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="cerrarEditorFactura()"
+        ></button>
+      </div>
+
+      <div *ngIf="validationError" class="alert alert-danger py-1">
+        {{ validationError }}
+      </div>
+
+      <div>
+        <label class="form-label">Número de Factura</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="selectedFactura.numeroFactura"
+        />
+
+        <label class="form-label">Proveedor</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="selectedFactura.nombreProveedor"
+        />
+
+        <label class="form-label">Monto</label>
+        <input
+          type="number"
+          class="form-control mb-2"
+          [(ngModel)]="selectedFactura.monto"
+        />
+
+        <label class="form-label">Fecha de Emisión</label>
+        <input
+          type="date"
+          class="form-control mb-3"
+          [(ngModel)]="selectedFactura.fechaEmision"
+        />
+
+        <button class="btn btn-success w-100" (click)="guardarFactura()">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

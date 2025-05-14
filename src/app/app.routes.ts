@@ -3,10 +3,12 @@ import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { RecoveryComponent } from './pages/recovery/recovery.component';
 import { InventarioComponent } from './pages/inventario/inventario.component';
+import { FacturasComponent } from './pages/facturas/facturas.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'recovery', component: RecoveryComponent },
   { path: 'inventario', component: InventarioComponent },
+  { path: 'facturas', component: FacturasComponent },
 ];
