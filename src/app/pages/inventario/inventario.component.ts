@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -35,7 +35,7 @@ interface ProductoConHistorial {
   templateUrl: './inventario.component.html',
   styleUrls: ['./inventario.component.scss'],
 })
-export class InventarioComponent {
+export class InventarioComponent implements OnInit, AfterViewInit {
   productos: ProductoConHistorial[] = [
     {
       id: 1,
@@ -47,16 +47,16 @@ export class InventarioComponent {
         { cantidad: 50, tipo: 'ENTRADA', fecha: new Date('2025-05-05') },
         { cantidad: 30, tipo: 'SALIDA', fecha: new Date('2025-05-11') },
       ],
-      stock: 25, // Añadimos la propiedad stock
-      detalles: '', // Añadimos la propiedad detalles
+      stock: 25,
+      detalles: '',
     },
     {
       id: 2,
       nombre: 'PISCO BAUZA',
       descripcion: 'Pisco chileno de alta calidad, ideal para cócteles.',
       historialMovimientos: [],
-      stock: 15, // Añadimos la propiedad stock
-      detalles: '750cc', // Añadimos la propiedad detalles
+      stock: 15,
+      detalles: '750cc',
     },
     {
       id: 3,
@@ -64,30 +64,110 @@ export class InventarioComponent {
       descripcion:
         'Ron venezolano añejo, perfecto para disfrutar solo o en mezclas.',
       historialMovimientos: [],
-      stock: 30, // Añadimos la propiedad stock
-      detalles: 'Carta Oro', // Añadimos la propiedad detalles
+      stock: 30,
+      detalles: 'Carta Oro',
+    },
+    {
+      id: 4,
+      nombre: 'VINO CARMENERE',
+      descripcion: 'Vino tinto chileno, suave y afrutado.',
+      historialMovimientos: [],
+      stock: 40,
+      detalles: 'Reserva',
+    },
+    {
+      id: 5,
+      nombre: 'CERVEZA ARTESANAL IPA',
+      descripcion: 'Cerveza con notas amargas y cítricas.',
+      historialMovimientos: [],
+      stock: 20,
+      detalles: 'Lúpulo Cascade',
+    },
+    {
+      id: 6,
+      nombre: 'AGUA MINERAL',
+      descripcion: 'Agua purificada sin gas.',
+      historialMovimientos: [],
+      stock: 100,
+      detalles: '500ml',
+    },
+    {
+      id: 7,
+      nombre: 'JUGO DE NARANJA',
+      descripcion: 'Jugo natural de naranjas frescas.',
+      historialMovimientos: [],
+      stock: 35,
+      detalles: '1 Litro',
+    },
+    {
+      id: 8,
+      nombre: 'GASEOSA COLA',
+      descripcion: 'Refresco carbonatado sabor cola.',
+      historialMovimientos: [],
+      stock: 60,
+      detalles: 'Lata 355ml',
+    },
+    {
+      id: 9,
+      nombre: 'SNACK PAPAS FRITAS',
+      descripcion: 'Papas fritas crujientes y saladas.',
+      historialMovimientos: [],
+      stock: 50,
+      detalles: 'Bolsa 150g',
+    },
+    {
+      id: 10,
+      nombre: 'CHOCOLATE AMARGO',
+      descripcion: 'Chocolate con alto porcentaje de cacao.',
+      historialMovimientos: [],
+      stock: 25,
+      detalles: '70% Cacao',
+    },
+    {
+      id: 11,
+      nombre: 'GALLETAS DE AVENA',
+      descripcion: 'Galletas saludables con hojuelas de avena.',
+      historialMovimientos: [],
+      stock: 45,
+      detalles: 'Paquete 200g',
     },
   ];
-  //flags para el popup de confirmación
+  productosFiltrados: ProductoConHistorial[] = [...this.productos];
+  displayedColumns: string[] = ['nombre', 'stock', 'detalles', 'opciones'];
+  dataSource = new MatTableDataSource<ProductoConHistorial>(
+    this.productosFiltrados
+  ); // Especifica el tipo
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+  // Propiedades para el historial
+  displayedColumnsHistorial: string[] = ['cantidad', 'tipo', 'fecha'];
+  dataSourceHistorial = new MatTableDataSource<Movimiento>([]); // DataSource para el historial
+  @ViewChild('paginatorHistorial') paginatorHistorial!: MatPaginator; // Referencia al paginador del historial
+  @ViewChild('sortHistorial') sortHistorial!: MatSort; // Referencia al sort del historial
+
   productoSeleccionado: ProductoConHistorial | null = null;
   mostrarModalConfirmacion = false;
   productoAConfirmar: any = null;
   selectedProducto: any = null;
   validationError = '';
-  mensajeConfirmacion = ''; // Nuevo mensaje para el popup
-  productoAEliminar: any = null; // Producto a eliminar
+  mensajeConfirmacion = '';
+  productoAEliminar: any = null;
   nuevoProducto: { nombre: string; stock: number | null; descripcion: string } =
     { nombre: '', stock: null, descripcion: '' };
-  mostrarModalNuevoProducto = false; // Nueva propiedad para controlar el modal de nuevo producto
+  mostrarModalNuevoProducto = false;
+  searchTerm: string = '';
 
-  displayedColumns: string[] = ['cantidad', 'tipo', 'fecha'];
-  dataSource: MatTableDataSource<Movimiento> =
-    new MatTableDataSource<Movimiento>([]);
+  constructor() {}
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  ngOnInit() {
+    this.dataSource = new MatTableDataSource(this.productosFiltrados);
+  }
 
-  //Funciones de incrementar y decrementar con los simbolos
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
 
   incrementarStock(producto: any) {
     producto.stock++;
@@ -100,7 +180,7 @@ export class InventarioComponent {
   }
 
   abrirEditor(producto: any) {
-    this.selectedProducto = { ...producto }; // copia
+    this.selectedProducto = { ...producto };
     this.validationError = '';
   }
 
@@ -122,13 +202,11 @@ export class InventarioComponent {
     this.productoAConfirmar = {
       id: this.selectedProducto.id,
       ...this.selectedProducto,
-    }; // Guardamos el id y los cambios
+    };
     this.mensajeConfirmacion = `¿DESEA CONFIRMAR LOS CAMBIOS EN ${this.selectedProducto.nombre}?`;
     this.mostrarModalConfirmacion = true;
-    this.cerrarEditor(); // Cerramos el editor después de solicitar la confirmación
+    this.cerrarEditor();
   }
-
-  //esto guarda la variables de forma local pero tengo mis dudas al respecto ******************* modificar con BD
 
   guardarProductofila(productoParaGuardar: any) {
     const index = this.productos.findIndex(
@@ -146,7 +224,6 @@ export class InventarioComponent {
     }
   }
 
-  //Esto es para el botón de guardar pero al no tener bd no se si funciona
   solicitarConfirmacionGuardado(producto: any) {
     this.productoAConfirmar = { ...producto };
     this.mensajeConfirmacion = `¿DESEA CONFIRMAR LOS CAMBIOS EN ${producto.nombre}?`;
@@ -161,7 +238,8 @@ export class InventarioComponent {
       );
       if (index !== -1) {
         this.productos[index] = { ...this.productoAConfirmar };
-        this.productosFiltrados = [...this.productos]; // Actualiza la lista filtrada
+        this.productosFiltrados = [...this.productos];
+        this.dataSource.data = this.productosFiltrados; // Actualiza el DataSource
         console.log(`Producto "${this.productoAConfirmar.nombre}" guardado.`);
         this.cerrarModalConfirmacion();
       } else {
@@ -172,13 +250,19 @@ export class InventarioComponent {
     }
   }
 
-  //Funciones de eliminar
-
   solicitarConfirmacionEliminar(producto: any) {
     this.productoAEliminar = { ...producto };
     this.mensajeConfirmacion = `¿DESEA ELIMINAR EL PRODUCTO "${producto.nombre}"?`;
     this.mostrarModalConfirmacion = true;
-    this.productoAConfirmar = null; // Aseguramos que la variable de guardar esté nula
+    this.productoAConfirmar = null;
+  }
+
+  confirmarAccion() {
+    if (this.productoAConfirmar) {
+      this.confirmarGuardado();
+    } else if (this.productoAEliminar) {
+      this.confirmarEliminar();
+    }
   }
 
   confirmarEliminar() {
@@ -188,7 +272,8 @@ export class InventarioComponent {
       );
       if (index !== -1) {
         this.productos.splice(index, 1);
-        this.productosFiltrados = [...this.productos]; // Actualiza la lista filtrada
+        this.productosFiltrados = [...this.productos];
+        this.dataSource.data = this.productosFiltrados; // Actualiza el DataSource
         console.log(`Producto "${this.productoAEliminar.nombre}" eliminado.`);
         if (this.productoSeleccionado?.id === this.productoAEliminar.id) {
           this.cerrarHistorial();
@@ -196,15 +281,7 @@ export class InventarioComponent {
       }
     }
     this.cerrarModalConfirmacion();
-    this.productoAEliminar = null; // Limpiamos la variable después de la acción
-  }
-
-  confirmarAccion() {
-    if (this.productoAConfirmar) {
-      this.confirmarGuardado();
-    } else if (this.productoAEliminar) {
-      this.confirmarEliminar(); // Llama al nuevo método de eliminación
-    }
+    this.productoAEliminar = null;
   }
 
   guardarCambiosConfirmados() {
@@ -250,8 +327,6 @@ export class InventarioComponent {
     }
   }
 
-  //Método para ver movimientos
-
   cerrarModalConfirmacion() {
     this.mostrarModalConfirmacion = false;
     this.productoAConfirmar = null;
@@ -261,24 +336,19 @@ export class InventarioComponent {
     this.productoSeleccionado =
       this.productos.find((p) => p.id === productoId) || null;
     if (this.productoSeleccionado?.historialMovimientos) {
-      this.dataSource = new MatTableDataSource<Movimiento>(
+      this.dataSourceHistorial = new MatTableDataSource<Movimiento>(
         this.productoSeleccionado.historialMovimientos
       );
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
+      this.dataSourceHistorial.paginator = this.paginatorHistorial; // Usa el paginador del historial
+      this.dataSourceHistorial.sort = this.sortHistorial; // Usa el sort del historial
     } else {
-      this.dataSource = new MatTableDataSource<Movimiento>([]); // Especificamos el tipo genérico
+      this.dataSourceHistorial = new MatTableDataSource<Movimiento>([]);
     }
   }
 
   cerrarHistorial() {
     this.productoSeleccionado = null;
   }
-
-  //Método para filtrar
-
-  searchTerm: string = '';
-  productosFiltrados: ProductoConHistorial[] = [...this.productos]; // Inicialmente, muestra todos los productos
 
   applyFilter() {
     this.productosFiltrados = this.productos.filter(
@@ -291,13 +361,15 @@ export class InventarioComponent {
           .toLowerCase()
           .includes(this.searchTerm.toLowerCase())
     );
+    this.dataSource.data = this.productosFiltrados; // Actualiza el DataSource con los productos filtrados
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
-
-  //Nuevo producto
 
   abrirModalNuevoProducto() {
     this.mostrarModalNuevoProducto = true;
-    this.nuevoProducto = { nombre: '', stock: null, descripcion: '' }; // Resetear el formulario
+    this.nuevoProducto = { nombre: '', stock: null, descripcion: '' };
   }
 
   cerrarModalNuevoProducto() {
@@ -313,7 +385,7 @@ export class InventarioComponent {
       const nuevoProductoConHistorial: ProductoConHistorial = {
         id: nuevoId,
         nombre: this.nuevoProducto.nombre,
-        descripcion: '', // Puedes dejar la descripción vacía o pedirla en otro campo si es necesario
+        descripcion: '',
         historialMovimientos: [
           {
             cantidad: this.nuevoProducto.stock,
@@ -322,11 +394,12 @@ export class InventarioComponent {
           },
         ],
         stock: this.nuevoProducto.stock,
-        detalles: this.nuevoProducto.descripcion, // Asignamos la descripción del modal a la propiedad 'detalles'
+        detalles: this.nuevoProducto.descripcion,
       };
       console.log('Nuevo producto a agregar:', nuevoProductoConHistorial);
       this.productos.push(nuevoProductoConHistorial);
       this.productosFiltrados = [...this.productos];
+      this.dataSource.data = this.productosFiltrados; // Actualiza el DataSource
       this.cerrarModalNuevoProducto();
       console.log('Nuevo producto agregado:', nuevoProductoConHistorial);
       // Aquí podrías llamar a tu servicio para guardar en el backend
