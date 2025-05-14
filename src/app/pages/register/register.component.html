@@ -7,6 +7,11 @@
     <h3 class="fw-bold mb-4">REGISTRO DE USUARIO</h3>
     <form (ngSubmit)="onRegister()">
       <mat-form-field appearance="fill" class="w-100 mb-2">
+        <mat-label>Nombre de Usuario</mat-label>
+        <input matInput [(ngModel)]="email" name="email" required />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-100 mb-2">
         <mat-label>Email</mat-label>
         <input matInput [(ngModel)]="email" name="email" required />
       </mat-form-field>
@@ -35,9 +40,10 @@
 
       <button
         mat-raised-button
-        color="primary"
+        color="accent"
         class="w-100 mb-2"
         type="submit"
+        (click)="onRegister()"
       >
         Registrarse
       </button>

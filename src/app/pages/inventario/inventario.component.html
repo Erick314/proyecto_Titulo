@@ -201,7 +201,11 @@
     </div>
     <p class="descripcion">{{ productoSeleccionado.descripcion }}</p>
 
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
+    <table
+      mat-table
+      [dataSource]="dataSourceHistorial"
+      class="mat-elevation-z1"
+    >
       <ng-container matColumnDef="cantidad">
         <th mat-header-cell *matHeaderCellDef>STOCK AL MOVIMIENTO</th>
         <td mat-cell *matCellDef="let row">{{ row.cantidad }}</td>
@@ -227,8 +231,8 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsHistorial"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsHistorial"></tr>
     </table>
 
     <mat-paginator
