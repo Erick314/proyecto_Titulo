@@ -160,6 +160,33 @@ nav a.btn {
   }
 }
 
+.btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 2rem;
+  padding: 0.6rem;
+  font-weight: bold;
+  text-align: left; /* Alinea el texto a la izquierda para que quede espacio para el icono */
+  text-decoration: none;
+  color: black;
+  background-color: #f44336; /* Un color rojo para indicar peligro */
+  color: white;
+  margin-top: 1rem; /* Espacio entre la info del usuario y el botón */
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+
+  span.material-symbols-outlined {
+    font-size: 1.2rem;
+  }
+}
+
+.d-flex {
+  width: 100%;
+  justify-content: center; /* Centra el botón en pantallas pequeñas */
+}
 @media (max-width: 768px) {
   .sidebar {
     width: 60px;
