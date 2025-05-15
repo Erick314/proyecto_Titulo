@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CrudService } from '../crud/crud.service';
 import { Observable } from 'rxjs';
 export interface Producto {
-  id?: string;
+  id?: number;
   categoria: string;
   descripcion: string;
   estado: string;
@@ -50,59 +50,5 @@ export class ProductoService {
   eliminar(id: string): Promise<void> {
     return this.crud.delete(this.path, id);
   }
-  // Getters
-  get categoria(): string {
-    return this.categoria;
-  }
-
-  get descripcion(): string {
-    return this.descripcion;
-  }
-
-  get estado(): string {
-    return this.estado;
-  }
-
-  get id(): number {
-    return this.id;
-  }
-
-  get nombre(): string {
-    return this.nombre;
-  }
-
-  get precioUnitario(): number {
-    return this.precioUnitario;
-  }
-  get cantidad(): number {
-    return this.cantidad;
-  }
-
-  // Setters
-  set categoria(value: string) {
-    this.categoria = value;
-  }
-
-  set descripcion(value: string) {
-    this.descripcion = value;
-  }
-
-  set estado(value: string) {
-    this.estado = value;
-  }
-
-  set id(value: number) {
-    this.id = value;
-  }
-
-  set nombre(value: string) {
-    this.nombre = value;
-  }
-
-  set precioUnitario(value: number) {
-    this.precioUnitario = value;
-  }
-  set cantidad(value: number) {
-    this.cantidad = value;
-  }
+  
 }

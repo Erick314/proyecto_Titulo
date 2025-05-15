@@ -1,71 +1,41 @@
 import { Injectable } from '@angular/core';
-import { ProductoService } from '../producto/producto.service';
+import { Producto } from '../producto/producto.service';
+import { CrudService } from '../crud/crud.service';
+import { Observable } from 'rxjs';
+export interface Movimientos{
+  id?: number;
+  facturaAsociada: number;
+  fechaHora: Date;
+  tipoMovimiento: string;
+  productos: Record<string, Producto>;
+}
 @Injectable({
   providedIn: 'root'
 })
 export class MovimientosService {
 
-  private _id: number = 0;
-  private _facturaAsociada: number = 0;
-  private _fechaHora: Date = new Date();
-  private _tipoMovimiento: 'Agregar' | 'Quitar' = 'Agregar';
-  private _productos: Record<string, ProductoService> = {};
+private readonly path = 'Rol';
 
-  constructor(data?: {
-    id?: number;
-    facturaAsociada?: number;
-    fechaHora?: Date;
-    tipoMovimiento?: 'Agregar' | 'Quitar';
-    productos?: Record<string, ProductoService>;
-  }) {
-    if (data) {
-      this._id = data.id ?? 0;
-      this._facturaAsociada = data.facturaAsociada ?? 0;
-      this._fechaHora = data.fechaHora ?? new Date();
-      this._tipoMovimiento = data.tipoMovimiento ?? 'Agregar';
-      this._productos = data.productos ?? {};
-    }
+  constructor(private readonly crud: CrudService<Movimientos>) {}
+
+  listar(): Observable<Movimientos[]> {
+    return this.crud.getAll(this.path);
   }
 
-  // Getters
-  get id(): number {
-    return this._id;
+  obtenerPorId(id: string): Observable<Movimientos | undefined> {
+    return this.crud.getById(this.path, id);
   }
 
-  get facturaAsociada(): number {
-    return this._facturaAsociada;
+  crear(data: Omit<Movimientos, 'id'>): Promise<string> {
+    return this.crud.create(this.path, data);
   }
 
-  get fechaHora(): Date {
-    return this._fechaHora;
+  actualizar(id: string, cambios: Partial<Omit<Movimientos, 'id'>>): Promise<void> {
+    return this.crud.update(this.path, id, cambios);
   }
 
-  get tipoMovimiento(): 'Agregar' | 'Quitar' {
-    return this._tipoMovimiento;
+  eliminar(id: string): Promise<void> {
+    return this.crud.delete(this.path, id);
   }
-
-  get productos(): Record<string, ProductoService> {
-    return this._productos;
-  }
-
-  // Setters
-  set id(value: number) {
-    this._id = value;
-  }
-
-  set facturaAsociada(value: number) {
-    this._facturaAsociada = value;
-  }
-
-  set fechaHora(value: Date) {
-    this._fechaHora = value;
-  }
-
-  set tipoMovimiento(value: 'Agregar' | 'Quitar') {
-    this._tipoMovimiento = value;
-  }
-
-  set productos(value: Record<string, ProductoService>) {
-    this._productos = value;
-  }
+  
 }

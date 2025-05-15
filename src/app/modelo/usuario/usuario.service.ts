@@ -1,93 +1,43 @@
 import { Injectable } from '@angular/core';
+import { CrudService } from '../crud/crud.service';
+import { Observable } from 'rxjs';
 
+export interface Usuario {
+  uid: string;
+  apellido: string;
+  correo: string;
+  id?: number;
+  nombre: string;
+  rol: string;
+  usuario: string;
+}
 @Injectable({
   providedIn: 'root'
 })
 export class UsuarioService {
 
-  private _uid: string = '';
-  private _apellido: string = '';
-  private _correo: string = '';
-  private _id: number = 0;
-  private _nombre: string = '';
-  private _rol: string = '';
-  private _usuario: string = '';
+  private readonly path = 'Usuario';
 
-  constructor(data?: {
-    uid?: string;
-    apellido?: string;
-    correo?: string;
-    id?: number;
-    nombre?: string;
-    rol?: string;
-    usuario?: string;
-  }) {
-    if (data) {
-      this._uid = data.uid ?? '';
-      this._apellido = data.apellido ?? '';
-      this._correo = data.correo ?? '';
-      this._id = data.id ?? 0;
-      this._nombre = data.nombre ?? '';
-      this._rol = data.rol ?? '';
-      this._usuario = data.usuario ?? '';
-    }
+  constructor(private readonly crud: CrudService<Usuario>) {}
+
+  listar(): Observable<Usuario[]> {
+    return this.crud.getAll(this.path);
   }
 
-  // Getters
-  get uid(): string {
-    return this._uid;
+  obtenerPorId(id: string): Observable<Usuario | undefined> {
+    return this.crud.getById(this.path, id);
   }
 
-  get apellido(): string {
-    return this._apellido;
+  crear(data: Omit<Usuario, 'id'>): Promise<string> {
+    return this.crud.create(this.path, data);
   }
 
-  get correo(): string {
-    return this._correo;
+  actualizar(id: string, cambios: Partial<Omit<Usuario, 'id'>>): Promise<void> {
+    return this.crud.update(this.path, id, cambios);
   }
 
-  get id(): number {
-    return this._id;
+  eliminar(id: string): Promise<void> {
+    return this.crud.delete(this.path, id);
   }
-
-  get nombre(): string {
-    return this._nombre;
-  }
-
-  get rol(): string {
-    return this._rol;
-  }
-
-  get usuario(): string {
-    return this._usuario;
-  }
-
-  // Setters
-  set uid(value: string) {
-    this._uid = value;
-  }
-
-  set apellido(value: string) {
-    this._apellido = value;
-  }
-
-  set correo(value: string) {
-    this._correo = value;
-  }
-
-  set id(value: number) {
-    this._id = value;
-  }
-
-  set nombre(value: string) {
-    this._nombre = value;
-  }
-
-  set rol(value: string) {
-    this._rol = value;
-  }
-
-  set usuario(value: string) {
-    this._usuario = value;
-  }
+  
 }

@@ -17,7 +17,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export interface WithId {
-  id?: string;
+  id?: number;
 }
 
 @Injectable({
@@ -62,7 +62,7 @@ export class CrudService<T extends WithId> {
   }
 
   /** Opcional: genera un Observable con docs + cambios personalizados */
-  watch(path: string): Observable<{ id: string; data: T }[]> {
+  watch(path: string): Observable<{ id: number; data: T }[]> {
     return collectionData(this.colRef(path), { idField: 'id' }).pipe(
       map(arr => arr.map(item => ({ id: item.id!, data: item })))
     );

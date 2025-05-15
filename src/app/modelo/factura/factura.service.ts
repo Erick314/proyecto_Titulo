@@ -1,117 +1,48 @@
 import { Injectable } from '@angular/core';
-import { ProductoService } from '../producto/producto.service';
+import { Producto } from '../producto/producto.service';
+import { CrudService } from '../crud/crud.service';
+import { Observable } from 'rxjs';
+
+export interface Factura{
+  id?: number;
+  esVisible: boolean;
+  fechaEmision: Date;
+  iva: number;
+  idUsuario: string ;
+  nombreProveedor: string ;
+  numeroFactura: string ;
+  pdfAsociado: string ;
+  productos: Record<string, Producto>;
+  totalFinal: number;
+  totalNeto: number;
+}
 @Injectable({
   providedIn: 'root'
 })
 export class FacturaService {
 
-  private _id: number = 0;
-  private _esVisible: boolean = true;
-  private _fechaEmision: Date = new Date();
-  private _iva: number = 0;
-  private _idUsuario: string = '';
-  private _nombreProveedor: string = '';
-  private _numeroFactura: string = '';
-  private _pdfAsociado: string = '';
-  private _productos: Record<string, ProductoService> = {};
-  private _totalFinal: number = 0;
-  private _totalNeto: number = 0;
-
-  constructor(data?: {
-    id?: number;
-    esVisible?: boolean;
-    fechaEmision?: Date;
-    iva?: number;
-    idUsuario?: string;
-    nombreProveedor?: string;
-    numeroFactura?: string;
-    pdfAsociado?: string;
-    productos?: Record<string, ProductoService>;
-    totalFinal?: number;
-    totalNeto?: number;
-  }) {
-    if (data) {
-      this._id = data.id ?? 0;
-      this._esVisible = data.esVisible ?? true;
-      this._fechaEmision = data.fechaEmision ?? new Date();
-      this._iva = data.iva ?? 0;
-      this._idUsuario = data.idUsuario ?? '';
-      this._nombreProveedor = data.nombreProveedor ?? '';
-      this._numeroFactura = data.numeroFactura ?? '';
-      this._pdfAsociado = data.pdfAsociado ?? '';
-      this._productos = data.productos ?? {};
-      this._totalFinal = data.totalFinal ?? 0;
-      this._totalNeto = data.totalNeto ?? 0;
-    }
+  private readonly path = 'Factura';
+  
+  constructor(private readonly crud: CrudService<Factura>) {}
+  
+  listar(): Observable<Factura[]> {
+    return this.crud.getAll(this.path);
   }
 
-  // Getters
-  get id(): number {
-    return this._id;
-  }
-  get esVisible(): boolean {
-    return this._esVisible;
-  }
-  get fechaEmision(): Date {
-    return this._fechaEmision;
-  }
-  get iva(): number {
-    return this._iva;
-  }
-  get idUsuario(): string {
-    return this._idUsuario;
-  }
-  get nombreProveedor(): string {
-    return this._nombreProveedor;
-  }
-  get numeroFactura(): string {
-    return this._numeroFactura;
-  }
-  get pdfAsociado(): string {
-    return this._pdfAsociado;
-  }
-  get productos(): Record<string, ProductoService> {
-    return this._productos;
-  }
-  get totalFinal(): number {
-    return this._totalFinal;
-  }
-  get totalNeto(): number {
-    return this._totalNeto;
+  obtenerPorId(id: string): Observable<Factura | undefined> {
+    return this.crud.getById(this.path, id);
   }
 
-  // Setters
-  set id(value: number) {
-    this._id = value;
+  crear(data: Omit<Factura, 'id'>): Promise<string> {
+    return this.crud.create(this.path, data);
   }
-  set esVisible(value: boolean) {
-    this._esVisible = value;
+
+  actualizar(id: string, cambios: Partial<Omit<Factura, 'id'>>): Promise<void> {
+    return this.crud.update(this.path, id, cambios);
   }
-  set fechaEmision(value: Date) {
-    this._fechaEmision = value;
+
+  eliminar(id: string): Promise<void> {
+    return this.crud.delete(this.path, id);
   }
-  set iva(value: number) {
-    this._iva = value;
-  }
-  set idUsuario(value: string) {
-    this._idUsuario = value;
-  }
-  set nombreProveedor(value: string) {
-    this._nombreProveedor = value;
-  }
-  set numeroFactura(value: string) {
-    this._numeroFactura = value;
-  }
-  set pdfAsociado(value: string) {
-    this._pdfAsociado = value;
-  }
-  set productos(value: Record<string, ProductoService>) {
-    this._productos = value;
-  }
-  set totalFinal(value: number) {
-    this._totalFinal = value;
-  }
-  set totalNeto(value: number) {
-    this._totalNeto = value;
-  }
+  
 }
