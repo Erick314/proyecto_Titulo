@@ -15,7 +15,7 @@ export interface Producto {
 })
 export class ProductoService {
 
-  private readonly path = 'producto';
+  private readonly path = 'Producto';
 
   constructor(private readonly crud: CrudService<Producto>) {}
 
