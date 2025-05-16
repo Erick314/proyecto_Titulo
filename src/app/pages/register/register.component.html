@@ -5,37 +5,33 @@
   >
     <img src="assets/logos/tlc.png" width="60" class="mb-3" />
     <h3 class="fw-bold mb-4">REGISTRO DE USUARIO</h3>
-    <form (ngSubmit)="onRegister()">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
       <mat-form-field appearance="fill" class="w-100 mb-2">
-        <mat-label>Nombre de Usuario</mat-label>
-        <input matInput [(ngModel)]="email" name="email" required />
+        <mat-label for="correo">correo</mat-label>
+        <input matInput formControlName="correo"/>
+        @if(isRequired('correo')){
+          <mat-error>Campo Obligatorio</mat-error>
+        }
+        @if(hasEmailError()){
+          <mat-error>Debe ser Email</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="w-100 mb-2">
-        <mat-label>Email</mat-label>
-        <input matInput [(ngModel)]="email" name="email" required />
+        <mat-label for="contrasenia">Contraseña</mat-label>
+        <input matInput formControlName="contrasenia" type="password"/>
+        @if(isRequired('contrasenia')){
+          <mat-error>Campo Obligatorio</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="w-100 mb-2">
-        <mat-label>Contraseña</mat-label>
-        <input
-          matInput
-          type="password"
-          [(ngModel)]="password"
-          name="password"
-          required
-        />
-      </mat-form-field>
-
-      <mat-form-field appearance="fill" class="w-100 mb-2">
-        <mat-label>Repetir contraseña</mat-label>
-        <input
-          matInput
-          type="password"
-          [(ngModel)]="repeatPassword"
-          name="repeatPassword"
-          required
-        />
+        <mat-label for="repetirContrasenia">Repetir contraseña</mat-label>
+        <input matInput type="password" formControlName="repetirContrasenia"/>
+        @if(isRequired('repetirContrasenia')){
+            <mat-error>Campo Obligatorio</mat-error>
+        }
       </mat-form-field>
 
       <button
@@ -43,13 +39,10 @@
         color="accent"
         class="w-100 mb-2"
         type="submit"
-        (click)="onRegister()"
       >
         Registrarse
       </button>
-      <a class="d-block text-white mt-2" routerLink="/"
-        >¿Ya tienes cuenta? Iniciar sesión</a
-      >
     </form>
+    <a class="d-block text-white mt-2" routerLink="/">¿Ya tienes cuenta? Iniciar sesión</a>
   </div>
 </div>

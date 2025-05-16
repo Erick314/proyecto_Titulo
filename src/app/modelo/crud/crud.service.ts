@@ -1,5 +1,5 @@
 // src/app/services/generic-crud.service.ts
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -24,16 +24,16 @@ export interface WithId {
   providedIn: 'root'
 })
 export class CrudService<T extends WithId> {
-  constructor(private readonly firestore: Firestore) {}
-
+  constructor() {}
+  private _firestore = Inject(Firestore)
   /** Obtiene el referencia a la colección */
   private colRef(path: string): CollectionReference<T> {
-    return collection(this.firestore, path) as CollectionReference<T>;
+    return collection(this._firestore, path) as CollectionReference<T>;
   }
 
   /** Obtiene el documento */
   private docRef(path: string, id: string): DocumentReference<DocumentData> {
-    return doc(this.firestore, `${path}/${id}`);
+    return doc(this._firestore, `${path}/${id}`);
   }
 
   /** Crea un documento nuevo y devuelve su id */

@@ -1,10 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, Validators, ReactiveFormsModule, FormBuilder} from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../services/auth.service';
+import { hasEmailError, isRequired} from '../../utils/validators';
+import { toast } from 'ngx-sonner';
+export interface CrearUsuario {
+  correo: FormControl<string | null>;
+  contrasenia: FormControl<string | null>;
+  repetirContrasenia: FormControl<string | null>;
+}
 
 @Component({
   selector: 'app-register',
@@ -15,32 +22,48 @@ import { AuthService } from '../../services/auth.service';
     RouterModule,
     MatInputModule,
     MatButtonModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent {
-  email = '';
-  password = '';
-  repeatPassword = '';
+  private _formBuilder = inject(FormBuilder);
+  private _authService = inject(AuthService)
+  constructor() {}
+  form = this._formBuilder.group<CrearUsuario>({
+    correo: this._formBuilder.control('', [Validators.required, Validators.email]),
+    contrasenia: this._formBuilder.control('', Validators.required),
+    repetirContrasenia: this._formBuilder.control('', Validators.required)
+  })
+  isRequired(field: 'correo' | 'contrasenia' | 'repetirContrasenia'){
+    return isRequired(field, this.form);
+  }
+  hasEmailError(){
+    return hasEmailError(this.form);
+  }
+  onSubmit(){
+    if (this.form.invalid) return;
 
-  constructor(private authService: AuthService) {}
+    const { correo, contrasenia, repetirContrasenia } = this.form.value;
 
-  onRegister() {
-    if (this.password !== this.repeatPassword) {
-      alert('Las contraseñas no coinciden');
-      return;
-    }
-
-    this.authService
-      .register(this.email, this.password)
-      .then(() => alert('Registro exitoso'))
+    if (contrasenia !== repetirContrasenia) return;
+    if (!correo || !contrasenia) return;
+    this._authService
+      .register(correo, contrasenia)
+      .then(() => toast.success('Registro exitoso'))
       .catch((err: unknown) => {
         if (err instanceof Error) {
-          alert(err.message);
+          toast.error('Error inesperado');
         } else {
-          alert('Error inesperado');
+          toast.error('Error inesperado');
         }
       });
+    console.log(this.form.getRawValue())
   }
+  // onRegister() {
+  //   if (this.password !== this.repeatPassword) return;
+  //   }
+  //   
+  // }
 }

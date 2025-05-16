@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable,  } from '@angular/core';
 import {
   Auth,
   signInWithEmailAndPassword,
@@ -12,21 +12,22 @@ import {
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private auth: Auth) {}
+  private _auth = inject(Auth);
+  constructor() {}
 
   login(email: string, password: string): Promise<UserCredential> {
-    return signInWithEmailAndPassword(this.auth, email, password);
+    return signInWithEmailAndPassword(this._auth, email, password);
   }
 
   register(email: string, password: string): Promise<UserCredential> {
-    return createUserWithEmailAndPassword(this.auth, email, password);
+    return createUserWithEmailAndPassword(this._auth, email, password);
   }
 
   recover(email: string): Promise<void> {
-    return sendPasswordResetEmail(this.auth, email);
+    return sendPasswordResetEmail(this._auth, email);
   }
 
   logout(): Promise<void> {
-    return signOut(this.auth);
+    return signOut(this._auth);
   }
 }

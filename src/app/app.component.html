@@ -1,5 +1,5 @@
 <app-navbar *ngIf="showNavbar" (menuState)="menuOpen = $event"></app-navbar>
 
 <div [class.with-navbar]="showNavbar && menuOpen" class="main-content">
-  <router-outlet></router-outlet>
+  <router-outlet></router-outlet><ngx-sonner-toaster />
 </div>
