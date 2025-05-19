@@ -44,9 +44,7 @@ export class RegisterComponent {
   }
   onSubmit(){
     if (this.form.invalid) return;
-
     const { correo, contrasenia, repetirContrasenia } = this.form.value;
-
     if (contrasenia !== repetirContrasenia) return;
     if (!correo || !contrasenia) return;
     this._authService
@@ -61,9 +59,4 @@ export class RegisterComponent {
       });
     console.log(this.form.getRawValue())
   }
-  // onRegister() {
-  //   if (this.password !== this.repeatPassword) return;
-  //   }
-  //   
-  // }
 }
