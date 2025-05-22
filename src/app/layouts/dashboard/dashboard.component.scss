@@ -1,0 +1,576 @@
+/* src/styles.scss */
+
+/* Importar Material Icons/Symbols si no lo has hecho ya en index.html o aquí */
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
+
+// ===============================================
+// Variables de Color para Modo Claro y Oscuro
+// ===============================================
+
+// Modo Claro Colores
+$light-background: #f8f9fa; // Fondo general claro (tu bg-warning-subtle es #fcf8e3)
+$light-card-background: white; // Fondo de tarjetas/paneles
+$light-text-color: #333; // Color de texto principal
+$light-muted-text-color: #6c757d; // Texto gris claro
+$light-border-color: #dee2e6; // Color de bordes
+$light-primary-color: #28a745; // Tu verde principal
+$light-secondary-color: #6c757d; // gris secundario
+$light-input-background: #f8f9fa; // Fondo de inputs en modo claro
+$light-hamburger-color: #fcd34d; // Color de la hamburguesa
+$light-sidebar-bg: #2ecc71; // Color de fondo del sidebar en modo claro
+
+// Modo Oscuro Colores
+$dark-background: #212529; // Fondo general oscuro
+$dark-card-background: #343a40; // Fondo de tarjetas/paneles oscuro
+$dark-text-color: #e9ecef; // Color de texto principal oscuro
+$dark-muted-text-color: #adb5bd; // Texto gris oscuro
+$dark-border-color: #495057; // Color de bordes oscuro
+$dark-primary-color: #8bc34a; // Un verde más claro para el modo oscuro
+$dark-secondary-color: #ced4da; // gris claro secundario
+$dark-input-background: #495057; // Fondo de inputs en modo oscuro
+$dark-hamburger-color: #8bc34a; // Color de la hamburguesa en modo oscuro
+$dark-sidebar-bg: #1a1e21; // Color de fondo del sidebar en modo oscuro
+
+// ===============================================
+// Estilos Globales Predeterminados (Modo Claro)
+// ===============================================
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: $light-background;
+  color: $light-text-color;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Estilos para el sidebar (navbar) en modo claro - TOMADOS DE TU NAVBAR.COMPONENT.SCSS */
+// OJO: Estos estilos serán aplicados por el NavbarComponent, pero los incluimos aquí
+// para ver cómo se verán afectados por el modo oscuro.
+.sidebar {
+  background-color: $light-sidebar-bg;
+  color: $light-text-color; // El texto dentro del sidebar
+  span {
+    // para los iconos del hamburger
+    background-color: $light-hamburger-color;
+  }
+}
+nav a.btn {
+  &.btn-inventario {
+    background-color: lighten(
+      $light-hamburger-color,
+      10%
+    ); // Un amarillo más claro para botón inventario
+  }
+  &.btn-seccion {
+    background-color: lighten(
+      $light-primary-color,
+      20%
+    ); // Un verde claro para secciones
+  }
+}
+.user-name {
+  color: #fff; // Asegura que el nombre de usuario sea blanco en modo claro (sidebar oscuro)
+}
+.user-status {
+  color: $light-hamburger-color; // Color de estado (amarillo)
+}
+// Fin de estilos del sidebar que se ven afectados por el tema
+
+/* --- Estilos Comunes para Overlays y Modales (Aplicables globalmente) --- */
+.overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.edit-card {
+  background-color: $light-card-background;
+  color: $light-text-color;
+}
+.edit-card label {
+  color: $light-text-color;
+}
+.alert.alert-danger {
+  background-color: #f8d7da; /* Light red background */
+  color: #721c24; /* Dark red text */
+  border: 1px solid #f5c6cb; /* Red border */
+}
+
+.edit-card input[type="text"],
+.edit-card input[type="number"],
+.edit-card input[type="date"],
+.edit-card input[type="file"],
+.mat-mdc-form-field-appearance-fill .mat-mdc-form-field-flex {
+  background-color: $light-input-background;
+  border: 1px solid $light-border-color;
+  color: $light-text-color;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+}
+.mat-mdc-input-element,
+.mat-mdc-select-value-text {
+  color: $light-text-color !important;
+}
+.mat-mdc-floating-label.mdc-floating-label {
+  color: $light-muted-text-color;
+}
+.mat-mdc-form-field-icon-suffix {
+  color: $light-muted-text-color;
+}
+
+/* Estilo para el enlace del ícono de PDF */
+.pdf-icon-link {
+  color: #007bff !important;
+  &:hover {
+    color: #0056b3 !important;
+  }
+}
+
+/* Estilos para el background de las páginas (del mockup) */
+.bg-warning-subtle {
+  background-color: $light-background !important; // Usa tu variable para el fondo principal
+}
+
+/* Estilos para el texto de los títulos de página */
+.text-center.fw-bold.mb-4,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: $light-text-color;
+}
+
+/* Estilos para la tabla (color del header y el color del texto) */
+.mat-table {
+  background-color: $light-card-background;
+}
+.mat-header-cell {
+  background-color: $light-primary-color;
+  color: white;
+}
+.mat-cell {
+  color: $light-text-color;
+  border-bottom: 1px solid $light-border-color;
+}
+.mat-paginator {
+  background-color: $light-card-background;
+  color: $light-text-color;
+}
+.mat-mdc-paginator-page-size-label,
+.mat-mdc-paginator-range-label,
+.mat-mdc-paginator-page-size-value,
+.mat-mdc-select-value-text {
+  color: $light-text-color !important;
+}
+.mat-mdc-paginator-icon {
+  fill: $light-text-color !important;
+}
+.mat-mdc-paginator-navigation-next,
+.mat-mdc-paginator-navigation-previous,
+.mat-mdc-paginator-navigation-first,
+.mat-mdc-paginator-navigation-last {
+  .mat-mdc-icon-button {
+    color: $light-text-color !important;
+  }
+}
+
+/* Estilos para los botones de búsqueda y añadir */
+.input-group-text.bg-white {
+  background-color: $light-card-background !important;
+  border: 1px solid $light-border-color;
+  border-right: none;
+}
+.form-control.border-start-0 {
+  border: 1px solid $light-border-color;
+  border-left: none;
+}
+.bg-success-subtle {
+  background-color: lighten($light-primary-color, 30%) !important;
+  color: darken($light-primary-color, 20%) !important;
+  border: 1px solid lighten($light-primary-color, 20%) !important;
+}
+
+.text-success {
+  color: $light-primary-color !important;
+}
+
+/* Quita el underline por defecto de Angular Material Select */
+.mat-form-field-underline {
+  display: none;
+}
+/* Estiliza el borde y fondo del select */
+.mat-mdc-form-field-appearance-fill .mat-mdc-form-field-flex,
+.mat-mdc-form-field-appearance-fill .mat-mdc-form-field-subscript-wrapper {
+  background-color: $light-input-background !important;
+}
+.mat-mdc-select-value {
+  color: $light-text-color !important;
+}
+.mat-mdc-select-arrow {
+  color: $light-text-color !important;
+}
+
+/* Estilos específicos para las flechas de movimiento dentro de la tabla */
+.movement-arrow {
+  // Estos colores se ajustarán en el modo oscuro si son text-success o text-danger
+}
+
+/* Estilos para el botón "Ver" de movimientos */
+.btn-info.text-dark.rounded-pill {
+  background-color: #add8e6 !important;
+  color: #333 !important;
+  border: 1px solid #99c0d1 !important;
+}
+
+/* Estilos generales para las tarjetas de información de contacto y configuración */
+.contact-info-card,
+.setting-card,
+.card {
+  background-color: $light-card-background;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  color: $light-text-color;
+}
+.contact-info-card .icon-lg,
+.icon-header {
+  color: $light-primary-color;
+}
+.contact-info-card h4,
+.card-title-header {
+  color: $light-text-color;
+}
+.contact-info-card p {
+  color: $light-muted-text-color;
+}
+
+/* Estilo para el botón de enviar mensaje, siguiendo el estilo de "agregar" */
+.custom-button-green {
+  background-color: $light-primary-color !important;
+  color: white !important;
+}
+
+/* Estilos para los íconos sufijo en los inputs */
+.mat-mdc-form-field-icon-suffix {
+  color: $light-muted-text-color;
+}
+
+.text-primary-dark {
+  color: $light-primary-color;
+}
+
+/* Ajuste para el texto dentro de mat-slide-toggle */
+mat-slide-toggle span {
+  color: $light-muted-text-color;
+}
+
+/* NUEVOS ESTILOS PARA BOTONES DE ACCIÓN ESPECÍFICOS */
+.custom-button-blue {
+  background-color: #007bff !important;
+  color: white !important;
+}
+.custom-button-red {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+/* Asegurar que los toggles tengan un buen contraste */
+.mdc-switch.mdc-switch--unselected .mdc-switch__track {
+  background-color: #ccc;
+}
+.mdc-switch.mdc-switch--selected .mdc-switch__track {
+  background-color: $light-primary-color;
+}
+.mdc-switch.mdc-switch--unselected .mdc-switch__handle {
+  background-color: #888;
+}
+.mdc-switch.mdc-switch--selected .mdc-switch__handle {
+  background-color: #fff;
+}
+
+// ===============================================
+// ESTILOS PARA MODO OSCURO (body.dark-mode)
+// ===============================================
+body.dark-mode {
+  background-color: $dark-background !important;
+  color: $dark-text-color !important;
+
+  /* Sidebar (navbar) en modo oscuro */
+  .sidebar {
+    background-color: $dark-sidebar-bg !important;
+    color: $dark-text-color !important;
+    span {
+      // para los iconos del hamburger
+      background-color: $dark-hamburger-color !important;
+    }
+  }
+  nav a.btn {
+    &.btn-inventario {
+      background-color: lighten($dark-hamburger-color, 10%) !important;
+    }
+    &.btn-seccion {
+      background-color: lighten($dark-primary-color, 20%) !important;
+    }
+  }
+  .user-name {
+    color: $dark-text-color !important;
+  }
+  .user-status {
+    color: $dark-hamburger-color !important;
+  }
+
+  /* Overlays y Modales */
+  .overlay {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+  }
+  .edit-card {
+    background-color: $dark-card-background !important;
+    color: $dark-text-color !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+  }
+  .edit-card label {
+    color: $dark-text-color !important;
+  }
+  .alert.alert-danger {
+    background-color: rgba(#fd7e14, 0.2) !important;
+    color: #fd7e14 !important;
+    border-color: #fd7e14 !important;
+  }
+
+  .edit-card input[type="text"],
+  .edit-card input[type="number"],
+  .edit-card input[type="date"],
+  .edit-card input[type="file"],
+  .mat-mdc-form-field-appearance-fill .mat-mdc-form-field-flex {
+    background-color: $dark-input-background !important;
+    border: 1px solid $dark-border-color !important;
+    color: $dark-text-color !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  }
+  .mat-mdc-input-element,
+  .mat-mdc-select-value-text {
+    color: $dark-text-color !important;
+  }
+  .mat-mdc-floating-label.mdc-floating-label {
+    color: $dark-muted-text-color !important;
+  }
+  .mat-mdc-form-field-icon-suffix {
+    color: $dark-muted-text-color !important;
+  }
+
+  /* Estilo para el enlace del ícono de PDF */
+  .pdf-icon-link {
+    color: $dark-primary-color !important;
+    &:hover {
+      color: lighten($dark-primary-color, 10%) !important;
+    }
+  }
+
+  /* Estilos para el background de las páginas */
+  .bg-warning-subtle {
+    background-color: $dark-background !important;
+  }
+
+  /* Estilos para el texto de los títulos de página */
+  .text-center.fw-bold.mb-4,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: $dark-text-color !important;
+  }
+
+  /* Estilos para la tabla */
+  .mat-table {
+    background-color: $dark-card-background !important;
+  }
+  .mat-header-cell {
+    background-color: $dark-primary-color !important;
+    color: $dark-text-color !important; // Texto claro para headers
+  }
+  .mat-cell {
+    color: $dark-text-color !important;
+    border-bottom: 1px solid $dark-border-color !important;
+  }
+  .mat-paginator {
+    background-color: $dark-card-background !important;
+    color: $dark-text-color !important;
+  }
+  .mat-mdc-paginator-page-size-label,
+  .mat-mdc-paginator-range-label,
+  .mat-mdc-paginator-page-size-value,
+  .mat-mdc-select-value-text {
+    color: $dark-text-color !important;
+  }
+  .mat-mdc-paginator-icon {
+    fill: $dark-text-color !important;
+  }
+  .mat-mdc-paginator-navigation-next,
+  .mat-mdc-paginator-navigation-previous,
+  .mat-mdc-paginator-navigation-first,
+  .mat-mdc-paginator-navigation-last {
+    .mat-mdc-icon-button {
+      color: $dark-text-color !important;
+    }
+  }
+
+  /* Estilos para los botones de búsqueda y añadir */
+  .input-group-text.bg-white {
+    background-color: $dark-input-background !important;
+    border: 1px solid $dark-border-color !important;
+  }
+  .form-control.border-start-0 {
+    border: 1px solid $dark-border-color !important;
+    border-left: none;
+  }
+  .bg-success-subtle {
+    background-color: rgba($dark-primary-color, 0.2) !important;
+    color: $dark-primary-color !important;
+    border: 1px solid $dark-primary-color !important;
+  }
+
+  .text-success {
+    color: $dark-primary-color !important;
+  }
+
+  /* Estiliza el borde y fondo del select */
+  .mat-mdc-form-field-appearance-fill .mat-mdc-form-field-flex,
+  .mat-mdc-form-field-appearance-fill .mat-mdc-form-field-subscript-wrapper {
+    background-color: $dark-input-background !important;
+  }
+  .mat-mdc-select-value {
+    color: $dark-text-color !important;
+  }
+  .mat-mdc-select-arrow {
+    color: $dark-text-color !important;
+  }
+
+  /* Estilos para el botón "Ver" de movimientos */
+  .btn-info.text-dark.rounded-pill {
+    background-color: #6c757d !important; // Un gris oscuro para info
+    color: $dark-text-color !important;
+    border: 1px solid #495057 !important;
+  }
+
+  /* Estilos generales para las tarjetas de información de contacto y configuración */
+  .contact-info-card,
+  .setting-card,
+  .card {
+    background-color: $dark-card-background !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+    color: $dark-text-color !important;
+  }
+  .contact-info-card .icon-lg,
+  .icon-header {
+    color: $dark-primary-color !important;
+  }
+  .contact-info-card h4,
+  .card-title-header {
+    color: $dark-text-color !important;
+  }
+  .contact-info-card p {
+    color: $dark-muted-text-color !important;
+  }
+
+  /* Estilo para el botón de enviar mensaje, siguiendo el estilo de "agregar" */
+  .custom-button-green {
+    background-color: $dark-primary-color !important;
+    color: $dark-text-color !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4) !important;
+  }
+  .custom-button-blue {
+    background-color: darken(#007bff, 15%) !important;
+    color: $dark-text-color !important;
+  }
+  .custom-button-red {
+    background-color: darken(#dc3545, 15%) !important;
+    color: $dark-text-color !important;
+  }
+
+  /* Estilos para los íconos sufijo en los inputs */
+  .mat-mdc-form-field-icon-suffix {
+    color: $dark-muted-text-color !important;
+  }
+
+  .text-primary-dark {
+    color: $dark-primary-color !important;
+  }
+
+  /* Ajuste para el texto dentro de mat-slide-toggle */
+  mat-slide-toggle span {
+    color: $dark-muted-text-color !important;
+  }
+
+  /* Asegurar que los toggles tengan un buen contraste */
+  .mdc-switch.mdc-switch--unselected .mdc-switch__track {
+    background-color: $dark-border-color !important;
+  }
+  .mdc-switch.mdc-switch--selected .mdc-switch__track {
+    background-color: $dark-primary-color !important;
+  }
+  .mdc-switch.mdc-switch--unselected .mdc-switch__handle {
+    background-color: $dark-muted-text-color !important;
+  }
+  .mdc-switch.mdc-switch--selected .mdc-switch__handle {
+    background-color: $dark-text-color !important;
+  }
+}
+
+// ===============================================
+// ESTILOS DE LAYOUT PARA DASHBOARD (MOVIDOS DE dashboard.component.scss)
+// ===============================================
+
+/* src/app/layouts/dashboard/dashboard.component.scss */
+.dashboard-layout {
+  display: flex; // Habilita Flexbox para layout horizontal
+  flex-direction: row; // Los ítems (sidebar y main content) se organizarán en una fila
+  min-height: 100vh; // Ocupa toda la altura de la vista
+  width: 100%; // Ocupa todo el ancho
+
+  .dashboard-content {
+    flex-grow: 1; // Permite que el contenido ocupe todo el espacio restante horizontalmente
+    padding: 0px; // Espacio alrededor del contenido de la página (ajusta según necesites)
+    transition: margin-left 0.3s ease; // Para una transición suave cuando el sidebar se abre/cierra
+    overflow-x: hidden; // Previene scroll horizontal si el contenido es muy ancho
+    // Asegúrate de que el fondo de cada página se adapte al modo oscuro,
+    // o envuelve el router-outlet con un div si las páginas tienen un fondo específico.
+    // .bg-warning-subtle se encargará de esto globalmente.
+  }
+}
+
+// Estilos para cuando el menú del sidebar está abierto
+.dashboard-layout.menu-open {
+  .dashboard-content {
+    margin-left: 200px; /* Ancho de tu sidebar cuando está abierto */
+  }
+}
+
+// Estilos para cuando el menú del sidebar está cerrado
+.dashboard-layout.menu-closed {
+  .dashboard-content {
+    margin-left: 60px; /* Ancho de tu sidebar cuando está cerrado */
+  }
+}
+
+// Media queries para dispositivos móviles (o anchos de pantalla más pequeños)
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column; // En móviles, el sidebar irá arriba o se superpondrá
+  }
+
+  .dashboard-layout .dashboard-content {
+    margin-left: 0 !important; // Elimina el margen izquierdo en móviles
+    padding-top: 60px; // Si tu navbar es fijo arriba en móvil, añade padding superior.
+    // Tu sidebar es fixed, así que si se colapsa arriba, esto es necesario.
+  }
+
+  // Si quieres que el sidebar se oculte completamente de la pantalla en modo cerrado en móvil
+  // y solo aparezca al abrirlo (ej. con un botón flotante):
+  .sidebar.closed {
+    left: -200px; /* Oculta completamente el sidebar */
+  }
+  .sidebar.open {
+    left: 0; /* Muestra el sidebar */
+  }
+}

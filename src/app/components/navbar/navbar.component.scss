@@ -1,10 +1,13 @@
+/* src/app/navbar/navbar.component.scss */
+
 .sidebar {
-  width: 200px;
-  height: 100vh; /* Asegura que el sidebar ocupe toda la altura de la pantalla */
+  width: 200px; /* Ancho por defecto (abierto, según tu configuración) */
+  min-width: 60px; /* Ancho mínimo cuando está cerrado */
+  height: 100vh;
   background-color: #2ecc71;
   padding: 1rem;
   border-radius: 0 0 1rem 0;
-  position: fixed;
+  position: fixed; /* Esto es lo que lo saca del flujo normal */
   top: 0;
   left: 0;
   transition: all 0.3s ease;
@@ -20,6 +23,10 @@
   margin-bottom: 1rem;
   cursor: pointer;
   transition: 0.4s;
+  // Centrar el hamburguesa cuando el sidebar está cerrado
+  .sidebar.closed & {
+    margin: 0 auto 1rem auto; // Centra horizontalmente
+  }
 
   span {
     background-color: #fcd34d;
@@ -63,8 +70,9 @@ nav {
   flex-direction: column;
   gap: 10px;
   margin-top: 1rem;
-  flex-grow: 1; /* Permite que la navegación crezca y ocupe el espacio disponible */
-  margin-bottom: 1rem; /* Agrega un poco de espacio antes de la info del usuario */
+  flex-grow: 1;
+  margin-bottom: 1rem;
+  overflow: hidden; /* Oculta el contenido si el sidebar se cierra y el texto es muy largo */
 }
 
 nav a.btn {
@@ -75,6 +83,9 @@ nav a.btn {
   text-align: center;
   text-decoration: none;
   color: black;
+  white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+  text-overflow: ellipsis; /* Añade puntos suspensivos si el texto es demasiado largo */
+  overflow: hidden; /* Oculta el texto que desborda */
 
   &.btn-inventario {
     background-color: #ffe066;
@@ -94,6 +105,10 @@ nav a.btn {
   align-items: center;
   padding: 10px;
   border-top: 1px solid #eee;
+  // Ocultar info de usuario cuando está cerrado
+  .sidebar.closed & {
+    display: none; // Oculta completamente user-info cuando el sidebar está cerrado
+  }
 }
 
 .user-icon {
@@ -126,53 +141,57 @@ nav a.btn {
   color: #fcd34d;
 }
 
+/* Estilos específicos para cuando el sidebar está cerrado */
 .sidebar.closed {
-  width: 60px;
+  width: 60px; /* Ancho más pequeño cuando está cerrado */
 
   nav {
-    display: none;
+    display: none; /* Oculta la navegación completa cuando el sidebar está cerrado */
   }
 
   .user-info {
-    display: flex; /* Asegúrate de que se muestre cuando esté cerrado */
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    padding: 5px;
-    border-top: none; /* Opcional: quitar la línea superior cuando está cerrado */
+    display: none; /* Oculta completamente la información de usuario */
+  }
 
-    .user-icon {
-      margin-right: 0;
-      margin-bottom: 5px;
-    }
-
-    .user-details {
+  .d-flex {
+    // Contenedor del botón cerrar sesión
+    justify-content: center; // Centra el botón
+    // Considera ocultar el botón si quieres que el sidebar cerrado sea solo el ícono.
+    // Si quieres que el ícono de cerrar sesión sea visible:
+    .btn-outline-danger {
+      width: 40px; // Ancho para el ícono de cerrar sesión
+      height: 40px;
+      padding: 0;
+      display: flex;
+      justify-content: center;
       align-items: center;
-    }
-
-    .user-name {
-      font-size: 0.8em;
-    }
-
-    .user-status {
-      font-size: 0.6em;
+      span {
+        // Oculta el texto "Cerrar Sesión"
+        display: none;
+      }
+      .material-symbols-outlined {
+        // Muestra el ícono de salir
+        display: block; // Asegúrate de que el icono sea visible
+        font-size: 24px; // Tamaño más grande para el ícono
+        color: white; // Color del icono
+      }
     }
   }
 }
 
 .btn-logout {
+  // Ahora se llama .btn-outline-danger en tu HTML
   display: flex;
   align-items: center;
   gap: 0.5rem;
   border-radius: 2rem;
   padding: 0.6rem;
   font-weight: bold;
-  text-align: left; /* Alinea el texto a la izquierda para que quede espacio para el icono */
+  text-align: left;
   text-decoration: none;
-  color: black;
-  background-color: #f44336; /* Un color rojo para indicar peligro */
+  background-color: #f44336;
   color: white;
-  margin-top: 1rem; /* Espacio entre la info del usuario y el botón */
+  margin-top: 1rem;
 
   &:hover {
     filter: brightness(1.1);
@@ -185,22 +204,39 @@ nav a.btn {
 
 .d-flex {
   width: 100%;
-  justify-content: center; /* Centra el botón en pantallas pequeñas */
+  justify-content: center;
 }
+
 @media (max-width: 768px) {
   .sidebar {
-    width: 60px;
+    width: 60px; /* Por defecto en móvil, puede ser pequeño */
+    // Si quieres que el sidebar se oculte completamente en móvil por defecto:
+    // left: -60px;
+    // .sidebar.open { left: 0; width: 200px; }
+
+    .hamburger {
+      margin: 0.5rem; // Ajusta margen en móvil
+    }
   }
 
   .sidebar.open {
     width: 200px;
+    nav {
+      display: flex; /* Muestra nav cuando está abierto en móvil */
+    }
+    .user-info {
+      display: flex; /* Muestra user-info cuando está abierto en móvil */
+    }
+    .d-flex .btn-outline-danger span {
+      display: inline; // Muestra el texto del botón al abrir
+    }
+    .d-flex .btn-outline-danger .material-symbols-outlined {
+      font-size: 1.2rem; // Tamaño normal del ícono
+    }
   }
 
-  .sidebar.open nav {
-    display: flex;
-  }
-
-  .sidebar.open .user-info {
-    display: flex;
-  }
+  // Si decides que el sidebar se oculte completamente en móvil:
+  // .sidebar.closed {
+  //   left: -60px;
+  // }
 }

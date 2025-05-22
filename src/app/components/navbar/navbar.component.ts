@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+// src/app/navbar/navbar.component.ts
+import { Component, OnInit, Output, EventEmitter } from '@angular/core'; // Añadido OnInit y Output, EventEmitter
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-navbar',
@@ -10,20 +10,33 @@ import { Output, EventEmitter } from '@angular/core';
   styleUrls: ['./navbar.component.scss'],
   templateUrl: './navbar.component.html',
 })
-export class NavbarComponent {
-  menuOpen = true;
-  constructor(private router: Router) {} // Inyecta el Router
+export class NavbarComponent implements OnInit {
+  // Implementa OnInit
+  menuOpen = true; // Asume que inicia abierto por defecto
 
-  @Output() menuState = new EventEmitter<boolean>();
+  // Renombramos el EventEmitter para que coincida con lo que el DashboardComponent espera escuchar
+  @Output() menuToggle = new EventEmitter<boolean>();
+
+  constructor(private router: Router) {}
+
+  ngOnInit(): void {
+    // Emite el estado inicial del menú cuando el componente se inicializa
+    // Esto asegura que el DashboardComponent reciba el estado inicial del sidebar
+    setTimeout(() => {
+      // Pequeño delay para asegurar que el DashboardComponent esté listo para escuchar
+      this.menuToggle.emit(this.menuOpen);
+    }, 0);
+  }
+
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
-    this.menuState.emit(this.menuOpen); // emite el estado
+    this.menuToggle.emit(this.menuOpen); // Emite el nuevo estado a través del EventEmitter
   }
 
   cerrarSesion() {
-    // Aquí puedes agregar la lógica para cerrar la sesión
-    // Por ejemplo, limpiar tokens, eliminar datos del localStorage, etc.
     console.log('Cerrando sesión...');
-    this.router.navigate(['/login']); // Redirige a la página de inicio de sesión
+    // Lógica para cerrar la sesión (ej. limpiar tokens, localStorage)
+    // Redirige a la página de login
+    this.router.navigate(['/login']);
   }
 }
