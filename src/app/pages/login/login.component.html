@@ -4,17 +4,17 @@
       class="card-body text-center p-4"
       style="background-color: #4caf50; color: black; border-radius: 0.5rem"
     >
-      <img src="assets/logos/tlc.png" width="60" class="mb-3" />
+      <img src="assets/logos/tlc.png" width="150" class="mb-3" />
       <h3 class="fw-bold mb-4">THE LAST CHELITA</h3>
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="fill" class="w-100 mb-3">
           <mat-label for="correo">correo</mat-label>
-          <input matInput formControlName="correo"/>
+          <input matInput formControlName="correo" />
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="w-100 mb-2">
           <mat-label for="contrasenia">Contraseña</mat-label>
-          <input matInput formControlName="contrasenia" type="password"/>
+          <input matInput formControlName="contrasenia" type="password" />
         </mat-form-field>
 
         <button
