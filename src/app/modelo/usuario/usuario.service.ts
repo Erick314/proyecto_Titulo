@@ -3,13 +3,11 @@ import { CrudService } from '../crud/crud.service';
 import { Observable } from 'rxjs';
 
 export interface Usuario {
-  uid: string;
   apellido: string;
   correo: string;
   id?: number;
   nombre: string;
   rol: string;
-  usuario: string;
 }
 @Injectable({
   providedIn: 'root'
@@ -21,7 +19,7 @@ export class UsuarioService {
   constructor(private readonly crud: CrudService<Usuario>) {}
 
   listar(): Observable<Usuario[]> {
-    return this.crud.getAll(this.path);
+    return this.crud.getAll(this.path); 
   }
 
   obtenerPorId(id: string): Observable<Usuario | undefined> {
@@ -39,5 +37,4 @@ export class UsuarioService {
   eliminar(id: string): Promise<void> {
     return this.crud.delete(this.path, id);
   }
-  
 }
