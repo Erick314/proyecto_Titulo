@@ -1,0 +1,144 @@
+/* Estilos para el overlay (fondo difuminado) */
+.overlay {
+  position: fixed; /* Fija el overlay en la ventana de visualización */
+  top: 0;
+  left: 0;
+  width: 100%; /* Cubre todo el ancho */
+  height: 100%; /* Cubre todo el alto */
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo negro semitransparente */
+  display: flex; /* Para centrar el contenido (la tarjeta) */
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+  z-index: 1000; /* Asegura que esté por encima de otros elementos */
+  backdrop-filter: blur(
+    5px
+  ); /* Efecto de difuminado (si el navegador lo soporta) */
+  -webkit-backdrop-filter: blur(
+    5px
+  ); /* Prefijo para compatibilidad con Safari */
+}
+
+/* Estilos para la tarjeta flotante dentro del overlay */
+.edit-card {
+  background-color: white; /* Fondo blanco para la tarjeta */
+  padding: 2rem; /* Espaciado interno */
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra para darle profundidad */
+  max-width: 500px; /* Ancho máximo de la tarjeta */
+  width: 90%; /* Ancho flexible */
+  position: relative; /* Para posicionar el botón de cerrar si es necesario */
+  animation: fadeIn 0.3s ease-out; /* Animación de aparición */
+  max-height: 90vh; /* Altura máxima para permitir scroll si el contenido es mucho */
+  overflow-y: auto; /* Permite scroll vertical si el contenido excede la altura */
+  color: black; // Asegura que el texto sea legible
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos para los botones del modal de confirmación */
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.confirm-button {
+  background-color: #28a745; // Color verde de éxito
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #218838; // Verde más oscuro al pasar el mouse
+  }
+}
+
+.cancel-button {
+  background-color: #dc3545; // Color rojo de peligro
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #c82333; // Rojo más oscuro al pasar el mouse
+  }
+}
+
+/* Estilos para los mensajes de error dentro de los modales */
+.alert.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+}
+
+/* Ajustes para los input de formulario dentro de la tarjeta flotante */
+.edit-card label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #333; // Color de texto para las etiquetas
+}
+
+.edit-card input[type="text"],
+.edit-card input[type="number"],
+.edit-card input[type="date"],
+.edit-card input[type="file"] {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  box-sizing: border-box; // Asegura que el padding no aumente el ancho total
+}
+
+.edit-card .btn.btn-success {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #218838;
+  }
+}
+
+.pdf-icon-link {
+  display: inline-flex; // Para alinear bien el ícono y el texto si lo hubiera
+  align-items: center;
+  text-decoration: none; // Quita el subrayado por defecto
+  color: #007bff !important; // Color azul para el enlace (Bootstrap primary)
+
+  .material-symbols-outlined {
+    font-size: 24px; // Ajusta el tamaño si lo necesitas
+    transition: color 0.2s ease-in-out;
+  }
+
+  &:hover {
+    color: #0056b3 !important; // Azul más oscuro al pasar el mouse
+  }
+}

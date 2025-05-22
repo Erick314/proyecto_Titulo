@@ -83,6 +83,30 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="verPdf">
+        <th mat-header-cell *matHeaderCellDef>PDF</th>
+        <td mat-cell *matCellDef="let factura">
+          <ng-container *ngIf="factura.pdfUrl">
+            <a
+              [href]="factura.pdfUrl"
+              target="_blank"
+              class="text-info mx-1 pdf-icon-link"
+            >
+              <span class="material-symbols-outlined" style="cursor: pointer"
+                >picture_as_pdf</span
+              >
+            </a>
+          </ng-container>
+          <ng-container *ngIf="!factura.pdfUrl">
+            <span
+              class="material-symbols-outlined text-muted mx-1"
+              title="PDF no disponible"
+              >description</span
+            >
+          </ng-container>
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="opciones">
         <th mat-header-cell *matHeaderCellDef>OPCIONES</th>
         <td mat-cell *matCellDef="let factura">
@@ -178,8 +202,107 @@
           [(ngModel)]="selectedFactura.fechaEmision"
         />
 
+        <label class="form-label">PDF de Factura</label>
+        <div class="mb-3">
+          <p *ngIf="selectedFactura.pdfUrl && !selectedFileForEdit">
+            PDF Actual:
+            <a
+              [href]="selectedFactura.pdfUrl"
+              target="_blank"
+              class="text-primary"
+              >Ver PDF</a
+            >
+          </p>
+          <p *ngIf="selectedFileForEdit">
+            Nuevo PDF seleccionado:
+            <strong class="text-success">{{ selectedFileForEdit.name }}</strong>
+            <button
+              class="btn btn-sm btn-link text-danger"
+              (click)="clearSelectedFileForEdit()"
+            >
+              X
+            </button>
+          </p>
+          <input
+            type="file"
+            class="form-control"
+            (change)="onFileSelectedForEdit($event)"
+            accept=".pdf"
+          />
+        </div>
+
         <button class="btn btn-success w-100" (click)="guardarFactura()">
           Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="overlay"
+    *ngIf="mostrarModalNuevaFactura"
+    (click)="cerrarModalNuevaFactura()"
+  >
+    <div class="edit-card" (click)="$event.stopPropagation()">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="m-0">Nueva Factura</h5>
+        <button
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="cerrarModalNuevaFactura()"
+        ></button>
+      </div>
+
+      <div *ngIf="newFacturaValidationError" class="alert alert-danger py-1">
+        {{ newFacturaValidationError }}
+      </div>
+
+      <div>
+        <label class="form-label">Número de Factura</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="nuevaFactura.numeroFactura"
+          required
+        />
+
+        <label class="form-label">Proveedor</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="nuevaFactura.nombreProveedor"
+          required
+        />
+
+        <label class="form-label">Monto</label>
+        <input
+          type="number"
+          class="form-control mb-2"
+          [(ngModel)]="nuevaFactura.monto"
+          required
+        />
+
+        <label class="form-label">Fecha de Emisión</label>
+        <input
+          type="date"
+          class="form-control mb-3"
+          [(ngModel)]="nuevaFactura.fechaEmision"
+          required
+        />
+
+        <label class="form-label">Subir PDF (Opcional)</label>
+        <input
+          type="file"
+          class="form-control mb-3"
+          (change)="onFileSelected($event)"
+          accept=".pdf"
+        />
+        <p *ngIf="selectedFile">
+          Archivo seleccionado: {{ selectedFile.name }}
+        </p>
+
+        <button class="btn btn-success w-100" (click)="agregarNuevaFactura()">
+          Agregar Factura
         </button>
       </div>
     </div>
