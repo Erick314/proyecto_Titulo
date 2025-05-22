@@ -6,27 +6,21 @@
     >
       <img src="assets/logos/tlc.png" width="60" class="mb-3" />
       <h3 class="fw-bold mb-4">THE LAST CHELITA</h3>
-      <form (ngSubmit)="onLogin()">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="fill" class="w-100 mb-3">
-          <mat-label>Email</mat-label>
-          <input matInput [(ngModel)]="email" name="email" required />
+          <mat-label for="correo">correo</mat-label>
+          <input matInput formControlName="correo"/>
         </mat-form-field>
 
-        <mat-form-field appearance="fill" class="w-100 mb-3">
-          <mat-label>Contraseña</mat-label>
-          <input
-            matInput
-            type="password"
-            [(ngModel)]="password"
-            name="password"
-            required
-          />
+        <mat-form-field appearance="fill" class="w-100 mb-2">
+          <mat-label for="contrasenia">Contraseña</mat-label>
+          <input matInput formControlName="contrasenia" type="password"/>
         </mat-form-field>
 
         <button
           mat-raised-button
           color="primary"
-          class="w-100 mb-2"
+          class="primary w-100 mb-2"
           type="submit"
         >
           Iniciar sesión
