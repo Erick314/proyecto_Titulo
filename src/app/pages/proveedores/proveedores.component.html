@@ -1,0 +1,235 @@
+<div class="container-fluid bg-warning-subtle min-vh-100 py-4">
+  <div class="row">
+    <h2 class="text-center fw-bold mb-4">Proveedores</h2>
+
+    <div
+      class="row justify-content-center mb-4 gap-2 px-3 flex-wrap text-center"
+    >
+      <div class="col-auto">
+        <mat-form-field>
+          <mat-label>Sucursal</mat-label>
+          <mat-select>
+            <mat-option value="todas">Todas</mat-option>
+            <mat-option value="sucursal1">Sucursal 1</mat-option>
+            <mat-option value="sucursal2">Sucursal 2</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-auto">
+        <div class="input-group rounded-pill d-flex align-items-center">
+          <span
+            class="input-group-text bg-white border-end-0"
+            style="line-height: 1"
+          >
+            <span
+              class="material-symbols-outlined"
+              style="font-size: 24px; vertical-align: middle"
+              >search</span
+            >
+          </span>
+          <input
+            type="text"
+            class="form-control border-start-0"
+            placeholder="Filtrar proveedor"
+            [(ngModel)]="searchTerm"
+            (input)="applyFilter()"
+          />
+        </div>
+      </div>
+
+      <div class="col-auto">
+        <button
+          class="form-control rounded-pill px-4 py-2 d-flex align-items-center gap-2 bg-success-subtle"
+          (click)="abrirModalNuevoProveedor()"
+        >
+          <span class="material-symbols-outlined text-success">add</span>
+          Nuevo Proveedor
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive px-3">
+    <table
+      mat-table
+      [dataSource]="dataSourceProveedores"
+      class="mat-elevation-z8"
+      matSort
+    >
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef matSortHeader>ID</th>
+        <td mat-cell *matCellDef="let proveedor">{{ proveedor.id }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="nombreProveedor">
+        <th mat-header-cell *matHeaderCellDef matSortHeader>Proveedor</th>
+        <td mat-cell *matCellDef="let proveedor">
+          {{ proveedor.nombreProveedor }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="facturasEmitidas">
+        <th mat-header-cell *matHeaderCellDef matSortHeader>FACTURAS</th>
+        <td mat-cell *matCellDef="let proveedor">
+          {{ proveedor.facturasEmitidas }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="ultimoPedido">
+        <th mat-header-cell *matHeaderCellDef matSortHeader>Último pedido</th>
+        <td mat-cell *matCellDef="let proveedor">
+          {{ proveedor.ultimoPedido | date : "dd-MM-yyyy" }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="opciones">
+        <th mat-header-cell *matHeaderCellDef>OPCIONES</th>
+        <td mat-cell *matCellDef="let proveedor">
+          <span
+            class="material-symbols-outlined mx-1"
+            style="cursor: pointer"
+            (click)="abrirEditorProveedor(proveedor)"
+            >settings</span
+          >
+          <span
+            class="material-symbols-outlined mx-1"
+            style="cursor: pointer"
+            (click)="solicitarConfirmacionGuardadoProveedor(proveedor)"
+            >save</span
+          >
+          <span
+            class="material-symbols-outlined text-danger mx-1"
+            style="cursor: pointer"
+            (click)="solicitarConfirmacionEliminarProveedor(proveedor)"
+            >delete</span
+          >
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsProveedores"></tr>
+      <tr
+        mat-row
+        *matRowDef="let proveedor; columns: displayedColumnsProveedores"
+      ></tr>
+    </table>
+
+    <mat-paginator
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      showFirstLastButtons
+    ></mat-paginator>
+  </div>
+
+  <div class="overlay confirm-overlay" *ngIf="mostrarModalConfirmacion">
+    <div class="edit-card">
+      <h2>{{ mensajeConfirmacion }}</h2>
+      <div class="modal-buttons">
+        <button class="confirm-button" (click)="confirmarAccionProveedor()">
+          CONFIRMAR
+        </button>
+        <button class="cancel-button" (click)="cerrarModalConfirmacion()">
+          CANCELAR
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="overlay"
+    *ngIf="selectedProveedor"
+    (click)="cerrarEditorProveedor()"
+  >
+    <div class="edit-card" (click)="$event.stopPropagation()">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="m-0">Editar Proveedor</h5>
+        <button
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="cerrarEditorProveedor()"
+        ></button>
+      </div>
+
+      <div *ngIf="validationError" class="alert alert-danger py-1">
+        {{ validationError }}
+      </div>
+
+      <div>
+        <label class="form-label">Nombre del Proveedor</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="selectedProveedor.nombreProveedor"
+        />
+
+        <label class="form-label">Facturas Emitidas</label>
+        <input
+          type="number"
+          class="form-control mb-2"
+          [(ngModel)]="selectedProveedor.facturasEmitidas"
+        />
+
+        <label class="form-label">Último Pedido</label>
+        <input
+          type="date"
+          class="form-control mb-3"
+          [(ngModel)]="selectedProveedor.ultimoPedido"
+        />
+
+        <button class="btn btn-success w-100" (click)="guardarProveedor()">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="overlay"
+    *ngIf="mostrarModalNuevoProveedor"
+    (click)="cerrarModalNuevoProveedor()"
+  >
+    <div class="edit-card" (click)="$event.stopPropagation()">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="m-0">Nuevo Proveedor</h5>
+        <button
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="cerrarModalNuevoProveedor()"
+        ></button>
+      </div>
+
+      <div *ngIf="newProveedorValidationError" class="alert alert-danger py-1">
+        {{ newProveedorValidationError }}
+      </div>
+
+      <div>
+        <label class="form-label">Nombre del Proveedor</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="nuevoProveedor.nombreProveedor"
+          required
+        />
+
+        <label class="form-label">Facturas Emitidas</label>
+        <input
+          type="number"
+          class="form-control mb-2"
+          [(ngModel)]="nuevoProveedor.facturasEmitidas"
+          required
+        />
+
+        <label class="form-label">Último Pedido</label>
+        <input
+          type="date"
+          class="form-control mb-3"
+          [(ngModel)]="nuevoProveedor.ultimoPedido"
+          required
+        />
+
+        <button class="btn btn-success w-100" (click)="agregarNuevoProveedor()">
+          Agregar Proveedor
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
