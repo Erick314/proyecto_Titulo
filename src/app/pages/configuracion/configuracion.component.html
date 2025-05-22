@@ -1,0 +1,218 @@
+<div class="container-fluid bg-warning-subtle min-vh-100 py-4">
+  <div class="row">
+    <h2 class="text-center fw-bold mb-5">CONFIGURACIÓN</h2>
+
+    <div class="col-12 col-lg-10 mx-auto">
+      <mat-card class="setting-card mb-4 p-4 shadow-sm">
+        <h3 class="card-title-header mb-3">
+          <mat-icon class="icon-header">settings</mat-icon>
+          Configuración General
+        </h3>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <mat-form-field appearance="fill" class="w-100">
+              <mat-label>Nombre de la Empresa</mat-label>
+              <input
+                matInput
+                type="text"
+                [(ngModel)]="nombreEmpresa"
+                name="nombreEmpresa"
+              />
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field appearance="fill" class="w-100">
+              <mat-label>Zona Horaria</mat-label>
+              <mat-select [(ngModel)]="zonaHoraria" name="zonaHoraria">
+                <mat-option *ngFor="let tz of zonasHorarias" [value]="tz">
+                  {{ tz }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field appearance="fill" class="w-100">
+              <mat-label>Idioma</mat-label>
+              <mat-select [(ngModel)]="idioma" name="idioma">
+                <mat-option *ngFor="let lang of idiomas" [value]="lang.value">
+                  {{ lang.viewValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-12 text-end">
+            <button
+              mat-raised-button
+              class="custom-button-green"
+              (click)="guardarConfiguracionGeneral()"
+            >
+              Guardar General
+            </button>
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="setting-card mb-4 p-4 shadow-sm">
+        <h3 class="card-title-header mb-3">
+          <mat-icon class="icon-header">notifications</mat-icon>
+          Notificaciones
+        </h3>
+        <div class="row g-3 align-items-center">
+          <div
+            class="col-12 col-md-6 d-flex justify-content-between align-items-center"
+          >
+            <span>Notificaciones por Email:</span>
+            <mat-slide-toggle
+              [(ngModel)]="notificacionesEmail"
+              name="notificacionesEmail"
+            >
+              {{ notificacionesEmail ? "Activo" : "Inactivo" }}
+            </mat-slide-toggle>
+          </div>
+          <div
+            class="col-12 col-md-6 d-flex justify-content-between align-items-center"
+          >
+            <span>Notificaciones por SMS:</span>
+            <mat-slide-toggle
+              [(ngModel)]="notificacionesSMS"
+              name="notificacionesSMS"
+            >
+              {{ notificacionesSMS ? "Activo" : "Inactivo" }}
+            </mat-slide-toggle>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field appearance="fill" class="w-100">
+              <mat-label>Frecuencia de Notificaciones</mat-label>
+              <mat-select
+                [(ngModel)]="frecuenciaNotificaciones"
+                name="frecuenciaNotificaciones"
+              >
+                <mat-option
+                  *ngFor="let freq of frecuencias"
+                  [value]="freq.value"
+                >
+                  {{ freq.viewValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-12 text-end">
+            <button
+              mat-raised-button
+              class="custom-button-green"
+              (click)="guardarConfiguracionNotificaciones()"
+            >
+              Guardar Notificaciones
+            </button>
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="setting-card mb-4 p-4 shadow-sm">
+        <h3 class="card-title-header mb-3">
+          <mat-icon class="icon-header">security</mat-icon>
+          Seguridad
+        </h3>
+        <div class="row g-3 align-items-center">
+          <div
+            class="col-12 col-md-6 d-flex justify-content-between align-items-center"
+          >
+            <span>Autenticación de Dos Factores:</span>
+            <mat-slide-toggle
+              [(ngModel)]="autenticacionDosFactores"
+              name="autenticacionDosFactores"
+            >
+              {{ autenticacionDosFactores ? "Activo" : "Inactivo" }}
+            </mat-slide-toggle>
+          </div>
+          <div
+            class="col-12 col-md-6 d-flex justify-content-between align-items-center"
+          >
+            <span>Permitir Sesiones Múltiples:</span>
+            <mat-slide-toggle
+              [(ngModel)]="permitirSesionesMultiples"
+              name="permitirSesionesMultiples"
+            >
+              {{ permitirSesionesMultiples ? "Sí" : "No" }}
+            </mat-slide-toggle>
+          </div>
+          <div class="col-12 text-end">
+            <button
+              mat-raised-button
+              class="custom-button-green"
+              (click)="guardarConfiguracionSeguridad()"
+            >
+              Guardar Seguridad
+            </button>
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="setting-card mb-4 p-4 shadow-sm">
+        <h3 class="card-title-header mb-3">
+          <mat-icon class="icon-header">palette</mat-icon>
+          Apariencia
+        </h3>
+        <div class="row g-3 align-items-center">
+          <div class="col-12 d-flex justify-content-between align-items-center">
+            <span>Modo Oscuro:</span>
+            <mat-slide-toggle
+              [(ngModel)]="modoOscuro"
+              name="modoOscuro"
+              (change)="guardarConfiguracionApariencia()"
+            >
+              {{ modoOscuro ? "Activado" : "Desactivado" }}
+            </mat-slide-toggle>
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="setting-card mb-4 p-4 shadow-sm">
+        <h3 class="card-title-header mb-3">
+          <mat-icon class="icon-header">dns</mat-icon>
+          Gestión de Datos
+        </h3>
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <button
+              mat-raised-button
+              class="custom-button-blue"
+              (click)="exportarDatos()"
+            >
+              <mat-icon>download</mat-icon>
+              Exportar Todos los Datos
+            </button>
+          </div>
+          <div class="col-12 col-md-6">
+            <button
+              mat-raised-button
+              class="custom-button-red"
+              (click)="borrarCache()"
+            >
+              <mat-icon>delete_forever</mat-icon>
+              Borrar Caché y Datos Locales
+            </button>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+
+  <div class="overlay confirm-overlay" *ngIf="mostrarConfirmacionBorrarCache">
+    <div class="edit-card">
+      <h2>¿Estás seguro de que quieres borrar la caché y los datos locales?</h2>
+      <p class="text-center text-muted">
+        Esta acción es irreversible y podría requerir que vuelvas a iniciar
+        sesión.
+      </p>
+      <div class="modal-buttons">
+        <button class="confirm-button" (click)="confirmarBorrarCache()">
+          SÍ, BORRAR
+        </button>
+        <button class="cancel-button" (click)="cancelarBorrarCache()">
+          CANCELAR
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

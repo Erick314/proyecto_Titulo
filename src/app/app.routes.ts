@@ -7,6 +7,7 @@ import { FacturasComponent } from './pages/facturas/facturas.component';
 import { ProveedoresComponent } from './pages/proveedores/proveedores.component';
 import { SucursalesComponent } from './pages/sucursales/sucursales.component';
 import { ContactoComponent } from './pages/contacto/contacto.component';
+import { ConfiguracionComponent } from './pages/configuracion/configuracion.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -18,4 +19,5 @@ export const routes: Routes = [
   { path: 'proveedores', component: ProveedoresComponent },
   { path: 'sucursales', component: SucursalesComponent },
   { path: 'contacto', component: ContactoComponent },
+  { path: 'configuracion', component: ConfiguracionComponent },
 ];
