@@ -10,6 +10,7 @@ import { SucursalesComponent } from './pages/sucursales/sucursales.component';
 import { ContactoComponent } from './pages/contacto/contacto.component';
 import { ConfiguracionComponent } from './pages/configuracion/configuracion.component';
 import { DashboardComponent } from './layouts/dashboard/dashboard.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 export const routes: Routes = [
   // 1. Ruta de inicio: El login
@@ -46,5 +47,6 @@ export const routes: Routes = [
 
   // 5. Ruta comodín para cualquier otra URL no definida
   // Después de definir todas las rutas, cualquier URL que no coincida será redirigida al login
-  { path: '**', redirectTo: '/login' },
+  // 4. Ruta 404 (Not Found) - Esta debe ser la ÚLTIMA ruta en tu array
+  { path: '**', component: NotFoundComponent }, // Cualquier otra URL no definida va aquí
 ];

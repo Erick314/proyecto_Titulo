@@ -1,0 +1,98 @@
+/* Definir colores básicos para la página 404 localmente */
+$color-primary-404: #28a745; // Tu verde principal
+$color-secondary-404: #6c757d; // Gris secundario
+$color-background-404: #f8f9fa; // Fondo claro
+$color-card-background-404: white; // Fondo de la tarjeta 404
+$color-text-primary-404: #333; // Color de texto principal
+$color-text-muted-404: #6c757d; // Color de texto secundario/apagado
+
+// Variantes de color para hover de botones (calculadas con Sass)
+$color-primary-404-darken-10: darken($color-primary-404, 10%);
+$color-secondary-404-darken-10: darken($color-secondary-404, 10%);
+
+.not-found-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Ocupa toda la altura de la ventana */
+  background-color: $color-background-404;
+  color: $color-text-primary-404;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box; /* Asegura que el padding no cause desbordamiento */
+}
+
+.not-found-content {
+  max-width: 600px;
+  background-color: $color-card-background-404;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(-20px); /* Un pequeño ajuste para centrar visualmente */
+  animation: fadeInDown 0.8s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-20px);
+  }
+}
+
+.not-found-title {
+  font-size: 8em;
+  font-weight: bold;
+  color: $color-primary-404;
+  margin-bottom: 0.1em;
+  text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.not-found-message {
+  font-size: 1.8em;
+  margin-bottom: 15px;
+  color: $color-text-primary-404;
+}
+
+.not-found-sub-message {
+  font-size: 1.2em;
+  color: $color-text-muted-404;
+  margin-bottom: 30px;
+}
+
+.not-found-button {
+  padding: 12px 25px;
+  font-size: 1.1em;
+  border-radius: 8px;
+  margin: 0 10px; // Espacio entre botones
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  min-width: 180px;
+
+  &.btn-primary {
+    background-color: $color-primary-404;
+    border-color: $color-primary-404;
+    color: white;
+
+    &:hover {
+      background-color: $color-primary-404-darken-10;
+      border-color: $color-primary-404-darken-10;
+      transform: translateY(-2px);
+    }
+  }
+
+  &.btn-secondary {
+    background-color: $color-secondary-404;
+    border-color: $color-secondary-404;
+    color: white;
+
+    &:hover {
+      background-color: $color-secondary-404-darken-10;
+      border-color: $color-secondary-404-darken-10;
+      transform: translateY(-2px);
+    }
+  }
+}
