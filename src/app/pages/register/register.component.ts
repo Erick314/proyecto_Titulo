@@ -7,10 +7,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../services/auth.service';
 import { hasEmailError, isRequired} from '../../utils/validators';
 import { toast } from 'ngx-sonner';
+import { Usuario, UsuarioService } from '../../modelo/usuario/usuario.service';
 export interface CrearUsuario {
   correo: FormControl<string | null>;
   contrasenia: FormControl<string | null>;
   repetirContrasenia: FormControl<string | null>;
+  nombre: FormControl<string | null>;
+  apellido: FormControl<string | null>;
+  rol: FormControl<string | null>;
 }
 
 @Component({
@@ -29,34 +33,45 @@ export interface CrearUsuario {
 })
 export class RegisterComponent {
   private _formBuilder = inject(FormBuilder);
-  private _authService = inject(AuthService)
+  private _authService = inject(AuthService);
+  private _usuarioService = inject(UsuarioService)
   constructor() {}
   form = this._formBuilder.group<CrearUsuario>({
     correo: this._formBuilder.control('', [Validators.required, Validators.email]),
     contrasenia: this._formBuilder.control('', Validators.required),
-    repetirContrasenia: this._formBuilder.control('', Validators.required)
+    repetirContrasenia: this._formBuilder.control('', Validators.required),
+    nombre: this._formBuilder.control('', Validators.required),
+    apellido: this._formBuilder.control('', Validators.required),
+    rol: this._formBuilder.control('Usuario')
   })
-  isRequired(field: 'correo' | 'contrasenia' | 'repetirContrasenia'){
+
+  isRequired(field: string){
     return isRequired(field, this.form);
+
   }
   hasEmailError(){
     return hasEmailError(this.form);
   }
+
   onSubmit(){
     if (this.form.invalid) return;
-    const { correo, contrasenia, repetirContrasenia } = this.form.value;
+    const { correo, contrasenia, repetirContrasenia, nombre, apellido, rol } = this.form.value;
     if (contrasenia !== repetirContrasenia) return;
-    if (!correo || !contrasenia) return;
+    if (!correo || !contrasenia || !repetirContrasenia || !nombre || !apellido) return;
+    const nuevoUsuario = { correo, nombre, apellido, rol } as Omit<Usuario, 'id'>;
+    console.log(nuevoUsuario)
     this._authService
       .register(correo, contrasenia)
+      .then(() => this._usuarioService.crear(nuevoUsuario))
       .then(() => toast.success('Registro exitoso'))
       .catch((err: unknown) => {
         if (err instanceof Error) {
-          toast.error('Error inesperado');
+          toast.error(err.message);
         } else {
           toast.error('Error inesperado');
         }
       });
     console.log(this.form.getRawValue())
   }
+
 }

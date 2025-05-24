@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { CrudService } from '../crud/crud.service';
 import { Observable } from 'rxjs';
+import { Firestore } from '@angular/fire/firestore';
+import { addDoc, collection } from 'firebase/firestore';
 
 export interface Usuario {
   apellido: string;
@@ -14,7 +16,9 @@ export interface Usuario {
 })
 export class UsuarioService {
 
-  private readonly path = 'Usuario';
+  private readonly path = 'usuario';
+  private readonly _firestore = inject(Firestore);
+  private readonly _collection = collection(this._firestore, this.path)
 
   constructor(private readonly crud: CrudService<Usuario>) {}
 
@@ -27,6 +31,7 @@ export class UsuarioService {
   }
 
   crear(data: Omit<Usuario, 'id'>): Promise<string> {
+    addDoc(this._collection, data)
     return this.crud.create(this.path, data);
   }
 

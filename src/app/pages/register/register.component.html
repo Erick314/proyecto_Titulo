@@ -8,7 +8,23 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
       <mat-form-field appearance="fill" class="w-100 mb-2">
-        <mat-label for="correo">correo</mat-label>
+        <mat-label for="nombre">Nombre</mat-label>
+        <input matInput formControlName="nombre"/>
+        @if(isRequired('nombre')){
+          <mat-error>Campo Obligatorio</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-100 mb-2">
+        <mat-label for="apellido">Apellido</mat-label>
+        <input matInput formControlName="apellido"/>
+        @if(isRequired('apellido')){
+          <mat-error>Campo Obligatorio</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-100 mb-2">
+        <mat-label for="correo">Correo</mat-label>
         <input matInput formControlName="correo"/>
         @if(isRequired('correo')){
           <mat-error>Campo Obligatorio</mat-error>
@@ -36,8 +52,7 @@
 
       <button
         mat-raised-button
-        color="accent"
-        class="w-100 mb-2"
+        class="w-100 mb-2 btn btn-success"
         type="submit"
       >
         Registrarse

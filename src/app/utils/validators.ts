@@ -2,7 +2,7 @@ import { FormGroup } from "@angular/forms";
 import {ErrorStateMatcher} from '@angular/material/core';
 
 
-export const isRequired = (field: 'correo' | 'contrasenia' | 'repetirContrasenia', form: FormGroup) => {
+export const isRequired = (field: string, form: FormGroup) => {
     const control = form.get(field);
     return control && control.hasError('required')
 };
