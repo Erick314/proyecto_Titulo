@@ -7,7 +7,7 @@ import { addDoc, collection } from 'firebase/firestore';
 export interface Usuario {
   apellido: string;
   correo: string;
-  id?: number;
+  id?: string;
   nombre: string;
   rol: string;
 }
@@ -17,8 +17,6 @@ export interface Usuario {
 export class UsuarioService {
 
   private readonly path = 'usuario';
-  private readonly _firestore = inject(Firestore);
-  private readonly _collection = collection(this._firestore, this.path)
 
   constructor(private readonly crud: CrudService<Usuario>) {}
 
@@ -31,7 +29,6 @@ export class UsuarioService {
   }
 
   crear(data: Omit<Usuario, 'id'>): Promise<string> {
-    addDoc(this._collection, data)
     return this.crud.create(this.path, data);
   }
 

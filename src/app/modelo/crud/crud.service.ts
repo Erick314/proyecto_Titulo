@@ -1,5 +1,5 @@
 // src/app/services/generic-crud.service.ts
-import { Inject, Injectable } from '@angular/core';
+import { inject, Inject, Injectable } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -17,7 +17,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export interface WithId {
-  id?: number;
+  id?: string;
 }
 
 @Injectable({
@@ -25,10 +25,10 @@ export interface WithId {
 })
 export class CrudService<T extends WithId> {
   constructor() {}
-  private _firestore = Inject(Firestore)
+  private _firestore = inject(Firestore)
   /** Obtiene el referencia a la colección */
-  private colRef(path: string): CollectionReference<T> {
-    return collection(this._firestore, path) as CollectionReference<T>;
+  private colRef(path: string): CollectionReference {
+    return collection(this._firestore, path) as CollectionReference;
   }
 
   /** Obtiene el documento */
@@ -62,9 +62,9 @@ export class CrudService<T extends WithId> {
   }
 
   /** Opcional: genera un Observable con docs + cambios personalizados */
-  watch(path: string): Observable<{ id: number; data: T }[]> {
-    return collectionData(this.colRef(path), { idField: 'id' }).pipe(
-      map(arr => arr.map(item => ({ id: item.id!, data: item })))
-    );
-  }
+  // watch(path: string): Observable<{ id: number; data: T }[]> {
+  //   return collectionData(this.colRef(path), { idField: 'id' }).pipe(
+  //     map(arr => arr.map(item => ({ id: item.id!, data: item })))
+  //   );
+  // }
 }

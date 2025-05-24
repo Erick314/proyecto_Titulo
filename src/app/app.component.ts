@@ -7,7 +7,7 @@ import { NgxSonnerToaster } from 'ngx-sonner';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NavbarComponent, NgxSonnerToaster],
+  imports: [CommonModule, RouterOutlet, NgxSonnerToaster],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
