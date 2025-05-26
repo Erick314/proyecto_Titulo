@@ -83,13 +83,9 @@ nav a.btn {
   text-align: center;
   text-decoration: none;
   color: black;
-  white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
-  text-overflow: ellipsis; /* Añade puntos suspensivos si el texto es demasiado largo */
-  overflow: hidden; /* Oculta el texto que desborda */
-
-  &.btn-inventario {
-    background-color: #ffe066;
-  }
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 
   &.btn-seccion {
     background-color: #a3e635;
@@ -97,6 +93,26 @@ nav a.btn {
 
   &:hover {
     filter: brightness(1.1);
+  }
+
+  &.active {
+    background-color: #28a745;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: scale(1.02);
+  }
+}
+
+body.dark-mode {
+  nav a.btn {
+    &.active {
+      background-color: darken(
+        #8bc34a,
+        10%
+      ); // Un verde para modo oscuro, un poco más oscuro al activo
+      color: #e9ecef; // Color de texto para el modo oscuro
+    }
   }
 }
 
