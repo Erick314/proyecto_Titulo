@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../services/auth.service';
-import { hasEmailError, isRequired} from '../../utils/validators';
+import { hasEmailError, isRequired, hasSixDigits} from '../../utils/validators';
 import { toast } from 'ngx-sonner';
 import { Usuario, UsuarioService } from '../../modelo/usuario/usuario.service';
 export interface CrearUsuario {
@@ -38,8 +38,8 @@ export class RegisterComponent {
   constructor() {}
   form = this._formBuilder.group<CrearUsuario>({
     correo: this._formBuilder.control('', [Validators.required, Validators.email]),
-    contrasenia: this._formBuilder.control('', Validators.required),
-    repetirContrasenia: this._formBuilder.control('', Validators.required),
+    contrasenia: this._formBuilder.control('', [Validators.required, Validators.minLength(6)]),
+    repetirContrasenia: this._formBuilder.control('', [Validators.required, Validators.minLength(6)]),
     nombre: this._formBuilder.control('', Validators.required),
     apellido: this._formBuilder.control('', Validators.required),
     rol: this._formBuilder.control('Usuario')
@@ -47,19 +47,27 @@ export class RegisterComponent {
 
   isRequired(field: string){
     return isRequired(field, this.form);
-
   }
-  hasEmailError(){
-    return hasEmailError(this.form);
+  hasEmailError(field: string){
+    return hasEmailError(field, this.form);
+  }
+  hasSixDigits(field: string){
+    return hasSixDigits(field, this.form)
   }
 
   onSubmit(){
     if (this.form.invalid) return;
+
     const { correo, contrasenia, repetirContrasenia, nombre, apellido, rol } = this.form.value;
-    if (contrasenia !== repetirContrasenia) return;
+
+    if (contrasenia !== repetirContrasenia) {toast.error('Contraseñas deben coincidir'); return }
+    
     if (!correo || !contrasenia || !repetirContrasenia || !nombre || !apellido) return;
+    
     const nuevoUsuario = { correo, nombre, apellido, rol } as Omit<Usuario, 'id'>;
+    
     console.log(nuevoUsuario)
+    
     this._authService
       .register(correo, contrasenia)
       .then(() => this._usuarioService.crear(nuevoUsuario))

@@ -35,16 +35,16 @@ export class LoginComponent {
     correo: this._formBuilder.control('', [Validators.required, Validators.email]),
     contrasenia: this._formBuilder.control('', Validators.required),
   })
-  isRequired(field: 'correo' | 'contrasenia'){
+  isRequired(field: string){
     return isRequired(field, this.form);
   }
-  hasEmailError(){
-    return hasEmailError(this.form);
+  hasEmailError(field: string){
+    return hasEmailError(field, this.form);
   }
   onSubmit(){
     if (this.form.invalid) return;
     const { correo, contrasenia } = this.form.value;
-    if (!correo || !contrasenia) return;
+    if (!correo || !contrasenia) return ;
     this._authService
       .login(correo, contrasenia)
       .then(() => this._router.navigateByUrl('/inventario'))

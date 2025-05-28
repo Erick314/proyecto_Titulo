@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
   <div
     class="p-5 rounded shadow-lg text-center"
-    style="background: #2196f3; color: black; width: 360px"
+    style="background: #2196f3; color: black; width: 50%"
   >
     <img src="assets/logos/tlc.png" width="60" class="mb-3" />
     <h3 class="fw-bold mb-4">REGISTRO DE USUARIO</h3>
@@ -29,7 +29,7 @@
         @if(isRequired('correo')){
           <mat-error>Campo Obligatorio</mat-error>
         }
-        @if(hasEmailError()){
+        @if(hasEmailError('correo')){
           <mat-error>Debe ser Email</mat-error>
         }
       </mat-form-field>
@@ -40,6 +40,9 @@
         @if(isRequired('contrasenia')){
           <mat-error>Campo Obligatorio</mat-error>
         }
+        @if(hasSixDigits('contrasenia')){
+          <mat-error>Debe tener un minimo de 6 caracteres</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="w-100 mb-2">
@@ -47,6 +50,9 @@
         <input matInput type="password" formControlName="repetirContrasenia"/>
         @if(isRequired('repetirContrasenia')){
             <mat-error>Campo Obligatorio</mat-error>
+        }
+        @if(hasSixDigits('repetirContrasenia')){
+          <mat-error>Debe tener un minimo de 6 caracteres</mat-error>
         }
       </mat-form-field>
 
