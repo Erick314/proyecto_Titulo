@@ -36,7 +36,7 @@ export class NavbarComponent implements OnInit {
   cerrarSesion() {
     console.log('Cerrando sesión...');
     // Lógica para cerrar la sesión (ej. limpiar tokens, localStorage)
-    // Redirige a la página de login
+    localStorage.clear();
     this.router.navigate(['/login']);
   }
 }

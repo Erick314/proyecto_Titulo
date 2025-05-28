@@ -4,7 +4,7 @@ import { FormControl, FormsModule, Validators, ReactiveFormsModule, FormBuilder}
 import { RouterModule } from '@angular/router';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../services/authentication/auth.service';
 import { hasEmailError, isRequired, hasSixDigits} from '../../utils/validators';
 import { toast } from 'ngx-sonner';
 import { Usuario, UsuarioService } from '../../modelo/usuario/usuario.service';

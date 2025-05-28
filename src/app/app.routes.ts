@@ -2,6 +2,7 @@
 import { Routes } from '@angular/router';
 // Solo importamos NotFoundComponent porque es el único que no se carga perezosamente
 import { NotFoundComponent } from './pages/not-found/not-found.component';
+import { privateGuard, publicGuard } from './guards/guards.guard';
 
 export const routes: Routes = [
   // 1. Ruta de inicio: El login
@@ -9,11 +10,13 @@ export const routes: Routes = [
 
   // 2. Rutas de autenticación (Carga perezosa de los componentes de autenticación)
   {
+    canActivate: [publicGuard()],
     path: 'login',
     loadComponent: () =>
       import('./pages/login/login.component').then((m) => m.LoginComponent),
   },
   {
+    canActivate: [publicGuard()],
     path: 'register',
     loadComponent: () =>
       import('./pages/register/register.component').then(
@@ -21,6 +24,7 @@ export const routes: Routes = [
       ),
   },
   {
+    canActivate: [publicGuard()],
     path: 'recovery',
     loadComponent: () =>
       import('./pages/recovery/recovery.component').then(
@@ -30,13 +34,14 @@ export const routes: Routes = [
 
   // 3. Ruta para el Dashboard y sus hijos (contenido principal de la aplicación)
   {
+
     path: 'dashboard',
     // Carga perezosa del componente Dashboard (layout principal)
     loadComponent: () =>
       import('./layouts/dashboard/dashboard.component').then(
         (m) => m.DashboardComponent
       ),
-    // Eliminamos 'canActivate: [AuthGuard]' por ahora
+    canActivate: [privateGuard()],
     children: [
       // Rutas hijas que también se cargarán perezosamente
       {
@@ -83,7 +88,7 @@ export const routes: Routes = [
       },
 
       // Si quieres una página de inicio específica dentro del dashboard (por ejemplo, al entrar a /dashboard)
-      { path: '', redirectTo: 'facturas', pathMatch: 'full' }, // /dashboard redirige a /dashboard/facturas
+      {canActivateChild: [privateGuard()], path: '', redirectTo: 'facturas', pathMatch: 'full' }, // /dashboard redirige a /dashboard/facturas
     ],
   },
 
