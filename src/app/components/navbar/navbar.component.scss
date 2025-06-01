@@ -1,258 +1,390 @@
 /* src/app/navbar/navbar.component.scss */
 
-.sidebar {
-  width: 200px; /* Ancho por defecto (abierto, según tu configuración) */
-  min-width: 60px; /* Ancho mínimo cuando está cerrado */
-  height: 100vh;
-  background-color: #2ecc71;
-  padding: 1rem;
-  border-radius: 0 0 1rem 0;
-  position: fixed; /* Esto es lo que lo saca del flujo normal */
-  top: 0;
-  left: 0;
-  transition: all 0.3s ease;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-}
+/* ========================================= */
+/* ESTILOS BASE/COMUNES (MUY GENERALES)      */
+/* Se aplican en todas las resoluciones si no son sobrescritos. */
+/* ========================================= */
 
-.hamburger {
-  width: 30px;
-  height: 22px;
-  position: relative;
-  margin-bottom: 1rem;
-  cursor: pointer;
-  transition: 0.4s;
-  // Centrar el hamburguesa cuando el sidebar está cerrado
-  .sidebar.closed & {
-    margin: 0 auto 1rem auto; // Centra horizontalmente
-  }
-
-  span {
-    background-color: #fcd34d;
-    position: absolute;
-    height: 4px;
-    width: 100%;
-    border-radius: 5px;
-    left: 0;
-    transition: 0.4s;
-  }
-
-  span:nth-child(1) {
-    top: 0;
-  }
-
-  span:nth-child(2) {
-    top: 9px;
-  }
-
-  span:nth-child(3) {
-    bottom: 0;
-  }
-
-  &.active span:nth-child(1) {
-    transform: rotate(45deg);
-    top: 9px;
-  }
-
-  &.active span:nth-child(2) {
-    opacity: 0;
-  }
-
-  &.active span:nth-child(3) {
-    transform: rotate(-45deg);
-    bottom: 9px;
-  }
-}
-
-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 1rem;
-  flex-grow: 1;
-  margin-bottom: 1rem;
-  overflow: hidden; /* Oculta el contenido si el sidebar se cierra y el texto es muy largo */
-}
-
-nav a.btn {
-  display: block;
-  border-radius: 2rem;
-  padding: 0.6rem;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
-  color: black;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-
-  &.btn-seccion {
-    background-color: #a3e635;
-  }
-
-  &:hover {
-    filter: brightness(1.1);
-  }
-
-  &.active {
-    background-color: #28a745;
-    color: white;
-    font-weight: bold;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transform: scale(1.02);
-  }
-}
-
+// Si tienes estilos para body.dark-mode que afectan ambos navbars, déjalos aquí
 body.dark-mode {
   nav a.btn {
+    // Esto aplica a los botones del sidebar
     &.active {
-      background-color: darken(
-        #8bc34a,
-        10%
-      ); // Un verde para modo oscuro, un poco más oscuro al activo
-      color: #e9ecef; // Color de texto para el modo oscuro
+      background-color: darken(#8bc34a, 10%);
+      color: #e9ecef;
+    }
+  }
+  // Si tienes un .navbar-desktop para dark-mode
+  .navbar-desktop {
+    background-color: #343a40; // Ejemplo de fondo oscuro para el navbar desktop
+    color: white; // Ejemplo de color de texto
+    .navbar-large-menu li a {
+      color: #e9ecef;
+      &:hover {
+        color: lighten(#28a745, 10%); // Verde más claro al hover en modo oscuro
+      }
+      &.active {
+        color: lighten(#28a745, 10%);
+        &::after {
+          background-color: lighten(#28a745, 10%);
+        }
+      }
+    }
+    .search-icon,
+    .user-name-large {
+      color: #e9ecef;
+    }
+    .user-status-large {
+      color: lighten(#28a745, 10%);
     }
   }
 }
 
-.user-info {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  border-top: 1px solid #eee;
-  // Ocultar info de usuario cuando está cerrado
-  .sidebar.closed & {
-    display: none; // Oculta completamente user-info cuando el sidebar está cerrado
+// Estilos comunes para botones que puedan ser usados en ambos (si es el caso)
+.btn-outline-danger {
+  // Aquí van estilos base del botón cerrar sesión, si no se especifican por media query
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  background-color: transparent;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  &:hover {
+    color: white;
+    background-color: #dc3545;
+    border-color: #dc3545;
   }
 }
 
-.user-icon {
-  width: 30px;
-  height: 30px;
-  font-size: 14px;
-  margin-right: 10px;
-  border-radius: 50%;
-  background-color: #7f8c8d;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.user-details {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.user-name {
-  font-size: 1em;
-  font-weight: bold;
-  color: #fff;
-}
-
-.user-status {
-  font-size: 0.8em;
-  color: #fcd34d;
-}
-
-/* Estilos específicos para cuando el sidebar está cerrado */
-.sidebar.closed {
-  width: 60px; /* Ancho más pequeño cuando está cerrado */
-
-  nav {
-    display: none; /* Oculta la navegación completa cuando el sidebar está cerrado */
+/* ========================================= */
+/* ESTILOS PARA MOBILE Y TABLET (HASTA 991px) */
+/* Aplica para d-lg-none en el HTML de la barra de escritorio */
+/* ========================================= */
+@media (max-width: 991.98px) {
+  .navbar-desktop {
+    display: none; /* Asegura que la navbar de escritorio no se muestre en mobile/tablet */
   }
 
-  .user-info {
-    display: none; /* Oculta completamente la información de usuario */
+  .sidebar {
+    width: 60px; /* Por defecto en móvil, puede ser pequeño */
+    min-width: 60px;
+    height: 100vh;
+    background-color: #2ecc71;
+    padding: 1rem;
+    border-radius: 0 0 1rem 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
   }
 
-  .d-flex {
-    // Contenedor del botón cerrar sesión
-    justify-content: center; // Centra el botón
-    // Considera ocultar el botón si quieres que el sidebar cerrado sea solo el ícono.
-    // Si quieres que el ícono de cerrar sesión sea visible:
-    .btn-outline-danger {
-      width: 40px; // Ancho para el ícono de cerrar sesión
-      height: 40px;
-      padding: 0;
+  .hamburger {
+    width: 30px;
+    height: 22px;
+    position: relative;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: 0.4s;
+    margin: 0 auto 1rem auto; /* Centra horizontalmente el hamburguesa por defecto */
+
+    span {
+      background-color: #fcd34d;
+      position: absolute;
+      height: 4px;
+      width: 100%;
+      border-radius: 5px;
+      left: 0;
+      transition: 0.4s;
+    }
+
+    span:nth-child(1) {
+      top: 0;
+    }
+    span:nth-child(2) {
+      top: 9px;
+    }
+    span:nth-child(3) {
+      bottom: 0;
+    }
+
+    &.active span:nth-child(1) {
+      transform: rotate(45deg);
+      top: 9px;
+    }
+    &.active span:nth-child(2) {
+      opacity: 0;
+    }
+    &.active span:nth-child(3) {
+      transform: rotate(-45deg);
+      bottom: 9px;
+    }
+  }
+
+  /* Estilos específicos para cuando el sidebar está cerrado (predeterminado en mobile) */
+  .sidebar.closed {
+    width: 60px;
+
+    nav,
+    .user-info {
+      display: none; /* Oculta la navegación y user-info cuando el sidebar está cerrado */
+    }
+
+    .d-flex {
+      justify-content: center;
+      .btn-outline-danger {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        span {
+          display: none;
+        } /* Oculta el texto */
+        .material-symbols-outlined {
+          display: block;
+          font-size: 24px;
+          color: white;
+        }
+      }
+    }
+  }
+
+  /* Estilos para cuando el sidebar está abierto (clase .open) */
+  .sidebar.open {
+    width: 200px;
+    .hamburger {
+      margin-left: 0.5rem; /* Ajusta el margen del hamburguesa cuando el sidebar se abre */
+    }
+
+    nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 1rem;
+      flex-grow: 1;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    nav a.btn {
+      display: block;
+      border-radius: 2rem;
+      padding: 0.6rem;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
+      color: black;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+
+      &.btn-seccion {
+        background-color: #a3e635;
+      }
+      &:hover {
+        filter: brightness(1.1);
+      }
+      &.active {
+        background-color: #28a745;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transform: scale(1.02);
+      }
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border-top: 1px solid #eee;
+    }
+
+    .user-icon {
+      width: 30px;
+      height: 30px;
+      font-size: 14px;
+      margin-right: 10px;
+      border-radius: 50%;
+      background-color: #7f8c8d;
+      color: white;
       display: flex;
       justify-content: center;
       align-items: center;
-      span {
-        // Oculta el texto "Cerrar Sesión"
-        display: none;
-      }
-      .material-symbols-outlined {
-        // Muestra el ícono de salir
-        display: block; // Asegúrate de que el icono sea visible
-        font-size: 24px; // Tamaño más grande para el ícono
-        color: white; // Color del icono
+    }
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .user-name {
+      font-size: 1em;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .user-status {
+      font-size: 0.8em;
+      color: #fcd34d;
+    }
+
+    .d-flex {
+      width: 100%;
+      justify-content: center;
+      .btn-outline-danger {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-radius: 2rem;
+        padding: 0.6rem;
+        font-weight: bold;
+        text-align: left;
+        text-decoration: none;
+        // background-color: #f44336; // Ya se define con .btn-outline-danger base
+        // color: white; // Ya se define con .btn-outline-danger base
+        margin-top: 1rem;
+        span {
+          display: inline;
+        } /* Muestra el texto del botón al abrir */
+        .material-symbols-outlined {
+          font-size: 1.2rem;
+        }
       }
     }
   }
 }
 
-.btn-logout {
-  // Ahora se llama .btn-outline-danger en tu HTML
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border-radius: 2rem;
-  padding: 0.6rem;
-  font-weight: bold;
-  text-align: left;
-  text-decoration: none;
-  background-color: #f44336;
-  color: white;
-  margin-top: 1rem;
-
-  &:hover {
-    filter: brightness(1.1);
-  }
-
-  span.material-symbols-outlined {
-    font-size: 1.2rem;
-  }
-}
-
-.d-flex {
-  width: 100%;
-  justify-content: center;
-}
-
-@media (max-width: 768px) {
+/* ========================================= */
+/* ESTILOS PARA ESCRITORIO (DESDE 992px Y MÁS) */
+/* Aplica para d-lg-block en el HTML de la barra de escritorio */
+/* ========================================= */
+@media (min-width: 992px) {
   .sidebar {
-    width: 60px; /* Por defecto en móvil, puede ser pequeño */
-    // Si quieres que el sidebar se oculte completamente en móvil por defecto:
-    // left: -60px;
-    // .sidebar.open { left: 0; width: 200px; }
+    display: none; /* Asegura que el sidebar no se muestre en desktop */
+  }
 
-    .hamburger {
-      margin: 0.5rem; // Ajusta margen en móvil
+  .navbar-desktop {
+    display: flex; /* SOBRESCRIBE el d-none de Bootstrap para mostrarlo */
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    height: 80px; /* Ajusta esta altura si tu logo es más pequeño o más grande */
+    align-items: center;
+    padding-top: 20px; /* Aumenta este valor para más espacio arriba */
+  }
+
+  .main-navbar-large {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .navbar-large-left {
+    // No se necesita mucho aquí
+  }
+
+  .navbar-logo-large {
+    height: 40px; /* CLAVE: Ajusta este valor para controlar el tamaño del logo */
+    width: auto; /* Mantiene la proporción */
+  }
+
+  .navbar-large-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-grow: 1;
+    justify-content: center;
+    gap: 30px;
+
+    /* AJUSTE FINO: Este valor es el que probablemente necesites ajustar más */
+    margin-left: -50px; /* Empieza con un valor pequeño, ajústalo hasta centrar visualmente */
+  }
+
+  .navbar-large-menu li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    padding: 10px 0;
+    position: relative;
+    white-space: nowrap;
+    font-size: 1.1em;
+
+    &:hover {
+      color: #28a745;
+    }
+
+    &.active {
+      color: #28a745;
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: #28a745;
+      }
     }
   }
 
-  .sidebar.open {
-    width: 200px;
-    nav {
-      display: flex; /* Muestra nav cuando está abierto en móvil */
-    }
-    .user-info {
-      display: flex; /* Muestra user-info cuando está abierto en móvil */
-    }
-    .d-flex .btn-outline-danger span {
-      display: inline; // Muestra el texto del botón al abrir
-    }
-    .d-flex .btn-outline-danger .material-symbols-outlined {
-      font-size: 1.2rem; // Tamaño normal del ícono
+  .navbar-large-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .search-icon {
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+  }
+
+  .user-info-large {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .user-icon-large {
+    width: 30px;
+    height: 30px;
+    background-color: #6c757d;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    span {
+      font-size: 18px;
+      color: white;
     }
   }
 
-  // Si decides que el sidebar se oculte completamente en móvil:
-  // .sidebar.closed {
-  //   left: -60px;
-  // }
+  .user-details-large {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .user-name-large {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .user-status-large {
+    font-size: 0.8em;
+    color: #28a745;
+  }
 }

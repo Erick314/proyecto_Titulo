@@ -1,4 +1,68 @@
-<div class="sidebar" [class.closed]="!menuOpen" [class.open]="menuOpen">
+<header class="navbar-desktop d-none d-lg-block">
+  <nav class="main-navbar-large">
+    <div class="navbar-large-left">
+      <img
+        src="assets/logos/tlc.png"
+        alt="CCU 175 Años Juntos"
+        class="navbar-logo-large"
+      />
+    </div>
+    <ul class="navbar-large-menu">
+      <li>
+        <a routerLink="/dashboard/inventario" routerLinkActive="active"
+          >INVENTARIO</a
+        >
+      </li>
+      <li>
+        <a routerLink="/dashboard/facturas" routerLinkActive="active"
+          >FACTURAS</a
+        >
+      </li>
+      <li>
+        <a routerLink="/dashboard/proveedores" routerLinkActive="active"
+          >PROVEEDORES</a
+        >
+      </li>
+      <li>
+        <a routerLink="/dashboard/sucursales" routerLinkActive="active"
+          >SUCURSALES</a
+        >
+      </li>
+      <li>
+        <a routerLink="/dashboard/configuracion" routerLinkActive="active"
+          >CONFIGURACIÓN</a
+        >
+      </li>
+      <li>
+        <a routerLink="/dashboard/contacto" routerLinkActive="active"
+          >CONTACTO</a
+        >
+      </li>
+    </ul>
+    <div class="navbar-large-right">
+      <div class="user-info-large">
+        <div
+          class="user-icon-large rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center"
+        >
+          <span class="material-symbols-outlined">person</span>
+        </div>
+        <div class="user-details-large">
+          <span class="user-name-large fw-semibold">USUARIO</span>
+          <div class="user-status-large text-success">Conectado</div>
+        </div>
+      </div>
+      <button class="btn btn-outline-danger" (click)="cerrarSesion()">
+        Cerrar Sesión
+      </button>
+    </div>
+  </nav>
+</header>
+
+<div
+  class="sidebar d-lg-none"
+  [class.closed]="!menuOpen"
+  [class.open]="menuOpen"
+>
   <div class="hamburger" [class.active]="menuOpen" (click)="toggleMenu()">
     <span></span>
     <span></span>
@@ -10,36 +74,42 @@
       routerLink="/dashboard/inventario"
       routerLinkActive="active"
       class="btn btn-seccion"
+      (click)="toggleMenu()"
       >INVENTARIO</a
     >
     <a
       routerLink="/dashboard/facturas"
       routerLinkActive="active"
       class="btn btn-seccion"
+      (click)="toggleMenu()"
       >FACTURAS</a
     >
     <a
       routerLink="/dashboard/proveedores"
       routerLinkActive="active"
       class="btn btn-seccion"
+      (click)="toggleMenu()"
       >PROVEEDORES</a
     >
     <a
       routerLink="/dashboard/sucursales"
       routerLinkActive="active"
       class="btn btn-seccion"
+      (click)="toggleMenu()"
       >SUCURSALES</a
     >
     <a
       routerLink="/dashboard/configuracion"
       routerLinkActive="active"
       class="btn btn-seccion"
+      (click)="toggleMenu()"
       >CONFIGURACIÓN</a
     >
     <a
       routerLink="/dashboard/contacto"
       routerLinkActive="active"
       class="btn btn-seccion"
+      (click)="toggleMenu()"
       >CONTACTO</a
     >
 

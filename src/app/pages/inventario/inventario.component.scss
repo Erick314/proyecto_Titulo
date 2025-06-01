@@ -1,167 +1,613 @@
-:host {
-  display: block;
-  font-family: Arial, sans-serif;
+/* src/app/pages/inventario/inventario.component.scss */
+
+// Definir el color de fondo para el contenedor principal de esta página
+.container-fluid {
+  background-color: #fcf8e3; // Color amarillo/crema específico para esta página
+  min-height: 100vh; // Asegura que el contenedor ocupe al menos toda la altura de la ventana
+  // Nota: Si usas 'min-vh-100' de Bootstrap, esa clase ya debería manejar la altura.
+  // Puedes dejar 'min-height: 100vh;' aquí como un fallback si Bootstrap no lo hace.
 }
 
-table {
-  background-color: #fef9c3;
+/* --- Estilos para la tabla (copiados de styles.scss para modularizar) --- */
+.mat-table {
+  background-color: white; /* Fondo de la tabla */
+  border-radius: 8px; /* Bordes redondeados para la tabla */
+  overflow: hidden; /* Asegura que los bordes redondeados se apliquen bien */
 }
 
-thead th {
-  background-color: #4caf50 !important;
+.mat-header-cell {
+  background-color: #28a745; /* Verde para el header de la tabla */
+  color: white; /* Texto blanco en el header */
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.mat-cell {
+  color: #333; /* Color de texto para las celdas */
+  border-bottom: 1px solid #eee; /* Líneas divisorias sutiles */
+}
+
+.mat-row:last-child .mat-cell {
+  border-bottom: none; /* Eliminar borde inferior de la última fila */
+}
+
+/* Estilos para el paginator (copiados de styles.scss) */
+.mat-paginator {
+  background-color: white;
+  color: #333;
+  border-radius: 0 0 8px 8px; /* Bordes redondeados solo abajo */
+  margin-top: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para los botones de búsqueda y añadir (copiados de styles.scss) */
+.input-group.rounded-pill .form-control,
+.input-group.rounded-pill .input-group-text,
+.form-control.rounded-pill {
+  border-radius: 50px !important; /* Asegura que sean realmente redondeados */
+}
+
+.input-group-text.border-end-0 {
+  background-color: white; /* Asumiendo que quieres el fondo blanco para el ícono de búsqueda */
+  border: 1px solid #ced4da;
+  border-right: none;
+}
+
+.form-control.border-start-0 {
+  border: 1px solid #ced4da;
+  border-left: none;
+  box-shadow: none !important;
+  &:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+  }
+}
+
+.bg-success-subtle {
+  background-color: #d4edda !important; /* Verde claro para el botón "Nuevo Producto" */
+  color: #155724; /* Texto oscuro para el botón */
+  border: 1px solid #c3e6cb !important;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #c0ddc8 !important;
+  }
+}
+
+/* Estilos específicos para las flechas de movimiento dentro de la tabla */
+.movement-arrow {
+  width: 24px; /* Ajusta el tamaño de la flecha según tu gusto */
+  height: 24px;
+  vertical-align: middle;
+  margin-left: 5px;
+}
+
+/* Estilos para los íconos de Material Symbols dentro de la tabla */
+.pdf-icon-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: #007bff; // Ya no necesita !important si no hay conflicto
+  .material-symbols-outlined {
+    font-size: 24px;
+    transition: color 0.2s ease-in-out;
+  }
+  &:hover {
+    color: #0056b3; // Ya no necesita !important
+  }
+}
+
+.text-primary-dark {
+  color: #28a745; /* Usar el verde principal de tu tema */
+}
+
+.text-success {
+  color: #28a745; /* Ya no necesita !important si no hay conflicto */
+}
+
+.text-danger {
+  color: #dc3545; /* Ya no necesita !important si no hay conflicto */
+}
+
+/* Estilos específicos para el modal de nuevo producto si difieren */
+.nuevo-producto-card {
+  background-color: var(
+    --card-background-color,
+    white
+  ); /* Usa la variable global si existe, sino blanco */
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  animation: fadeIn 0.3s ease-out;
+  max-height: 90vh;
+  overflow-y: auto;
   color: black;
 }
 
-button.form-control {
-  background-color: #fff3cd;
-  border: 1px solid #ccc;
-  font-weight: bold;
+.detalle-producto-card.edit-card.historial-modal-content {
+  width: 70%;
+  max-width: 800px;
+  padding: 30px;
 }
 
-.material-symbols-outlined {
-  vertical-align: middle;
-  font-size: 20px;
+/* Estilos para los campos de Material (fill appearance) específicos de Inventario si los necesitas */
+.mat-form-field {
+  width: 100%; /* Asegura que el select ocupe el ancho disponible */
 }
 
+/* Quita el underline por defecto de Angular Material Select */
+.mat-form-field-underline {
+  display: none;
+}
+/* Estiliza el borde y fondo del select */
+.mat-mdc-form-field-appearance-fill .mat-mdc-form-field-flex,
+.mat-mdc-form-field-appearance-fill .mat-mdc-form-field-subscript-wrapper {
+  background-color: white !important; // Mantener !important si Material lo sobrescribe
+  border-radius: 50px !important;
+  padding: 0.5rem 1rem !important;
+  height: auto !important;
+}
+.mat-mdc-form-field-ripple,
+.mat-mdc-form-field-focus-overlay {
+  display: none !important;
+}
+
+.mat-mdc-select-trigger {
+  padding: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  line-height: normal !important;
+}
+
+.mat-mdc-select-value {
+  color: #495057 !important;
+}
+
+.mat-mdc-form-field-infix {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  height: auto !important;
+}
+
+.mat-mdc-select-arrow {
+  color: #495057 !important;
+}
+
+/* Estilos para el texto de los títulos de página */
+.text-center.fw-bold.mb-4 {
+  color: #333; /* Un color oscuro para los títulos principales */
+}
+
+/* src/app/pages/configuracion/configuracion.component.scss */
+/* src/app/pages/contacto/contacto.component.scss */
+/* src/app/pages/sucursales/sucursales.component.scss */
+/* You can add global styles to this file, and also import other style files */
+
+/* Importar Material Icons/Symbols si no lo has hecho ya en index.html o aquí */
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
+
+:root {
+  // Se ha quitado --background-color-page de aquí, ya que se manejará por componente
+  --card-background-color: #ffffff; /* Fondo de tarjetas claro */
+  --text-color-primary: #212529; /* Texto principal oscuro */
+  --text-color-muted: #6c757d; /* Texto secundario/apagado */
+  --border-color: #dee2e6; /* Borde general */
+  --input-background: #ffffff; /* Fondo de inputs claro */
+  --input-text-color: #212529; /* Color de texto de inputs */
+  --box-shadow-color: rgba(0, 0, 0, 0.1); /* Sombra suave */
+  --box-shadow-color-card: rgba(0, 0, 0, 0.2); /* Sombra para tarjetas */
+  --primary-color: #28a745; /* Tu verde primario principal */
+  --secondary-color: #6c757d; /* Gris secundario */
+  --btn-inventario-bg: #ffe066; /* Amarillo para inventario (si lo gestionas aquí) */
+  --btn-seccion-bg: #a3e635; /* Verde claro para secciones (si lo gestionas aquí) */
+}
+
+/* dark mode */
+body.dark-mode {
+  --background-color-page: #343a40; /* Color de fondo general oscuro (si aún quieres dark mode) */
+  --card-background-color: #495057; /* Fondo de tarjetas oscuro */
+  --text-color-primary: #f8f9fa; /* Texto principal claro */
+  --text-color-muted: #adb5bd; /* Texto secundario/apagado */
+  --border-color: #495057; /* Borde oscuro */
+  --input-background: #6c757d; /* Fondo de inputs oscuro */
+  --input-text-color: #f8f9fa; /* Color de texto de inputs oscuro */
+  --box-shadow-color: rgba(0, 0, 0, 0.3); /* Sombra más pronunciada en oscuro */
+  --box-shadow-color-card: rgba(0, 0, 0, 0.4); /* Sombra para tarjetas oscuro */
+  --primary-color: #8bc34a; /* Un verde ajustado para modo oscuro */
+  --secondary-color: #adb5bd; /* Gris para modo oscuro */
+  --btn-inventario-bg: #d4ac0d; /* Amarillo más oscuro para inventario */
+  --btn-seccion-bg: #7cb342; /* Verde más oscuro para secciones */
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  // Si no hay un color de fondo para el body en inventario.component.scss,
+  // y quieres que el fondo del body sea un color general para toda la app,
+  // podrías dejar var(--background-color-page) aquí (definido en :root).
+  // Si cada componente maneja su fondo, el body puede quedarse transparente.
+  // background-color: var(--background-color-page); // Quitar si cada componente gestiona el 100% de su fondo
+}
+
+/* --- Estilos Comunes para Overlays y Modales (Aplicables globalmente) --- */
+
+/* Estilos para el overlay (fondo difuminado) */
 .overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 999;
+  align-items: center;
+  z-index: 1000; /* Z-index base para los overlays normales */
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
+/* Estilos para la tarjeta flotante dentro del overlay (el modal en sí) */
 .edit-card {
-  background-color: white;
-  border-radius: 12px;
+  background-color: white; // Usar var(--card-background-color) si quieres que siga el tema
   padding: 2rem;
-  width: 90%;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   max-width: 500px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  position: relative;
+  animation: fadeIn 0.3s ease-out;
+  max-height: 90vh;
+  overflow-y: auto;
+  color: black; /* Asegura que el texto dentro del modal sea legible */
 }
 
+/* Animación de entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos específicos para el overlay de CONFIRMACIÓN */
+/* Este debe tener un z-index más alto para aparecer por encima de otros overlays */
+.overlay.confirm-overlay {
+  z-index: 1001; /* Asegura que la confirmación esté por encima de la edición/nueva factura/proveedor */
+}
+
+/* Estilos para los botones del modal de confirmación */
 .modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
   margin-top: 20px;
-}
-
-.confirm-button,
-.cancel-button {
-  padding: 10px 20px;
-  margin: 0 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
 }
 
 .confirm-button {
-  background-color: #4caf50; /* Verde */
-  color: white;
-}
-
-.cancel-button {
-  background-color: #f44336; /* Rojo */
-  color: white;
-}
-
-.detalle-producto-card {
-  /* ... tus estilos generales para la tarjeta ... */
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  text-align: left; /* Alinea el texto a la izquierda para mejor lectura en tarjetas más anchas */
-}
-
-.historial-modal-content {
-  width: 70%; /* Ajusta el ancho según necesites */
-  max-width: 800px; /* Establece un ancho máximo si es necesario */
-  /* height: 60%; /* También puedes ajustar la altura si lo deseas */
-  /* max-height: 500px; */
-  padding: 30px; /* Aumenta el padding para dar más espacio interior */
-}
-.historial-tabla {
-  width: 100%; /* Asegura que la tabla intente ocupar el 100% del ancho de su contenedor */
-  border-collapse: collapse;
-  margin-top: 15px;
-}
-.historial-tabla {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-}
-
-.mat-table {
-  width: 100%;
-}
-
-.nuevo-producto-card {
-  background-color: #f8f9fa; /* Un fondo claro para la tarjeta */
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  width: 80%; /* Ajusta el ancho según necesites */
-  max-width: 400px;
-}
-
-.nuevo-producto-card h2 {
-  margin-bottom: 20px;
-  color: #28a745; /* Un color que combine con el botón de "Nuevo Producto" */
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-control {
-  padding: 12px;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-  width: 100%;
-  box-sizing: border-box;
-  margin-top: 5px;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: #28a745;
-  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-}
-
-.agregar-button {
-  background-color: #ffc107; /* Un color amarillo como en el mockup */
-  color: #212529;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-  margin-top: 20px;
-}
-
-.agregar-button:hover {
-  background-color: #e0a800;
-}
-
-.cancelar-button {
-  background-color: #6c757d;
+  background-color: #28a745; /* Bootstrap green */
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px;
+  font-weight: bold;
   transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #218838;
+  }
 }
 
-.cancelar-button:hover {
-  background-color: #5a6268;
+.cancel-button {
+  background-color: #dc3545; /* Bootstrap red */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #c82333;
+  }
+}
+
+/* Estilos para los mensajes de error dentro de los modales */
+.alert.alert-danger {
+  background-color: #f8d7da; /* Light red background */
+  color: #721c24; /* Dark red text */
+  border: 1px solid #f5c6cb; /* Red border */
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+}
+
+/* Ajustes para los input de formulario dentro de la tarjeta flotante */
+.edit-card label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #333; /* Color de texto para las etiquetas */
+}
+
+.edit-card input[type="text"],
+.edit-card input[type="number"],
+.edit-card input[type="date"],
+.edit-card input[type="file"] {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  box-sizing: border-box; /* Asegura que padding no aumente el ancho total */
+}
+
+.edit-card .btn.btn-success {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #218838;
+  }
+}
+
+/* Estilos para los íconos de Material Symbols (globalmente) */
+.material-symbols-outlined {
+  user-select: none; /* Evita que el texto del ícono se seleccione */
+  vertical-align: middle; /* Ayuda a alinear con texto si hay */
+}
+
+/* Estilos para el background de las páginas (del mockup) - Esta clase ahora es redundante si se modulariza por componente */
+.bg-warning-subtle {
+  background-color: #fcf8e3 !important; /* Un tono amarillo/crema para el fondo principal */
+}
+
+/* Estilos para el contenedor principal, si necesitas un margen específico */
+.container-fluid {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* Estilos generales para las tarjetas de información de contacto */
+.contact-info-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Sombra más sutil */
+  transition: transform 0.2s ease-in-out;
+  color: black; /* Asegura el color del texto */
+
+  &:hover {
+    transform: translateY(-5px); /* Pequeño efecto hover */
+  }
+
+  .icon-lg {
+    font-size: 48px; /* Tamaño grande para los íconos */
+    color: #28a745; /* Color verde como el tema de tu aplicación */
+  }
+
+  h4 {
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: #555;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+}
+
+/* Estilo para el botón de enviar mensaje, siguiendo el estilo de "agregar" */
+.custom-button-green {
+  background-color: #28a745 !important; /* Verde principal */
+  color: white !important;
+  font-weight: bold;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px; /* Bordes ligeramente más definidos */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background-color: #218838 !important; /* Verde más oscuro al pasar el ratón */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Estilos para el embed de Google Maps */
+.map-container {
+  overflow: hidden;
+  position: relative;
+  height: 0;
+  padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+  border: 1px solid #ddd; /* Borde sutil para el mapa */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* Ajustes para los campos de Material (fill appearance) para que se vean bien */
+.mat-mdc-form-field-appearance-fill .mat-mdc-form-field-flex {
+  background-color: #f8f9fa; /* Fondo gris claro para los inputs */
+  border-radius: 4px;
+  padding: 0.5rem 1rem !important;
+  height: auto !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075); /* Sombra interna sutil */
+}
+
+.mat-mdc-form-field-ripple,
+.mat-mdc-form-field-focus-overlay {
+  display: none !important; /* Quita el ripple y el focus overlay de Angular Material */
+}
+
+.mat-mdc-form-field-flex {
+  align-items: center; /* Alinea íconos y texto */
+}
+
+.mat-mdc-form-field-infix {
+  padding-top: 0.75rem !important; /* Ajusta padding del texto */
+  padding-bottom: 0.75rem !important;
+  min-height: 48px; /* Altura mínima para consistencia */
+}
+
+.mat-mdc-input-element {
+  color: #333; /* Color de texto del input */
+}
+
+.mat-mdc-floating-label.mdc-floating-label {
+  color: #666; /* Color de la etiqueta flotante */
+}
+
+/* Estilos para los íconos sufijo en los inputs */
+.mat-mdc-form-field-icon-suffix {
+  margin-left: 0.5rem;
+  color: #999; /* Color de los íconos del formulario */
+}
+
+.card {
+  border: none;
+  border-radius: 8px;
+  background-color: white;
+}
+
+.alert {
+  border-radius: 0.25rem;
+}
+
+/* Estilos para las tarjetas de configuración */
+.setting-card {
+  background-color: white;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem !important; /* Ajustar padding si es necesario */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Sombra consistente */
+  color: #333; /* Color de texto general dentro de la tarjeta */
+}
+
+/* Estilo para el título de cada sección de la tarjeta */
+.card-title-header {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #28a745; /* Usando el verde principal de tu tema */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.5rem; /* Espacio debajo del título */
+}
+
+.icon-header {
+  font-size: 28px;
+  color: #28a745;
+}
+
+/* Ajuste para el texto dentro de mat-slide-toggle */
+mat-slide-toggle span {
+  font-weight: 500;
+  color: #555;
+}
+
+/* NUEVOS ESTILOS PARA BOTONES DE ACCIÓN ESPECÍFICOS */
+
+/* Botón Azul para Exportar */
+.custom-button-blue {
+  background-color: #007bff !important; /* Azul de Bootstrap */
+  color: white !important;
+  font-weight: bold;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  width: 100%; /* Ocupar todo el ancho disponible */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover {
+    background-color: #0056b3 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Botón Rojo para Borrar */
+.custom-button-red {
+  background-color: #dc3545 !important; /* Rojo de Bootstrap */
+  color: white !important;
+  font-weight: bold;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  width: 100%; /* Ocupar todo el ancho disponible */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover {
+    background-color: #c82333 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Asegurar que los inputs de Material se vean bien con el fondo */
+.mat-mdc-form-field-appearance-fill .mat-mdc-form-field-flex {
+  background-color: #f8f9fa; /* Un gris muy claro para los inputs */
+  border-radius: 4px;
+  padding: 0.5rem 1rem !important;
+  height: auto !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+}
+
+.mat-mdc-input-element {
+  color: #333;
+}
+
+.mat-mdc-select-value-text {
+  color: #333 !important;
+}
+
+/* Esconder la línea inferior y el focus del input de Material */
+.mat-mdc-form-field-underline,
+.mat-mdc-form-field-ripple,
+.mat-mdc-form-field-focus-overlay {
+  display: none !important;
+}
+
+/* Asegurar que los toggles tengan un buen contraste */
+.mdc-switch.mdc-switch--unselected .mdc-switch__track {
+  background-color: #ccc; /* Fondo de toggle inactivo */
+}
+.mdc-switch.mdc-switch--selected .mdc-switch__track {
+  background-color: #28a745; /* Fondo de toggle activo (verde) */
+}
+.mdc-switch.mdc-switch--unselected .mdc-switch__handle {
+  background-color: #888; /* Círculo de toggle inactivo */
+}
+.mdc-switch.mdc-switch--selected .mdc-switch__handle {
+  background-color: #fff; /* Círculo de toggle activo (blanco) */
 }

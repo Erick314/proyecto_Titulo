@@ -323,3 +323,36 @@ body {
     background-color: #9ac8da !important;
   }
 }
+
+:root {
+  --background-color-page: #fcf8e3; /* Color de fondo general claro (un gris muy claro) */
+  --card-background-color: #ffffff; /* Fondo de tarjetas claro */
+  --text-color-primary: #212529; /* Texto principal oscuro */
+  --text-color-muted: #6c757d; /* Texto secundario/apagado */
+  --border-color: #dee2e6; /* Borde general */
+  --input-background: #ffffff; /* Fondo de inputs claro */
+  --input-text-color: #212529; /* Color de texto de inputs */
+  --box-shadow-color: rgba(0, 0, 0, 0.1); /* Sombra suave */
+  --box-shadow-color-card: rgba(0, 0, 0, 0.2); /* Sombra para tarjetas */
+  --primary-color: #28a745; /* Tu verde primario principal */
+  --secondary-color: #6c757d; /* Gris secundario */
+  --btn-inventario-bg: #ffe066; /* Amarillo para inventario (si lo gestionas aquí) */
+  --btn-seccion-bg: #a3e635; /* Verde claro para secciones (si lo gestionas aquí) */
+}
+
+/* dark mode */
+body.dark-mode {
+  --background-color-page: #343a40; /* Color de fondo general oscuro */
+  --card-background-color: #495057; /* Fondo de tarjetas oscuro */
+  --text-color-primary: #f8f9fa; /* Texto principal claro */
+  --text-color-muted: #adb5bd; /* Texto secundario/apagado */
+  --border-color: #495057; /* Borde oscuro */
+  --input-background: #6c757d; /* Fondo de inputs oscuro */
+  --input-text-color: #f8f9fa; /* Color de texto de inputs oscuro */
+  --box-shadow-color: rgba(0, 0, 0, 0.3); /* Sombra más pronunciada en oscuro */
+  --box-shadow-color-card: rgba(0, 0, 0, 0.4); /* Sombra para tarjetas oscuro */
+  --primary-color: #8bc34a; /* Un verde ajustado para modo oscuro */
+  --secondary-color: #adb5bd; /* Gris para modo oscuro */
+  --btn-inventario-bg: #d4ac0d; /* Amarillo más oscuro para inventario */
+  --btn-seccion-bg: #7cb342; /* Verde más oscuro para secciones */
+}
