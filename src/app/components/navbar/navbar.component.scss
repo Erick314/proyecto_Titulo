@@ -69,7 +69,7 @@ body.dark-mode {
     width: 60px; /* Por defecto en móvil, puede ser pequeño */
     min-width: 60px;
     height: 100vh;
-    background-color: #2ecc71;
+    background-color: #63de97;
     padding: 1rem;
     border-radius: 0 0 1rem 0;
     position: fixed;
@@ -91,7 +91,7 @@ body.dark-mode {
     margin: 0 auto 1rem auto; /* Centra horizontalmente el hamburguesa por defecto */
 
     span {
-      background-color: #fcd34d;
+      background-color: #ffffff;
       position: absolute;
       height: 4px;
       width: 100%;
@@ -183,13 +183,13 @@ body.dark-mode {
       overflow: hidden;
 
       &.btn-seccion {
-        background-color: #a3e635;
+        background-color: #e5e5e5;
       }
       &:hover {
         filter: brightness(1.1);
       }
       &.active {
-        background-color: #28a745;
+        background-color: #6bb97d;
         color: white;
         font-weight: bold;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
