@@ -18,15 +18,8 @@
 
       <div class="col-auto">
         <div class="input-group rounded-pill d-flex align-items-center">
-          <span
-            class="input-group-text bg-white border-end-0"
-            style="line-height: 1"
-          >
-            <span
-              class="material-symbols-outlined"
-              style="font-size: 24px; vertical-align: middle"
-              >search</span
-            >
+          <span class="input-group-text bg-white border-end-0">
+            <span class="material-symbols-outlined">search</span>
           </span>
           <input
             type="text"
@@ -90,11 +83,9 @@
             <a
               [href]="factura.pdfUrl"
               target="_blank"
-              class="text-info mx-1 pdf-icon-link"
+              class="mx-1 pdf-icon-link"
             >
-              <span class="material-symbols-outlined" style="cursor: pointer"
-                >picture_as_pdf</span
-              >
+              <span class="material-symbols-outlined">picture_as_pdf</span>
             </a>
           </ng-container>
           <ng-container *ngIf="!factura.pdfUrl">
@@ -111,19 +102,19 @@
         <th mat-header-cell *matHeaderCellDef>OPCIONES</th>
         <td mat-cell *matCellDef="let factura">
           <span
-            class="material-symbols-outlined mx-1"
+            class="material-symbols-outlined mx-1 icon-action"
             style="cursor: pointer"
             (click)="abrirEditorFactura(factura)"
             >settings</span
           >
           <span
-            class="material-symbols-outlined mx-1"
+            class="material-symbols-outlined mx-1 icon-action"
             style="cursor: pointer"
             (click)="solicitarConfirmacionGuardadoFactura(factura)"
             >save</span
           >
           <span
-            class="material-symbols-outlined text-danger mx-1"
+            class="material-symbols-outlined text-danger mx-1 icon-action"
             style="cursor: pointer"
             (click)="solicitarConfirmacionEliminarFactura(factura)"
             >delete</span
@@ -209,7 +200,7 @@
             <a
               [href]="selectedFactura.pdfUrl"
               target="_blank"
-              class="text-primary"
+              class="text-primary-dark"
               >Ver PDF</a
             >
           </p>
