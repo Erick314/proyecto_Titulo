@@ -28,9 +28,8 @@ export class AuthService {
   }
 
   logout(): Promise<void> {
-    console.log('Sesión cerrada');
-    console.log(this._auth.currentUser); 
+    sessionStorage.clear();
     localStorage.clear();
-    return signOut(this._auth);
+    return signOut(this._auth).then(() => {});;
   }
 }

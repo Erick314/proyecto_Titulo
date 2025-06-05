@@ -47,7 +47,7 @@ export class LoginComponent {
     if (!correo || !contrasenia) return ;
     this._authService
       .login(correo, contrasenia)
-      .then(() => this._router.navigateByUrl('/inventario'))
+      .then(() => this._router.navigateByUrl('/facturas'))
       .catch((err: unknown) => {
         if (err instanceof Error) {
           toast.error('Ocurrio un error inesperado' + err.message);

@@ -1,7 +1,9 @@
 // src/app/navbar/navbar.component.ts
-import { Component, OnInit, Output, EventEmitter } from '@angular/core'; // Añadido OnInit y Output, EventEmitter
+import { Component, OnInit, Output, EventEmitter, Inject } from '@angular/core'; // Añadido OnInit y Output, EventEmitter
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { Auth } from '@angular/fire/auth';
+import { AuthService } from '../../services/authentication/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -17,8 +19,10 @@ export class NavbarComponent implements OnInit {
   // Renombramos el EventEmitter para que coincida con lo que el DashboardComponent espera escuchar
   @Output() menuToggle = new EventEmitter<boolean>();
 
-  constructor(private router: Router) {}
-
+  constructor() {}
+  private _auth = Inject(Auth);
+  private _router = Inject(Router);
+  private _authService = Inject(AuthService);
   ngOnInit(): void {
     // Emite el estado inicial del menú cuando el componente se inicializa
     // Esto asegura que el DashboardComponent reciba el estado inicial del sidebar
@@ -35,8 +39,11 @@ export class NavbarComponent implements OnInit {
 
   cerrarSesion() {
     console.log('Cerrando sesión...');
-    // Lógica para cerrar la sesión (ej. limpiar tokens, localStorage)
-    localStorage.clear();
-    this.router.navigate(['/login']);
+    this._authService.logout().then(() => {
+        console.log(this._auth.currentUser);
+        if (this._auth.currentUser == null) {
+          this._router.navigate(['/login']);
+        }
+    });
   }
 }
