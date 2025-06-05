@@ -21,6 +21,7 @@ interface ProductoConHistorial {
   detalles?: string;
 }
 
+
 @Component({
   selector: 'app-inventario',
   standalone: true,

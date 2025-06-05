@@ -4,7 +4,7 @@ import { CrudService } from '../crud/crud.service';
 import { Observable } from 'rxjs';
 
 export interface Factura{
-  id?: number;
+  id?: string;
   esVisible: boolean;
   fechaEmision: Date;
   iva: number;

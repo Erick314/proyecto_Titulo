@@ -3,7 +3,7 @@ import { Producto } from '../producto/producto.service';
 import { CrudService } from '../crud/crud.service';
 import { Observable } from 'rxjs';
 export interface Movimientos{
-  id?: number;
+  id?: string;
   facturaAsociada: number;
   fechaHora: Date;
   tipoMovimiento: string;

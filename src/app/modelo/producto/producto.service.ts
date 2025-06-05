@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CrudService } from '../crud/crud.service';
 import { Observable } from 'rxjs';
 export interface Producto {
-  id?: number;
+  id?: string;
   categoria: string;
   descripcion: string;
   estado: string;

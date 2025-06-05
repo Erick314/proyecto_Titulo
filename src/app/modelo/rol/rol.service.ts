@@ -3,7 +3,7 @@ import { CrudService } from '../crud/crud.service';
 import { Observable } from 'rxjs';
 
 export interface Rol {
-  id?: number;
+  id?: string;
   tipoRol: string;
 }
 @Injectable({

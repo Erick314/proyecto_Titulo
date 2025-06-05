@@ -58,34 +58,34 @@
       matSort
     >
       <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef matSortHeader>ID</th>
-        <td mat-cell *matCellDef="let proveedor">{{ proveedor.id }}</td>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">ID</th>
+        <td mat-cell *matCellDef="let proveedor" class="text-center">{{ proveedor.id }}</td>
       </ng-container>
 
       <ng-container matColumnDef="nombreProveedor">
-        <th mat-header-cell *matHeaderCellDef matSortHeader>Proveedor</th>
-        <td mat-cell *matCellDef="let proveedor">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Proveedor</th>
+        <td mat-cell *matCellDef="let proveedor" class="text-center">
           {{ proveedor.nombreProveedor }}
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="facturasEmitidas">
-        <th mat-header-cell *matHeaderCellDef matSortHeader>FACTURAS</th>
-        <td mat-cell *matCellDef="let proveedor">
+      <ng-container matColumnDef="facturasEmitidas" >
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">FACTURAS</th>
+        <td mat-cell *matCellDef="let proveedor" class="text-center">
           {{ proveedor.facturasEmitidas }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="ultimoPedido">
-        <th mat-header-cell *matHeaderCellDef matSortHeader>Último pedido</th>
-        <td mat-cell *matCellDef="let proveedor">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Último pedido</th>
+        <td mat-cell *matCellDef="let proveedor" class="text-center">
           {{ proveedor.ultimoPedido | date : "dd-MM-yyyy" }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="opciones">
-        <th mat-header-cell *matHeaderCellDef>OPCIONES</th>
-        <td mat-cell *matCellDef="let proveedor">
+        <th mat-header-cell *matHeaderCellDef class="text-center">OPCIONES</th>
+        <td mat-cell *matCellDef="let proveedor" class="text-center">
           <span
             class="material-symbols-outlined mx-1"
             style="cursor: pointer"

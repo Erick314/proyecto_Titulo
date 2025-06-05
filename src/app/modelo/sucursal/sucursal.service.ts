@@ -4,7 +4,7 @@ import { CrudService } from '../crud/crud.service';
 import { Observable } from 'rxjs';
 
 export interface Sucursal {
-  id?: number;
+  id?: string;
   nombre: string ;
   direccion: string ;
   contacto: string ;

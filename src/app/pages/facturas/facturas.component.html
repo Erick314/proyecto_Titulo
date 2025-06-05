@@ -51,34 +51,34 @@
       matSort
     >
       <ng-container matColumnDef="factura">
-        <th mat-header-cell *matHeaderCellDef matSortHeader>Factura</th>
-        <td mat-cell *matCellDef="let factura">{{ factura.numeroFactura }}</td>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Factura</th>
+        <td mat-cell *matCellDef="let factura" class="text-center">{{ factura.numeroFactura }}</td>
       </ng-container>
 
       <ng-container matColumnDef="proveedor">
-        <th mat-header-cell *matHeaderCellDef matSortHeader>Proveedor</th>
-        <td mat-cell *matCellDef="let factura">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Proveedor</th>
+        <td mat-cell *matCellDef="let factura" class="text-center">
           {{ factura.nombreProveedor }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="monto">
-        <th mat-header-cell *matHeaderCellDef matSortHeader>Monto</th>
-        <td mat-cell *matCellDef="let factura">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Monto</th>
+        <td mat-cell *matCellDef="let factura" class="text-center">
           {{ factura.monto | currency : "CLP" : "$" : "1.0-0" }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="fechaEmision">
-        <th mat-header-cell *matHeaderCellDef matSortHeader>Fecha</th>
-        <td mat-cell *matCellDef="let factura">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Fecha</th>
+        <td mat-cell *matCellDef="let factura" class="text-center">
           {{ factura.fechaEmision | date : "dd-MM-yyyy" }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="verPdf">
-        <th mat-header-cell *matHeaderCellDef>PDF</th>
-        <td mat-cell *matCellDef="let factura">
+        <th mat-header-cell *matHeaderCellDef class="text-center">PDF</th>
+        <td mat-cell *matCellDef="let factura" class="text-center">
           <ng-container *ngIf="factura.pdfUrl">
             <a
               [href]="factura.pdfUrl"
@@ -99,8 +99,8 @@
       </ng-container>
 
       <ng-container matColumnDef="opciones">
-        <th mat-header-cell *matHeaderCellDef>OPCIONES</th>
-        <td mat-cell *matCellDef="let factura">
+        <th mat-header-cell *matHeaderCellDef class="text-center">OPCIONES</th>
+        <td mat-cell *matCellDef="let factura" class="text-center">
           <span
             class="material-symbols-outlined mx-1 icon-action"
             style="cursor: pointer"

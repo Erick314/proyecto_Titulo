@@ -5,7 +5,7 @@ export interface Proveedor {
   contacto: string;
   correo: string;
   direccion: string;
-  id?: number;
+  id?: string;
   nombreCliente: string;
   razonSocial: string;
   rutEmpresa: string;
