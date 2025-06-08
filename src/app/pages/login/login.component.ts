@@ -42,19 +42,23 @@ export class LoginComponent {
     return hasEmailError(field, this.form);
   }
   onSubmit(){
-    if (this.form.invalid) return;
     const { correo, contrasenia } = this.form.value;
-    if (!correo || !contrasenia) return ;
+    if (correo == "" || !correo ) {toast.error("Ingrese Correo"); return};
+    if (contrasenia == "" || !contrasenia) {toast.error("Ingrese contraseña"); return};
+    if (this.form.invalid || contrasenia.length < 6) {toast.error('Correo y/o Contraseña incorrectos'); return};
     this._authService
       .login(correo, contrasenia)
-      .then(() => this._router.navigateByUrl('/dashboard/inventario'))
+      .then(() => { const tos = toast.success("Contraseña correcta, Redireccionando");
+        setTimeout(() => {
+          this._router.navigateByUrl('/dashboard/inventario');
+          toast.dismiss();
+        }, 2000);})
       .catch((err: unknown) => {
         if (err instanceof Error) {
           toast.error('Ocurrio un error inesperado' + err.message);
         } else {
-          toast.error('Ocurrio un error inesperado');
+          toast.error('Correo y/o Contraseña incorrecta');
         }
       });
-    console.log(this.form.getRawValue())
   }
 }

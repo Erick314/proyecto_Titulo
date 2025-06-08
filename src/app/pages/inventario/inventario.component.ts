@@ -20,7 +20,15 @@ interface ProductoConHistorial {
   stock?: number;
   detalles?: string;
 }
-
+export interface Producto {
+  id?: string;
+  categoria: string;
+  descripcion: string;
+  estado: string;
+  nombre: string;
+  precioUnitario: number;
+  cantidad: number;
+}
 
 @Component({
   selector: 'app-inventario',

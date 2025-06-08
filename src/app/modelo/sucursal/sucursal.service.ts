@@ -8,7 +8,6 @@ export interface Sucursal {
   nombre: string ;
   direccion: string ;
   contacto: string ;
-  productosDisponibles: Record<string, Producto>;
 }
 @Injectable({
   providedIn: 'root'
@@ -38,5 +37,4 @@ export class SucursalService {
     eliminar(id: string): Promise<void> {
       return this.crud.delete(this.path, id);
     }
-    
 }
