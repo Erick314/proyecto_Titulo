@@ -29,6 +29,11 @@
         >
       </li>
       <li>
+        <a routerLink="/dashboard/productos" routerLinkActive="active"
+          >PRODUCTOS</a
+        >
+      </li>
+      <li>
         <a routerLink="/dashboard/configuracion" routerLinkActive="active"
           >CONFIGURACIÓN</a
         >
@@ -97,6 +102,13 @@
       class="btn btn-seccion"
       (click)="toggleMenu()"
       >SUCURSALES</a
+    >
+    <a
+      routerLink="/dashboard/productos"
+      routerLinkActive="active"
+      class="btn btn-seccion"
+      (click)="toggleMenu()"
+      >PRODUCTOS</a
     >
     <a
       routerLink="/dashboard/configuracion"

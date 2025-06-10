@@ -6,17 +6,6 @@
       class="row justify-content-center mb-4 gap-2 px-3 flex-wrap text-center"
     >
       <div class="col-auto">
-        <mat-form-field>
-          <mat-label>Sucursal</mat-label>
-          <mat-select>
-            <mat-option value="todas">Todas</mat-option>
-            <mat-option value="sucursal1">Central/Matriz</mat-option>
-            <mat-option value="sucursal2">Puente Alto</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <div class="col-auto">
         <div class="input-group rounded-pill d-flex align-items-center">
           <span
             class="input-group-text bg-white border-end-0"
@@ -41,8 +30,7 @@
       <div class="col-auto">
         <button
           class="form-control rounded-pill px-4 py-2 d-flex align-items-center gap-2 bg-success-subtle"
-          (click)="abrirModalNuevaSucursal()"
-        >
+          (click)="abrirModalNuevaSucursal()">
           <span class="material-symbols-outlined text-success">add</span>
           Nueva Sucursal
         </button>
@@ -51,54 +39,52 @@
   </div>
 
   <div class="table-responsive px-3">
-    <table
-      mat-table
-      [dataSource]="dataSourceSucursales"
-      class="mat-elevation-z8"
-      matSort
-    >
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef matSortHeader>ID</th>
-        <td mat-cell *matCellDef="let sucursal">{{ sucursal.id }}</td>
-      </ng-container>
+    <table mat-table [dataSource]="dataSourceSucursales" class="mat-elevation-z8" matSort>
 
       <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef matSortHeader>Sucursal</th>
-        <td mat-cell *matCellDef="let sucursal">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Sucursal</th>
+        <td mat-cell *matCellDef="let sucursal" class="text-center">
           {{ sucursal.nombre }}
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="direccion">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Direccion</th>
+        <td mat-cell *matCellDef="let sucursal" class="text-center">
+          {{ sucursal.direccion }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="numContacto">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Numero de Contacto</th>
+        <td mat-cell *matCellDef="let sucursal" class="text-center">
+          {{ sucursal.numContacto }}
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="ventas">
-        <th mat-header-cell *matHeaderCellDef matSortHeader>Ventas</th>
-        <td mat-cell *matCellDef="let sucursal">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Ventas</th>
+        <td mat-cell *matCellDef="let sucursal" class="text-center">
           {{ sucursal.ventas | currency : "CLP" : "$" : "1.0-0" }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="ultimoPedido">
-        <th mat-header-cell *matHeaderCellDef matSortHeader>Último pedido</th>
-        <td mat-cell *matCellDef="let sucursal">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Último pedido</th>
+        <td mat-cell *matCellDef="let sucursal" class="text-center">
           {{ sucursal.ultimoPedido | date : "dd-MM-yyyy" }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="opciones">
-        <th mat-header-cell *matHeaderCellDef>OPCIONES</th>
-        <td mat-cell *matCellDef="let sucursal">
+        <th mat-header-cell *matHeaderCellDef class="text-center">OPCIONES</th>
+        <td mat-cell *matCellDef="let sucursal" class="text-center">
           <span
             class="material-symbols-outlined mx-1"
             style="cursor: pointer"
             (click)="abrirEditorSucursal(sucursal)"
             title="Editar Sucursal"
             >settings</span
-          >
-          <span
-            class="material-symbols-outlined mx-1"
-            style="cursor: pointer"
-            (click)="solicitarConfirmacionGuardadoSucursal(sucursal)"
-            title="Guardar Cambios"
-            >save</span
           >
           <span
             class="material-symbols-outlined text-danger mx-1"
@@ -111,8 +97,8 @@
       </ng-container>
 
       <ng-container matColumnDef="movimientos">
-        <th mat-header-cell *matHeaderCellDef>MOVIMIENTOS</th>
-        <td mat-cell *matCellDef="let sucursal">
+        <th mat-header-cell *matHeaderCellDef class="text-center">MOVIMIENTOS</th>
+        <td mat-cell *matCellDef="let sucursal" class="text-center">
           <button
             class="btn btn-sm btn-info text-dark rounded-pill"
             (click)="abrirModalMovimientos(sucursal)"
@@ -172,27 +158,31 @@
       </div>
 
       <div>
-        <label class="form-label">ID de Sucursal</label>
-        <input
-          type="text"
-          class="form-control mb-2"
-          [(ngModel)]="selectedSucursal.id"
-          disabled
-          title="El ID no se puede editar"
-        />
-
         <label class="form-label">Nombre de Sucursal</label>
         <input
           type="text"
           class="form-control mb-2"
           [(ngModel)]="selectedSucursal.nombre"
+          placeholder="ej: Casa matriz"
+          required
         />
 
-        <label class="form-label">Ventas</label>
+        <label class="form-label">Direccion</label>
         <input
-          type="number"
+          type="text"
           class="form-control mb-2"
-          [(ngModel)]="selectedSucursal.ventas"
+          [(ngModel)]="selectedSucursal.direccion"
+          placeholder="av. Siempre viva 3245"
+          required
+        />
+
+        <label class="form-label">Numero de Contacto</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="selectedSucursal.numContacto"
+          placeholder="+56..."
+          required
         />
 
         <label class="form-label">Último Pedido</label>
@@ -200,6 +190,7 @@
           type="date"
           class="form-control mb-3"
           [(ngModel)]="selectedSucursal.ultimoPedido"
+          required
         />
 
         <button class="btn btn-success w-100" (click)="guardarSucursal()">
@@ -224,24 +215,31 @@
         ></button>
       </div>
 
-      <div *ngIf="newSucursalValidationError" class="alert alert-danger py-1">
-        {{ newSucursalValidationError }}
-      </div>
-
       <div>
         <label class="form-label">Nombre de Sucursal</label>
         <input
           type="text"
           class="form-control mb-2"
           [(ngModel)]="nuevaSucursal.nombre"
+          placeholder="ej: Casa matriz"
           required
         />
 
-        <label class="form-label">Ventas</label>
+        <label class="form-label">Direccion</label>
         <input
-          type="number"
+          type="text"
           class="form-control mb-2"
-          [(ngModel)]="nuevaSucursal.ventas"
+          [(ngModel)]="nuevaSucursal.direccion"
+          placeholder="av. Siempre viva 3245"
+          required
+        />
+
+        <label class="form-label">Numero de Contacto</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="nuevaSucursal.numContacto"
+          placeholder="+56..."
           required
         />
 
@@ -263,14 +261,15 @@
   <div
     class="overlay"
     *ngIf="mostrarModalMovimientos"
-    (click)="cerrarModalMovimientos()"
-  >
+    (click)="cerrarModalMovimientos()">
+
     <div
       class="edit-card"
       style="max-width: 800px; width: 95%"
-      (click)="$event.stopPropagation()"
-    >
+      (click)="$event.stopPropagation()">
+
       <div class="d-flex justify-content-between align-items-center mb-3">
+
         <h5 class="m-0">
           Movimientos de Sucursal:
           <span class="text-success fw-bold">{{

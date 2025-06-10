@@ -4,10 +4,12 @@ import { CrudService } from '../crud/crud.service';
 import { Observable } from 'rxjs';
 
 export interface Sucursal {
-  id?: string;
-  nombre: string ;
-  direccion: string ;
-  contacto: string ;
+  id: string;
+  nombre: string;
+  direccion: string;
+  numContacto: string;
+  ventas: number;
+  ultimoPedido: Date;
 }
 @Injectable({
   providedIn: 'root'

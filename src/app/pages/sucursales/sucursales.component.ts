@@ -1,7 +1,4 @@
-// src/app/pages/sucursales/sucursales.component.ts
-
-// ... (imports existentes) ...
-import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -14,14 +11,16 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { toast } from 'ngx-sonner';
+import { SucursalService, Sucursal } from '../../modelo/sucursal/sucursal.service';
+import { Observable } from 'rxjs';
 
-interface Sucursal {
-  id: string; // Usamos string porque en el mockup es "001", "002"
+interface AgregarSucursal {
+  id: string;
   nombre: string;
+  direccion: string;
+  numContacto: string;
   ventas: number;
   ultimoPedido: Date;
-  // Podrías añadir un array de movimientos aquí o cargarlos por separado
-  movimientos?: Movimiento[]; // Opcional, si los cargamos al abrir el modal
 }
 
 interface Movimiento {
@@ -53,39 +52,22 @@ interface Movimiento {
 })
 export class SucursalesComponent implements OnInit, AfterViewInit {
   // Datos de ejemplo para las sucursales
-  sucursales: Sucursal[] = [
-    {
-      id: '001',
-      nombre: 'Central/Matriz',
-      ventas: 15578590,
-      ultimoPedido: new Date('2025-04-01'),
-    },
-    {
-      id: '002',
-      nombre: 'Puente Alto',
-      ventas: 8200000,
-      ultimoPedido: new Date('2025-03-20'),
-    },
-    {
-      id: '003',
-      nombre: 'Maipú',
-      ventas: 10500000,
-      ultimoPedido: new Date('2025-04-10'),
-    },
-    // ... más sucursales
-  ];
+  constructor() { }
+  private sucursalService = inject(SucursalService)
+  sucursales: AgregarSucursal[] = []
+  
   sucursalesFiltradas: Sucursal[] = [...this.sucursales];
+  dataSourceSucursales = new MatTableDataSource<Sucursal>([]);
   displayedColumnsSucursales: string[] = [
-    'id',
     'nombre',
     'ventas',
+    'direccion',
+    'numContacto',
     'ultimoPedido',
     'opciones',
-    'movimientos', // Nueva columna para el botón de movimientos
+    'movimientos', 
   ];
-  dataSourceSucursales = new MatTableDataSource<Sucursal>(
-    this.sucursalesFiltradas
-  );
+  
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -95,13 +77,13 @@ export class SucursalesComponent implements OnInit, AfterViewInit {
 
   // Estado para la confirmación de acciones
   mostrarModalConfirmacion = false;
-  sucursalAConfirmar: Sucursal | null = null;
+  sucursalAConfirmar: AgregarSucursal | null = null;
   mensajeConfirmacion = '';
-  sucursalAEliminar: Sucursal | null = null;
+  sucursalAEliminar: AgregarSucursal | null = null;
 
   // Estado para el nuevo proveedor
   mostrarModalNuevaSucursal = false;
-  nuevaSucursal: Partial<Sucursal> = {
+  nuevaSucursal: Partial<AgregarSucursal> = {
     nombre: '',
     ventas: 0,
     ultimoPedido: new Date(),
@@ -113,7 +95,7 @@ export class SucursalesComponent implements OnInit, AfterViewInit {
 
   // --- Estados para el modal de Movimientos ---
   mostrarModalMovimientos = false;
-  selectedSucursalMovimientos: Sucursal | null = null;
+  selectedSucursalMovimientos: AgregarSucursal | null = null;
   movimientosSucursal: Movimiento[] = [];
   displayedColumnsMovimientos: string[] = [
     'producto',
@@ -126,12 +108,38 @@ export class SucursalesComponent implements OnInit, AfterViewInit {
   @ViewChild('movimientosPaginator') movimientosPaginator!: MatPaginator;
   @ViewChild('movimientosSort') movimientosSort!: MatSort;
 
-  constructor() {}
+  
 
   ngOnInit(): void {
-    this.dataSourceSucursales = new MatTableDataSource(
-      this.sucursalesFiltradas
-    );
+    this.sucursalService.listar().subscribe((sucursales) => {
+      
+      const sucursalesConvertidas = sucursales.map(suc => ({
+        ...suc,
+        ultimoPedido: suc.ultimoPedido instanceof Date
+          ? suc.ultimoPedido
+          : (suc.ultimoPedido && (suc.ultimoPedido as any).toDate)
+            ? (suc.ultimoPedido as any).toDate()
+            : suc.ultimoPedido
+      }));
+  
+      this.sucursales = sucursalesConvertidas;
+      this.sucursalesFiltradas = [...this.sucursales];
+      this.dataSourceSucursales.data = this.sucursalesFiltradas;
+      this.dataSourceSucursales.paginator = this.paginator;
+      this.dataSourceSucursales.sort = this.sort;
+    });
+
+    this.dataSourceSucursales.filterPredicate = (sucursal: AgregarSucursal, filter: string) => {
+      const searchStr = filter.toLowerCase().trim();
+      const searchableFields = [
+        sucursal.nombre?.toLowerCase() || '',
+        sucursal.direccion?.toLowerCase() || '',
+        sucursal.numContacto?.toLowerCase() || '',
+        sucursal.ultimoPedido ? new Date(sucursal.ultimoPedido).toLocaleDateString('es-CL') : ''
+      ];
+      
+      return searchableFields.some(field => field.includes(searchStr));
+    };
   }
 
   ngAfterViewInit(): void {
@@ -145,20 +153,6 @@ export class SucursalesComponent implements OnInit, AfterViewInit {
   // --- Funciones de la tabla y filtros (Similares a Proveedores/Facturas) ---
   applyFilter() {
     const filterValue = this.searchTerm.toLowerCase();
-    this.dataSourceSucursales.filterPredicate = (
-      sucursal: Sucursal,
-      filter: string
-    ) => {
-      const ultimoPedidoString = sucursal.ultimoPedido
-        ? new Date(sucursal.ultimoPedido).toLocaleDateString()
-        : '';
-      return (
-        sucursal.id.toLowerCase().includes(filter) ||
-        sucursal.nombre.toLowerCase().includes(filter) ||
-        sucursal.ventas.toString().includes(filter) ||
-        ultimoPedidoString.includes(filter)
-      );
-    };
     this.dataSourceSucursales.filter = filterValue;
 
     if (this.dataSourceSucursales.paginator) {
@@ -170,13 +164,9 @@ export class SucursalesComponent implements OnInit, AfterViewInit {
   abrirEditorSucursal(sucursal: Sucursal) {
     this.selectedSucursal = { ...sucursal };
     this.validationError = '';
-    if (
-      this.selectedSucursal.ultimoPedido &&
-      typeof this.selectedSucursal.ultimoPedido === 'string'
-    ) {
-      this.selectedSucursal.ultimoPedido = new Date(
-        this.selectedSucursal.ultimoPedido
-      );
+    if (this.selectedSucursal.ultimoPedido && this.selectedSucursal.ultimoPedido instanceof Date) {
+      const d = this.selectedSucursal.ultimoPedido;
+      this.selectedSucursal.ultimoPedido = d.toISOString().substring(0, 10) as any;
     }
   }
 
@@ -188,31 +178,28 @@ export class SucursalesComponent implements OnInit, AfterViewInit {
   guardarSucursal() {
     if (
       !this.selectedSucursal?.nombre ||
-      this.selectedSucursal?.ventas === null ||
-      this.selectedSucursal?.ventas === undefined ||
+      !this.selectedSucursal?.direccion ||
+      !this.selectedSucursal?.numContacto ||
       !this.selectedSucursal?.ultimoPedido
     ) {
-      this.validationError =
-        'Todos los campos obligatorios deben estar completos.';
-      toast.error(this.validationError);
+      toast.error('Todos los campos obligatorios deben estar completos.');
       return;
     }
 
     this.sucursalAConfirmar = { ...this.selectedSucursal };
-    this.mensajeConfirmacion = `¿DESEA CONFIRMAR LOS CAMBIOS EN LA SUCURSAL ${
-      this.selectedSucursal!.nombre
-    }?`;
+    this.mensajeConfirmacion = `¿DESEA CONFIRMAR LOS CAMBIOS EN LA SUCURSAL ${this.selectedSucursal!.nombre
+      }?`;
     this.mostrarModalConfirmacion = true;
   }
 
   // --- Funciones para el modal de CONFIRMACIÓN ---
-  solicitarConfirmacionGuardadoSucursal(sucursal: Sucursal) {
+  solicitarConfirmacionGuardadoSucursal(sucursal: AgregarSucursal) {
     this.sucursalAConfirmar = { ...sucursal };
     this.mensajeConfirmacion = `¿DESEA CONFIRMAR LOS CAMBIOS EN LA SUCURSAL ${sucursal.nombre}?`;
     this.mostrarModalConfirmacion = true;
   }
 
-  solicitarConfirmacionEliminarSucursal(sucursal: Sucursal) {
+  solicitarConfirmacionEliminarSucursal(sucursal: AgregarSucursal) {
     this.sucursalAEliminar = { ...sucursal };
     this.mensajeConfirmacion = `¿DESEA ELIMINAR LA SUCURSAL ${sucursal.nombre}?`;
     this.mostrarModalConfirmacion = true;
@@ -234,47 +221,52 @@ export class SucursalesComponent implements OnInit, AfterViewInit {
 
   confirmarGuardadoSucursal() {
     if (this.sucursalAConfirmar) {
-      const index = this.sucursales.findIndex(
-        (s) => s.id === this.sucursalAConfirmar!.id
-      );
-      if (index !== -1) {
-        this.sucursales[index] = { ...this.sucursalAConfirmar };
-        this.sucursalesFiltradas = [...this.sucursales];
-        this.dataSourceSucursales.data = this.sucursalesFiltradas;
-        toast.success(
-          `Sucursal "${this.sucursalAConfirmar.nombre}" guardada correctamente.`
-        );
-        console.log(`Sucursal "${this.sucursalAConfirmar.nombre}" guardada.`);
-        this.cerrarModalConfirmacion();
-        this.cerrarEditorSucursal();
-      } else {
-        toast.error(`No se encontró la sucursal para actualizar.`);
-        console.log(
-          `No se encontró la sucursal con ID ${this.sucursalAConfirmar.id} para actualizar.`
-        );
-        this.cerrarModalConfirmacion();
-        this.cerrarEditorSucursal();
+      const { id, ...cambios } = this.sucursalAConfirmar;
+      
+      if (typeof cambios.ultimoPedido === 'string') {
+        cambios.ultimoPedido = new Date(cambios.ultimoPedido);
       }
+      this.sucursalService.actualizar(id!, cambios).then(() => {
+        toast.success('Sucursal actualizada correctamente.');
+        this.cerrarModalConfirmacion();
+        this.cerrarEditorSucursal();
+        // Actualizar el array después de cerrar los modales
+        const idx = this.sucursales.findIndex(s => s.id === id);
+        if (idx !== -1) {
+          this.sucursales[idx] = { id, ...cambios } as AgregarSucursal;
+          this.sucursalesFiltradas = [...this.sucursales];
+          this.dataSourceSucursales.data = this.sucursalesFiltradas;
+        }
+      }).catch(error => {
+        toast.error('Error al actualizar la sucursal.');
+        console.error(error);
+      });
     }
   }
 
   confirmarEliminarSucursal() {
     if (this.sucursalAEliminar) {
-      const index = this.sucursales.findIndex(
-        (s) => s.id === this.sucursalAEliminar!.id
-      );
-      if (index !== -1) {
-        this.sucursales.splice(index, 1);
-        this.sucursalesFiltradas = [...this.sucursales];
-        this.dataSourceSucursales.data = this.sucursalesFiltradas;
+      const sucursalAEliminar = this.sucursalAEliminar;
+      this.sucursalService.eliminar(sucursalAEliminar.id).then(() => {
         toast.success(
-          `Sucursal "${this.sucursalAEliminar.nombre}" eliminada correctamente.`
+          `Sucursal "${sucursalAEliminar.nombre}" eliminada correctamente.`
         );
-        console.log(`Sucursal "${this.sucursalAEliminar.nombre}" eliminada.`);
-      }
+        this.cerrarModalConfirmacion();
+        // Actualizar el array después de cerrar el modal
+        const index = this.sucursales.findIndex(
+          (s) => s.id === sucursalAEliminar.id
+        );
+        if (index !== -1) {
+          this.sucursales.splice(index, 1);
+          this.sucursalesFiltradas = [...this.sucursales];
+          this.dataSourceSucursales.data = this.sucursalesFiltradas;
+        }
+        this.sucursalAEliminar = null;
+      }).catch(error => {
+        toast.error('Error al eliminar la sucursal.');
+        console.error('Error al eliminar la sucursal:', error);
+      });
     }
-    this.cerrarModalConfirmacion();
-    this.sucursalAEliminar = null;
   }
 
   cerrarModalConfirmacion() {
@@ -302,42 +294,48 @@ export class SucursalesComponent implements OnInit, AfterViewInit {
 
   agregarNuevaSucursal() {
     this.newSucursalValidationError = '';
-    if (
-      !this.nuevaSucursal.nombre ||
-      this.nuevaSucursal.ventas === null ||
-      this.nuevaSucursal.ventas === undefined ||
-      !this.nuevaSucursal.ultimoPedido
-    ) {
+    if (!this.nuevaSucursal.nombre || !this.nuevaSucursal.ultimoPedido || !this.nuevaSucursal.direccion || !this.nuevaSucursal.numContacto) {
       this.newSucursalValidationError =
         'Todos los campos obligatorios deben estar completos.';
       toast.error(this.newSucursalValidationError);
       return;
     }
-
-    // Generar un ID simple para el ejemplo (en un caso real, esto sería de un backend)
-    const nuevoId =
-      '00' + (this.sucursales.length + 1).toString().padStart(1, '0'); // Simulación "001", "002" etc.
-
-    const nuevaSucursalCompleta: Sucursal = {
-      id: nuevoId,
+    const maxId = this.sucursales.length
+      ? Math.max(...this.sucursales.map(s => Number(s.id)))
+      : 0;
+    const nuevoId: number = maxId + 1;
+    this.nuevaSucursal.ventas = 0;
+    
+    const nuevaSucursalCompleta: AgregarSucursal = {
+      id: String(nuevoId),
       nombre: this.nuevaSucursal.nombre!,
+      direccion: this.nuevaSucursal.direccion!,
+      numContacto: this.nuevaSucursal.numContacto!,
       ventas: this.nuevaSucursal.ventas!,
       ultimoPedido: new Date(this.nuevaSucursal.ultimoPedido!),
     };
-
-    this.sucursales.push(nuevaSucursalCompleta);
-    this.sucursalesFiltradas = [...this.sucursales];
-    this.dataSourceSucursales.data = this.sucursalesFiltradas;
-    this.cerrarModalNuevaSucursal();
-    toast.success('¡Nueva sucursal agregada exitosamente!');
-    console.log('Nueva sucursal agregada:', nuevaSucursalCompleta);
+    this.sucursalService.crear(nuevaSucursalCompleta).then(() => {
+      toast.success('¡Nueva sucursal agregada exitosamente!');
+      this.cerrarModalNuevaSucursal();
+      // Actualizar el array después de cerrar el modal
+      this.sucursales.push(nuevaSucursalCompleta);
+      this.sucursalesFiltradas = [...this.sucursales];
+      this.dataSourceSucursales.data = this.sucursalesFiltradas;
+      console.log('Nueva sucursal agregada:', nuevaSucursalCompleta);
+    }).catch((err: unknown) => {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error('algo paso, no se que, pero paso');
+      }
+    });
   }
 
   // --- Funciones para el modal de MOVIMIENTOS ---
-  abrirModalMovimientos(sucursal: Sucursal) {
+  abrirModalMovimientos(sucursal: AgregarSucursal) {
     this.selectedSucursalMovimientos = sucursal;
     // Simular carga de movimientos (en un caso real, harías una llamada HTTP aquí)
-    this.movimientosSucursal = this.getMovimientosDeSucursal(sucursal.id);
+    this.movimientosSucursal = this.getMovimientosDeSucursal(Number(sucursal.id));
     this.dataSourceMovimientos.data = this.movimientosSucursal;
     this.mostrarModalMovimientos = true;
 
@@ -362,7 +360,7 @@ export class SucursalesComponent implements OnInit, AfterViewInit {
   }
 
   // Función simulada para obtener movimientos (reemplazar con API real)
-  private getMovimientosDeSucursal(sucursalId: string): Movimiento[] {
+  private getMovimientosDeSucursal(sucursalId: number): Movimiento[] {
     // Aquí puedes tener un array de movimientos más grande o cargar desde un servicio
     const todosLosMovimientos: Movimiento[] = [
       {
