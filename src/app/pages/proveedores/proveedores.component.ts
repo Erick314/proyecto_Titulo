@@ -1,23 +1,20 @@
-import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { toast } from 'ngx-sonner';
+import { ProveedorService, Proveedor } from '../../modelo/proveedor/proveedor.service';
 
-interface Proveedor {
-  id: number;
-  nombreProveedor: string;
-  facturasEmitidas: number; // Esto es el 'FACTURAS' del mockup
-  ultimoPedido: Date; // Esto es el 'Último pedido' del mockup
-  // ... otras propiedades que necesites para un proveedor
+// Extender la interfaz Proveedor del servicio para incluir los campos adicionales
+interface ProveedorExtendido extends Proveedor {
+  facturasRecibidas: number;
+  ultimoPedido: Date;
 }
 
 @Component({
@@ -30,8 +27,6 @@ interface Proveedor {
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
-    MatFormFieldModule,
-    MatSelectModule,
     MatInputModule,
     MatButtonModule,
     MatIconModule,
@@ -40,67 +35,47 @@ interface Proveedor {
   styleUrl: './proveedores.component.scss',
 })
 export class ProveedoresComponent implements OnInit, AfterViewInit {
-  proveedores: Proveedor[] = [
-    {
-      id: 343,
-      nombreProveedor: 'Andina',
-      facturasEmitidas: 3,
-      ultimoPedido: new Date('2025-04-01'),
-    },
-    {
-      id: 101,
-      nombreProveedor: 'Coca-Cola FEMSA',
-      facturasEmitidas: 15,
-      ultimoPedido: new Date('2025-03-20'),
-    },
-    {
-      id: 202,
-      nombreProveedor: 'PepsiCo Chile',
-      facturasEmitidas: 8,
-      ultimoPedido: new Date('2025-02-10'),
-    },
-    {
-      id: 404,
-      nombreProveedor: 'Nestlé Chile',
-      facturasEmitidas: 22,
-      ultimoPedido: new Date('2025-04-25'),
-    },
-    {
-      id: 505,
-      nombreProveedor: 'Lucchetti S.A.',
-      facturasEmitidas: 5,
-      ultimoPedido: new Date('2025-01-05'),
-    },
-  ];
-  proveedoresFiltrados: Proveedor[] = [...this.proveedores];
+  constructor() {}
+  private proveedorService = inject(ProveedorService);
+  
+  proveedores: ProveedorExtendido[] = [];
+  proveedoresFiltrados: ProveedorExtendido[] = [...this.proveedores];
+  dataSourceProveedores = new MatTableDataSource<ProveedorExtendido>([]);
   displayedColumnsProveedores: string[] = [
-    'id',
-    'nombreProveedor',
-    'facturasEmitidas',
+    'razonSocial',
+    'rutEmpresa',
+    'nombreCliente',
+    'contacto',
+    'correo',
+    'direccion',
+    'facturasRecibidas',
     'ultimoPedido',
     'opciones',
   ];
-  dataSourceProveedores = new MatTableDataSource<Proveedor>(
-    this.proveedoresFiltrados
-  );
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   // Estado para la edición
-  selectedProveedor: Proveedor | null = null;
+  selectedProveedor: ProveedorExtendido | null = null;
   validationError = '';
 
   // Estado para la confirmación
   mostrarModalConfirmacion = false;
-  proveedorAConfirmar: Proveedor | null = null;
+  proveedorAConfirmar: ProveedorExtendido | null = null;
   mensajeConfirmacion = '';
-  proveedorAEliminar: Proveedor | null = null;
+  proveedorAEliminar: ProveedorExtendido | null = null;
 
   // Estado para el nuevo proveedor
   mostrarModalNuevoProveedor = false;
-  nuevoProveedor: Partial<Proveedor> = {
-    nombreProveedor: '',
-    facturasEmitidas: 0,
+  nuevoProveedor: Partial<ProveedorExtendido> = {
+    razonSocial: '',
+    rutEmpresa: '',
+    nombreCliente: '',
+    contacto: '',
+    correo: '',
+    direccion: '',
+    facturasRecibidas: 0,
     ultimoPedido: new Date(),
   };
   newProveedorValidationError = '';
@@ -108,12 +83,57 @@ export class ProveedoresComponent implements OnInit, AfterViewInit {
   // Filtro de búsqueda
   searchTerm: string = '';
 
-  constructor() {}
-
   ngOnInit(): void {
-    this.dataSourceProveedores = new MatTableDataSource(
-      this.proveedoresFiltrados
-    );
+    this.proveedorService.listar().subscribe((proveedores) => {
+      const proveedoresConvertidos = proveedores.map(prov => {
+        // Convertir la fecha de manera segura
+        let fechaConvertida: Date;
+        if (prov.ultimoPedido instanceof Date) {
+          fechaConvertida = prov.ultimoPedido;
+        } else if (prov.ultimoPedido && typeof prov.ultimoPedido === 'object' && 'toDate' in prov.ultimoPedido) {
+          fechaConvertida = (prov.ultimoPedido as any).toDate();
+        } else {
+          fechaConvertida = new Date();
+        }
+
+        return {
+          ...prov,
+          facturasRecibidas: 0, // Valor por defecto
+          ultimoPedido: fechaConvertida
+        };
+      });
+
+      this.proveedores = proveedoresConvertidos;
+      this.proveedoresFiltrados = [...this.proveedores];
+      this.dataSourceProveedores.data = this.proveedoresFiltrados;
+      this.dataSourceProveedores.paginator = this.paginator;
+      this.dataSourceProveedores.sort = this.sort;
+
+      // Configurar el filtro personalizado
+      this.dataSourceProveedores.filterPredicate = (proveedor: ProveedorExtendido, filter: string) => {
+        const searchStr = filter.toLowerCase().trim();
+        
+        // Convertir la fecha a string para búsqueda
+        const fechaStr = proveedor.ultimoPedido 
+          ? new Date(proveedor.ultimoPedido).toLocaleDateString('es-CL')
+          : '';
+
+        // Crear un array con todos los campos buscables
+        const searchableFields = [
+          proveedor.razonSocial?.toLowerCase() || '',
+          proveedor.rutEmpresa?.toLowerCase() || '',
+          proveedor.nombreCliente?.toLowerCase() || '',
+          proveedor.contacto?.toLowerCase() || '',
+          proveedor.correo?.toLowerCase() || '',
+          proveedor.direccion?.toLowerCase() || '',
+          proveedor.facturasRecibidas?.toString() || '',
+          fechaStr
+        ];
+
+        // Buscar en todos los campos
+        return searchableFields.some(field => field.includes(searchStr));
+      };
+    });
   }
 
   ngAfterViewInit(): void {
@@ -121,23 +141,8 @@ export class ProveedoresComponent implements OnInit, AfterViewInit {
     this.dataSourceProveedores.sort = this.sort;
   }
 
-  // --- Funciones de la tabla y filtros ---
   applyFilter() {
-    const filterValue = this.searchTerm.toLowerCase();
-    this.dataSourceProveedores.filterPredicate = (
-      proveedor: Proveedor,
-      filter: string
-    ) => {
-      const ultimoPedidoString = proveedor.ultimoPedido
-        ? new Date(proveedor.ultimoPedido).toLocaleDateString()
-        : '';
-      return (
-        proveedor.id.toString().includes(filter) ||
-        proveedor.nombreProveedor.toLowerCase().includes(filter) ||
-        proveedor.facturasEmitidas.toString().includes(filter) ||
-        ultimoPedidoString.includes(filter)
-      );
-    };
+    const filterValue = this.searchTerm.toLowerCase().trim();
     this.dataSourceProveedores.filter = filterValue;
 
     if (this.dataSourceProveedores.paginator) {
@@ -145,18 +150,12 @@ export class ProveedoresComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // --- Funciones para el modal de EDICIÓN de proveedor ---
-  abrirEditorProveedor(proveedor: Proveedor) {
+  abrirEditorProveedor(proveedor: ProveedorExtendido) {
     this.selectedProveedor = { ...proveedor };
     this.validationError = '';
-    // Asegurarse de que ultimoPedido sea un objeto Date para el input type="date"
-    if (
-      this.selectedProveedor.ultimoPedido &&
-      typeof this.selectedProveedor.ultimoPedido === 'string'
-    ) {
-      this.selectedProveedor.ultimoPedido = new Date(
-        this.selectedProveedor.ultimoPedido
-      );
+    if (this.selectedProveedor.ultimoPedido && this.selectedProveedor.ultimoPedido instanceof Date) {
+      const d = this.selectedProveedor.ultimoPedido;
+      this.selectedProveedor.ultimoPedido = d.toISOString().substring(0, 10) as any;
     }
   }
 
@@ -167,98 +166,94 @@ export class ProveedoresComponent implements OnInit, AfterViewInit {
 
   guardarProveedor() {
     if (
-      !this.selectedProveedor?.nombreProveedor ||
-      this.selectedProveedor?.facturasEmitidas === null ||
-      this.selectedProveedor?.facturasEmitidas === undefined ||
+      !this.selectedProveedor?.razonSocial ||
+      !this.selectedProveedor?.rutEmpresa ||
+      !this.selectedProveedor?.nombreCliente ||
+      !this.selectedProveedor?.contacto ||
+      !this.selectedProveedor?.correo ||
+      !this.selectedProveedor?.direccion ||
       !this.selectedProveedor?.ultimoPedido
     ) {
-      this.validationError =
-        'Todos los campos obligatorios deben estar completos.';
-      toast.error(this.validationError);
+      toast.error('Todos los campos obligatorios deben estar completos.');
       return;
     }
 
     this.proveedorAConfirmar = { ...this.selectedProveedor };
-    this.mensajeConfirmacion = `¿DESEA CONFIRMAR LOS CAMBIOS EN EL PROVEEDOR ${
-      this.selectedProveedor!.nombreProveedor
-    }?`;
+    this.mensajeConfirmacion = `¿DESEA CONFIRMAR LOS CAMBIOS EN EL PROVEEDOR ${this.selectedProveedor!.nombreCliente}?`;
     this.mostrarModalConfirmacion = true;
   }
 
-  // --- Funciones para el modal de CONFIRMACIÓN ---
-  solicitarConfirmacionGuardadoProveedor(proveedor: Proveedor) {
+  solicitarConfirmacionGuardadoProveedor(proveedor: ProveedorExtendido) {
     this.proveedorAConfirmar = { ...proveedor };
-    this.mensajeConfirmacion = `¿DESEA CONFIRMAR LOS CAMBIOS EN EL PROVEEDOR ${proveedor.nombreProveedor}?`;
+    this.mensajeConfirmacion = `¿DESEA CONFIRMAR LOS CAMBIOS EN EL PROVEEDOR ${proveedor.nombreCliente}?`;
     this.mostrarModalConfirmacion = true;
   }
 
-  solicitarConfirmacionEliminarProveedor(proveedor: Proveedor) {
+  solicitarConfirmacionEliminarProveedor(proveedor: ProveedorExtendido) {
     this.proveedorAEliminar = { ...proveedor };
-    this.mensajeConfirmacion = `¿DESEA ELIMINAR EL PROVEEDOR ${proveedor.nombreProveedor}?`;
+    this.mensajeConfirmacion = `¿DESEA ELIMINAR EL PROVEEDOR ${proveedor.nombreCliente}?`;
     this.mostrarModalConfirmacion = true;
   }
 
   confirmarAccionProveedor() {
-    if (
-      this.proveedorAConfirmar &&
-      this.mensajeConfirmacion.includes('CAMBIOS')
-    ) {
+    if (this.proveedorAConfirmar && this.mensajeConfirmacion.includes('CAMBIOS')) {
       this.confirmarGuardadoProveedor();
-    } else if (
-      this.proveedorAEliminar &&
-      this.mensajeConfirmacion.includes('ELIMINAR')
-    ) {
+    } else if (this.proveedorAEliminar && this.mensajeConfirmacion.includes('ELIMINAR')) {
       this.confirmarEliminarProveedor();
     }
   }
 
   confirmarGuardadoProveedor() {
     if (this.proveedorAConfirmar) {
-      const index = this.proveedores.findIndex(
-        (p) => p.id === this.proveedorAConfirmar!.id
-      );
-      if (index !== -1) {
-        this.proveedores[index] = { ...this.proveedorAConfirmar };
-        this.proveedoresFiltrados = [...this.proveedores];
-        this.dataSourceProveedores.data = this.proveedoresFiltrados;
-        toast.success(
-          `Proveedor "${this.proveedorAConfirmar.nombreProveedor}" guardado correctamente.`
-        );
-        console.log(
-          `Proveedor "${this.proveedorAConfirmar.nombreProveedor}" guardado.`
-        );
-        this.cerrarModalConfirmacion();
-        this.cerrarEditorProveedor();
-      } else {
-        toast.error(`No se encontró el proveedor para actualizar.`);
-        console.log(
-          `No se encontró el proveedor con ID ${this.proveedorAConfirmar.id} para actualizar.`
-        );
-        this.cerrarModalConfirmacion();
-        this.cerrarEditorProveedor();
+      const { id, facturasRecibidas, ...cambios } = this.proveedorAConfirmar;
+      
+      if (typeof cambios.ultimoPedido === 'string') {
+        cambios.ultimoPedido = new Date(cambios.ultimoPedido);
       }
+
+      this.proveedorService.actualizar(id!, cambios).then(() => {
+        toast.success('Proveedor actualizado correctamente.');
+        this.cerrarModalConfirmacion();
+        this.cerrarEditorProveedor();
+        
+        // Mantener el valor actual de facturasRecibidas al actualizar
+        const idx = this.proveedores.findIndex(p => p.id === id);
+        if (idx !== -1) {
+          const facturasActuales = this.proveedores[idx].facturasRecibidas;
+          this.proveedores[idx] = { 
+            id, 
+            facturasRecibidas: facturasActuales, 
+            ...cambios 
+          } as ProveedorExtendido;
+          this.proveedoresFiltrados = [...this.proveedores];
+          this.dataSourceProveedores.data = this.proveedoresFiltrados;
+        }
+      }).catch(error => {
+        toast.error('Error al actualizar el proveedor.');
+        console.error(error);
+      });
     }
   }
 
   confirmarEliminarProveedor() {
     if (this.proveedorAEliminar) {
-      const index = this.proveedores.findIndex(
-        (p) => p.id === this.proveedorAEliminar!.id
-      );
-      if (index !== -1) {
-        this.proveedores.splice(index, 1);
-        this.proveedoresFiltrados = [...this.proveedores];
-        this.dataSourceProveedores.data = this.proveedoresFiltrados;
-        toast.success(
-          `Proveedor "${this.proveedorAEliminar.nombreProveedor}" eliminado correctamente.`
-        );
-        console.log(
-          `Proveedor "${this.proveedorAEliminar.nombreProveedor}" eliminado.`
-        );
-      }
+      const proveedorAEliminar = this.proveedorAEliminar;
+      this.proveedorService.eliminar(proveedorAEliminar.id!).then(() => {
+        toast.success(`Proveedor "${proveedorAEliminar.nombreCliente}" eliminado correctamente.`);
+        this.cerrarModalConfirmacion();
+        
+        const index = this.proveedores.findIndex(p => p.id === proveedorAEliminar.id);
+        if (index !== -1) {
+          this.proveedores.splice(index, 1);
+          this.proveedoresFiltrados = [...this.proveedores];
+          this.dataSourceProveedores.data = this.proveedoresFiltrados;
+        }
+        this.proveedorAEliminar = null;
+      }).catch(error => {
+        toast.error('Error al eliminar el proveedor.');
+        console.error('Error al eliminar el proveedor:', error);
+      });
     }
-    this.cerrarModalConfirmacion();
-    this.proveedorAEliminar = null;
   }
 
   cerrarModalConfirmacion() {
@@ -268,12 +263,15 @@ export class ProveedoresComponent implements OnInit, AfterViewInit {
     this.mensajeConfirmacion = '';
   }
 
-  // --- Funciones para el modal de NUEVO proveedor ---
   abrirModalNuevoProveedor() {
     this.mostrarModalNuevoProveedor = true;
     this.nuevoProveedor = {
-      nombreProveedor: '',
-      facturasEmitidas: 0,
+      razonSocial: '',
+      rutEmpresa: '',
+      nombreCliente: '',
+      contacto: '',
+      correo: '',
+      direccion: '',
       ultimoPedido: new Date(),
     };
     this.newProveedorValidationError = '';
@@ -287,34 +285,63 @@ export class ProveedoresComponent implements OnInit, AfterViewInit {
   agregarNuevoProveedor() {
     this.newProveedorValidationError = '';
     if (
-      !this.nuevoProveedor.nombreProveedor ||
-      this.nuevoProveedor.facturasEmitidas === null ||
-      this.nuevoProveedor.facturasEmitidas === undefined ||
+      !this.nuevoProveedor.razonSocial ||
+      !this.nuevoProveedor.rutEmpresa ||
+      !this.nuevoProveedor.nombreCliente ||
+      !this.nuevoProveedor.contacto ||
+      !this.nuevoProveedor.correo ||
+      !this.nuevoProveedor.direccion ||
       !this.nuevoProveedor.ultimoPedido
     ) {
-      this.newProveedorValidationError =
-        'Todos los campos obligatorios deben estar completos.';
+      this.newProveedorValidationError = 'Todos los campos obligatorios deben estar completos.';
       toast.error(this.newProveedorValidationError);
       return;
     }
 
-    const nuevoId =
-      this.proveedores.length > 0
-        ? Math.max(...this.proveedores.map((p) => p.id)) + 1
-        : 1;
-
-    const nuevoProveedorCompleto: Proveedor = {
-      id: nuevoId,
-      nombreProveedor: this.nuevoProveedor.nombreProveedor!,
-      facturasEmitidas: this.nuevoProveedor.facturasEmitidas!,
-      ultimoPedido: new Date(this.nuevoProveedor.ultimoPedido!),
+    const proveedorParaCrear: Omit<Proveedor, 'id'> = {
+      razonSocial: this.nuevoProveedor.razonSocial!,
+      rutEmpresa: this.nuevoProveedor.rutEmpresa!,
+      nombreCliente: this.nuevoProveedor.nombreCliente!,
+      contacto: this.nuevoProveedor.contacto!,
+      correo: this.nuevoProveedor.correo!,
+      direccion: this.nuevoProveedor.direccion!,
+      ultimoPedido: new Date(this.nuevoProveedor.ultimoPedido!)
     };
+    
+    this.proveedorService.crear(proveedorParaCrear).then(() => {
+      toast.success('¡Nuevo proveedor agregado exitosamente!');
+      this.cerrarModalNuevoProveedor();
+      
+      // Recargar los proveedores desde el servicio
+      this.proveedorService.listar().subscribe(proveedores => {
+        const proveedoresConvertidos = proveedores.map(prov => {
+          // Convertir la fecha de manera segura
+          let fechaConvertida: Date;
+          if (prov.ultimoPedido instanceof Date) {
+            fechaConvertida = prov.ultimoPedido;
+          } else if (prov.ultimoPedido && typeof prov.ultimoPedido === 'object' && 'toDate' in prov.ultimoPedido) {
+            fechaConvertida = (prov.ultimoPedido as any).toDate();
+          } else {
+            fechaConvertida = new Date();
+          }
 
-    this.proveedores.push(nuevoProveedorCompleto);
-    this.proveedoresFiltrados = [...this.proveedores];
-    this.dataSourceProveedores.data = this.proveedoresFiltrados;
-    this.cerrarModalNuevoProveedor();
-    toast.success('¡Nuevo proveedor agregado exitosamente!');
-    console.log('Nuevo proveedor agregado:', nuevoProveedorCompleto);
+          return {
+            ...prov,
+            facturasRecibidas: 0, // Valor por defecto
+            ultimoPedido: fechaConvertida
+          };
+        });
+        
+        this.proveedores = proveedoresConvertidos;
+        this.proveedoresFiltrados = [...this.proveedores];
+        this.dataSourceProveedores.data = this.proveedoresFiltrados;
+      });
+    }).catch((err: unknown) => {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error('Error al crear el proveedor');
+      }
+    });
   }
 }

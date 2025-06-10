@@ -6,17 +6,6 @@
       class="row justify-content-center mb-4 gap-2 px-3 flex-wrap text-center"
     >
       <div class="col-auto">
-        <mat-form-field>
-          <mat-label>Sucursal</mat-label>
-          <mat-select>
-            <mat-option value="todas">Todas</mat-option>
-            <mat-option value="sucursal1">Sucursal 1</mat-option>
-            <mat-option value="sucursal2">Sucursal 2</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <div class="col-auto">
         <div class="input-group rounded-pill d-flex align-items-center">
           <span
             class="input-group-text bg-white border-end-0"
@@ -62,17 +51,40 @@
         <td mat-cell *matCellDef="let proveedor" class="text-center">{{ proveedor.id }}</td>
       </ng-container>
 
-      <ng-container matColumnDef="nombreProveedor">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Proveedor</th>
-        <td mat-cell *matCellDef="let proveedor" class="text-center">
-          {{ proveedor.nombreProveedor }}
-        </td>
+      <ng-container matColumnDef="razonSocial">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Razón Social</th>
+        <td mat-cell *matCellDef="let proveedor" class="text-center">{{ proveedor.razonSocial }}</td>
       </ng-container>
 
-      <ng-container matColumnDef="facturasEmitidas" >
+      <ng-container matColumnDef="rutEmpresa">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">RUT</th>
+        <td mat-cell *matCellDef="let proveedor" class="text-center">{{ proveedor.rutEmpresa }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="nombreCliente">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Nombre Proveedor</th>
+        <td mat-cell *matCellDef="let proveedor" class="text-center">{{ proveedor.nombreCliente }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="contacto">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Contacto</th>
+        <td mat-cell *matCellDef="let proveedor" class="text-center">{{ proveedor.contacto }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="correo">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Correo</th>
+        <td mat-cell *matCellDef="let proveedor" class="text-center">{{ proveedor.correo }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="direccion">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Dirección</th>
+        <td mat-cell *matCellDef="let proveedor" class="text-center">{{ proveedor.direccion }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="facturasRecibidas" >
         <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">FACTURAS</th>
         <td mat-cell *matCellDef="let proveedor" class="text-center">
-          {{ proveedor.facturasEmitidas }}
+          {{ proveedor.facturasRecibidas }}
         </td>
       </ng-container>
 
@@ -154,18 +166,46 @@
       </div>
 
       <div>
+        <label class="form-label">Razón Social</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="selectedProveedor.razonSocial"
+        />
+
+        <label class="form-label">RUT Empresa</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="selectedProveedor.rutEmpresa"
+        />
+
         <label class="form-label">Nombre del Proveedor</label>
         <input
           type="text"
           class="form-control mb-2"
-          [(ngModel)]="selectedProveedor.nombreProveedor"
+          [(ngModel)]="selectedProveedor.nombreCliente"
         />
 
-        <label class="form-label">Facturas Emitidas</label>
+        <label class="form-label">Contacto</label>
         <input
-          type="number"
+          type="text"
           class="form-control mb-2"
-          [(ngModel)]="selectedProveedor.facturasEmitidas"
+          [(ngModel)]="selectedProveedor.contacto"
+        />
+
+        <label class="form-label">Correo</label>
+        <input
+          type="email"
+          class="form-control mb-2"
+          [(ngModel)]="selectedProveedor.correo"
+        />
+
+        <label class="form-label">Dirección</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="selectedProveedor.direccion"
         />
 
         <label class="form-label">Último Pedido</label>
@@ -202,19 +242,51 @@
       </div>
 
       <div>
+        <label class="form-label">Razón Social</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="nuevoProveedor.razonSocial"
+          required
+        />
+
+        <label class="form-label">RUT Empresa</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="nuevoProveedor.rutEmpresa"
+          required
+        />
+
         <label class="form-label">Nombre del Proveedor</label>
         <input
           type="text"
           class="form-control mb-2"
-          [(ngModel)]="nuevoProveedor.nombreProveedor"
+          [(ngModel)]="nuevoProveedor.nombreCliente"
           required
         />
 
-        <label class="form-label">Facturas Emitidas</label>
+        <label class="form-label">Contacto</label>
         <input
-          type="number"
+          type="text"
           class="form-control mb-2"
-          [(ngModel)]="nuevoProveedor.facturasEmitidas"
+          [(ngModel)]="nuevoProveedor.contacto"
+          required
+        />
+
+        <label class="form-label">Correo</label>
+        <input
+          type="email"
+          class="form-control mb-2"
+          [(ngModel)]="nuevoProveedor.correo"
+          required
+        />
+
+        <label class="form-label">Dirección</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          [(ngModel)]="nuevoProveedor.direccion"
           required
         />
 

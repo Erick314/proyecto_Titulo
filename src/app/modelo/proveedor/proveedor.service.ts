@@ -9,6 +9,7 @@ export interface Proveedor {
   nombreCliente: string;
   razonSocial: string;
   rutEmpresa: string;
+  ultimoPedido?: Date;
 }
 @Injectable({
   providedIn: 'root'
@@ -38,6 +39,4 @@ export class ProveedorService {
   eliminar(id: string): Promise<void> {
     return this.crud.delete(this.path, id);
   }
-  
-
 }
