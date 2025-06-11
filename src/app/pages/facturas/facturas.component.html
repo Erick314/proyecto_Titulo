@@ -8,10 +8,9 @@
       <div class="col-auto">
         <mat-form-field>
           <mat-label>Sucursal</mat-label>
-          <mat-select>
+          <mat-select [(ngModel)]="sucursalSeleccionada" (selectionChange)="onSucursalChange()">
             <mat-option value="todas">Todas</mat-option>
-            <mat-option value="sucursal1">Sucursal 1</mat-option>
-            <mat-option value="sucursal2">Sucursal 2</mat-option>
+            <mat-option *ngFor="let sucursal of sucursales" [value]="sucursal.nombre">{{ sucursal.nombre }}</mat-option>
           </mat-select>
         </mat-form-field>
       </div>
@@ -63,14 +62,35 @@
       </ng-container>
 
       <ng-container matColumnDef="monto">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Monto</th>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Monto Base</th>
         <td mat-cell *matCellDef="let factura" class="text-center">
           {{ factura.monto | currency : "CLP" : "$" : "1.0-0" }}
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="iva">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">IVA</th>
+        <td mat-cell *matCellDef="let factura" class="text-center">
+          {{ (factura.iva || 0) | percent:'1.0-0' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="totalNeto">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Total Neto</th>
+        <td mat-cell *matCellDef="let factura" class="text-center">
+          {{ factura.totalNeto | currency : "CLP" : "$" : "1.0-0" }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="totalFinal">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Total Final</th>
+        <td mat-cell *matCellDef="let factura" class="text-center">
+          {{ factura.totalFinal | currency : "CLP" : "$" : "1.0-0" }}
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="fechaEmision">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Fecha</th>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Fecha Emisión</th>
         <td mat-cell *matCellDef="let factura" class="text-center">
           {{ factura.fechaEmision | date : "dd-MM-yyyy" }}
         </td>
@@ -173,17 +193,38 @@
         />
 
         <label class="form-label">Proveedor</label>
-        <input
-          type="text"
-          class="form-control mb-2"
-          [(ngModel)]="selectedFactura.nombreProveedor"
-        />
+        <mat-form-field>
+          <mat-select [(ngModel)]="selectedFactura.nombreProveedor" placeholder="Seleccione un proveedor">
+            <mat-option *ngFor="let proveedor of proveedores" [value]="proveedor.nombreCliente">
+              {{proveedor.nombreCliente}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
-        <label class="form-label">Monto</label>
+        <label class="form-label">Monto Base</label>
         <input
           type="number"
           class="form-control mb-2"
           [(ngModel)]="selectedFactura.monto"
+          (input)="actualizarTotalesEdicion()"
+        />
+
+        <label class="form-label">Total Neto</label>
+        <input
+          type="number"
+          class="form-control mb-2"
+          [(ngModel)]="selectedFactura.totalNeto"
+          readonly
+          disabled
+        />
+
+        <label class="form-label">Total Final</label>
+        <input
+          type="number"
+          class="form-control mb-2"
+          [(ngModel)]="selectedFactura.totalFinal"
+          readonly
+          disabled
         />
 
         <label class="form-label">Fecha de Emisión</label>
@@ -222,6 +263,13 @@
           />
         </div>
 
+        <label class="form-label">Sucursal</label>
+        <mat-form-field>
+          <mat-select [(ngModel)]="selectedFactura.sucursal" placeholder="Seleccione una sucursal">
+            <mat-option *ngFor="let sucursal of sucursales" [value]="sucursal.nombre">{{ sucursal.nombre }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
         <button class="btn btn-success w-100" (click)="guardarFactura()">
           Guardar
         </button>
@@ -258,19 +306,39 @@
         />
 
         <label class="form-label">Proveedor</label>
-        <input
-          type="text"
-          class="form-control mb-2"
-          [(ngModel)]="nuevaFactura.nombreProveedor"
-          required
-        />
+        <mat-form-field class="w-100 mb-2">
+          <mat-select [(ngModel)]="nuevaFactura.nombreProveedor" placeholder="Seleccione un proveedor">
+            <mat-option *ngFor="let proveedor of proveedores" [value]="proveedor.nombreCliente">
+              {{proveedor.nombreCliente}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
-        <label class="form-label">Monto</label>
+        <label class="form-label">Monto Base</label>
         <input
           type="number"
           class="form-control mb-2"
           [(ngModel)]="nuevaFactura.monto"
+          (input)="actualizarTotalesNuevaFactura()"
           required
+        />
+
+        <label class="form-label">Total Neto</label>
+        <input
+          type="number"
+          class="form-control mb-2"
+          [(ngModel)]="nuevaFactura.totalNeto"
+          readonly
+          disabled
+        />
+
+        <label class="form-label">Total Final</label>
+        <input
+          type="number"
+          class="form-control mb-2"
+          [(ngModel)]="nuevaFactura.totalFinal"
+          readonly
+          disabled
         />
 
         <label class="form-label">Fecha de Emisión</label>
@@ -291,6 +359,13 @@
         <p *ngIf="selectedFile">
           Archivo seleccionado: {{ selectedFile.name }}
         </p>
+
+        <label class="form-label">Sucursal</label>
+        <mat-form-field class="w-100 mb-2">
+          <mat-select [(ngModel)]="nuevaFactura.sucursal" placeholder="Seleccione una sucursal">
+            <mat-option *ngFor="let sucursal of sucursales" [value]="sucursal.nombre">{{ sucursal.nombre }}</mat-option>
+          </mat-select>
+        </mat-form-field>
 
         <button class="btn btn-success w-100" (click)="agregarNuevaFactura()">
           Agregar Factura

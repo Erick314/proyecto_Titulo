@@ -3,18 +3,19 @@ import { Producto } from '../producto/producto.service';
 import { CrudService } from '../crud/crud.service';
 import { Observable } from 'rxjs';
 
-export interface Factura{
+export interface Factura {
   id?: string;
-  esVisible: boolean;
+  numeroFactura: string;
+  nombreProveedor: string;
+  monto: number;
   fechaEmision: Date;
-  iva: number;
-  idUsuario: string ;
-  nombreProveedor: string ;
-  numeroFactura: string ;
-  pdfAsociado: string ;
-  productos: Record<string, Producto>;
-  totalFinal: number;
-  totalNeto: number;
+  pdfUrl?: string;
+  esVisible?: boolean;
+  iva?: number;
+  idUsuario?: string;
+  productos?: Record<string, Producto>;
+  totalFinal?: number;
+  totalNeto?: number;
 }
 @Injectable({
   providedIn: 'root'

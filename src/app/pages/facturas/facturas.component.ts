@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -11,15 +11,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { toast } from 'ngx-sonner';
+import { Factura, FacturaService } from '../../modelo/factura/factura.service';
+import { ProveedorService, Proveedor } from '../../modelo/proveedor/proveedor.service';
+import { Subscription } from 'rxjs';
+import { SucursalService, Sucursal } from '../../modelo/sucursal/sucursal.service';
 
-interface Factura {
-  id: number;
-  numeroFactura: string;
-  nombreProveedor: string;
-  monto: number;
-  fechaEmision: Date;
-  pdfUrl?: string;
-  // ... otras propiedades de la factura ...
+// Extender la interfaz Factura para incluir sucursal
+interface FacturaConSucursal extends Factura {
+  sucursal?: string;
 }
 
 @Component({
@@ -41,68 +40,48 @@ interface Factura {
   templateUrl: './facturas.component.html',
   styleUrl: './facturas.component.scss',
 })
-export class FacturasComponent implements OnInit, AfterViewInit {
-  facturas: Factura[] = [
-    {
-      id: 1,
-      numeroFactura: '694021',
-      nombreProveedor: 'Andina',
-      monto: 5578590,
-      fechaEmision: new Date('2025-04-01'),
-      pdfUrl:
-        'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', // Ejemplo de URL de PDF real
-    },
-    {
-      id: 2,
-      numeroFactura: '123456',
-      nombreProveedor: 'Coca-Cola',
-      monto: 1200000,
-      fechaEmision: new Date('2024-03-15'),
-      pdfUrl: 'https://www.africau.edu/images/default/sample.pdf', // Otro ejemplo de URL de PDF real
-    },
-    {
-      id: 3,
-      numeroFactura: '789012',
-      nombreProveedor: 'Pepsi',
-      monto: 850000,
-      fechaEmision: new Date('2025-01-20'),
-      // pdfUrl: 'assets/facturas/factura-ejemplo-3.pdf' // Puedes tener algunas sin PDF
-    },
-    // ... más datos de ejemplo de facturas ...
-  ];
-  facturasFiltradas: Factura[] = [...this.facturas];
-  // ¡IMPORTANTE! Agrega 'verPdf' aquí en el orden que desees
+export class FacturasComponent implements OnInit, AfterViewInit, OnDestroy {
+  facturas: FacturaConSucursal[] = [];
+  facturasFiltradas: FacturaConSucursal[] = [];
   displayedColumnsFacturas: string[] = [
     'factura',
     'proveedor',
     'monto',
+    'iva',
+    'totalNeto',
+    'totalFinal',
     'fechaEmision',
-    'verPdf', // <-- ¡NUEVA COLUMNA!
+    'verPdf',
     'opciones',
   ];
-  dataSourceFacturas = new MatTableDataSource<Factura>(this.facturasFiltradas);
+  dataSourceFacturas = new MatTableDataSource<FacturaConSucursal>([]);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   // Estado para la edición
-  selectedFactura: Factura | null = null;
+  selectedFactura: FacturaConSucursal | null = null;
   validationError = '';
   selectedFileForEdit: File | null = null;
 
   // Estado para la confirmación
   mostrarModalConfirmacion = false;
-  facturaAConfirmar: Factura | null = null;
+  facturaAConfirmar: FacturaConSucursal | null = null;
   mensajeConfirmacion = '';
-  facturaAEliminar: Factura | null = null;
+  facturaAEliminar: FacturaConSucursal | null = null;
 
   // Estado para la nueva factura
   mostrarModalNuevaFactura = false;
-  nuevaFactura: Partial<Factura> = {
+  nuevaFactura: Partial<FacturaConSucursal> = {
     numeroFactura: '',
-    // ... inicialización de nuevaFactura
+    nombreProveedor: '',
     monto: 0,
     fechaEmision: new Date(),
     pdfUrl: undefined,
+    esVisible: true,
+    iva: 0.19,
+    idUsuario: 'usuario1',
+    totalFinal: 0,
+    totalNeto: 0
   };
   selectedFile: File | null = null;
   newFacturaValidationError = '';
@@ -110,10 +89,57 @@ export class FacturasComponent implements OnInit, AfterViewInit {
   // Filtro de búsqueda
   searchTerm: string = '';
 
-  constructor() {}
+  proveedores: Proveedor[] = [];
+  private proveedorSubscription: Subscription | null = null;
+
+  private subscription: Subscription | null = null;
+
+  sucursales: Sucursal[] = [];
+  sucursalSeleccionada: string = 'todas';
+
+  constructor(
+    private facturaService: FacturaService,
+    private proveedorService: ProveedorService,
+    private sucursalService: SucursalService
+  ) {}
 
   ngOnInit(): void {
-    this.dataSourceFacturas = new MatTableDataSource(this.facturasFiltradas);
+    this.cargarFacturas();
+    this.cargarProveedores();
+    this.cargarSucursales();
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+    if (this.proveedorSubscription) {
+      this.proveedorSubscription.unsubscribe();
+    }
+  }
+
+  private cargarFacturas() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+
+    this.subscription = this.facturaService.listar().subscribe({
+      next: (facturas) => {
+        console.log('Facturas cargadas:', facturas);
+        this.actualizarDatosFacturas(facturas);
+        toast.success('Facturas cargadas correctamente');
+      },
+      error: (error) => {
+        console.error('Error al cargar facturas:', error);
+        toast.error('Error al cargar las facturas: ' + (error.message || 'Error desconocido'));
+      }
+    });
+  }
+
+  private actualizarDatosFacturas(facturas: FacturaConSucursal[]) {
+    this.facturas = facturas;
+    this.facturasFiltradas = this.filtrarFacturasPorSucursal();
+    this.dataSourceFacturas.data = this.facturasFiltradas;
   }
 
   ngAfterViewInit(): void {
@@ -123,20 +149,21 @@ export class FacturasComponent implements OnInit, AfterViewInit {
 
   applyFilter() {
     const filterValue = this.searchTerm.toLowerCase();
-    this.dataSourceFacturas.filterPredicate = (
-      factura: Factura,
-      filter: string
-    ) => {
+    this.dataSourceFacturas.filterPredicate = (factura: FacturaConSucursal, filter: string) => {
       const fechaEmisionString = factura.fechaEmision
         ? new Date(factura.fechaEmision).toLocaleDateString()
         : '';
+      
       return (
         factura.numeroFactura.toLowerCase().includes(filter) ||
         factura.nombreProveedor.toLowerCase().includes(filter) ||
         factura.monto.toString().includes(filter) ||
+        (factura.totalNeto?.toString() || '').includes(filter) ||
+        (factura.totalFinal?.toString() || '').includes(filter) ||
         fechaEmisionString.includes(filter)
       );
     };
+    
     this.dataSourceFacturas.filter = filterValue;
 
     if (this.dataSourceFacturas.paginator) {
@@ -144,8 +171,23 @@ export class FacturasComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // Edición de facturas
-  abrirEditorFactura(factura: Factura) {
+  actualizarTotalesEdicion() {
+    if (this.selectedFactura) {
+      const monto = this.selectedFactura.monto || 0;
+      const iva = this.selectedFactura.iva || 0.19;
+      this.selectedFactura.totalNeto = monto;
+      this.selectedFactura.totalFinal = monto * (1 + iva);
+    }
+  }
+
+  actualizarTotalesNuevaFactura() {
+    const monto = this.nuevaFactura.monto || 0;
+    const iva = this.nuevaFactura.iva || 0.19;
+    this.nuevaFactura.totalNeto = monto;
+    this.nuevaFactura.totalFinal = monto * (1 + iva);
+  }
+
+  abrirEditorFactura(factura: FacturaConSucursal) {
     this.selectedFactura = { ...factura };
     this.validationError = '';
     this.selectedFileForEdit = null;
@@ -157,6 +199,7 @@ export class FacturasComponent implements OnInit, AfterViewInit {
         this.selectedFactura.fechaEmision
       );
     }
+    this.actualizarTotalesEdicion();
   }
 
   cerrarEditorFactura() {
@@ -227,14 +270,13 @@ export class FacturasComponent implements OnInit, AfterViewInit {
     this.mostrarModalConfirmacion = true;
   }
 
-  // Eliminación de facturas
-  solicitarConfirmacionGuardadoFactura(factura: Factura) {
+  solicitarConfirmacionGuardadoFactura(factura: FacturaConSucursal) {
     this.facturaAConfirmar = { ...factura };
     this.mensajeConfirmacion = `¿DESEA CONFIRMAR LOS CAMBIOS EN LA FACTURA ${factura.numeroFactura}?`;
     this.mostrarModalConfirmacion = true;
   }
 
-  solicitarConfirmacionEliminarFactura(factura: Factura) {
+  solicitarConfirmacionEliminarFactura(factura: FacturaConSucursal) {
     this.facturaAEliminar = { ...factura };
     this.mensajeConfirmacion = `¿DESEA ELIMINAR LA FACTURA ${factura.numeroFactura}?`;
     this.mostrarModalConfirmacion = true;
@@ -254,53 +296,37 @@ export class FacturasComponent implements OnInit, AfterViewInit {
     }
   }
 
-  confirmarGuardadoFactura() {
-    if (this.facturaAConfirmar) {
-      const index = this.facturas.findIndex(
-        (f) => f.id === this.facturaAConfirmar!.id
-      );
-      if (index !== -1) {
-        this.facturas[index] = { ...this.facturaAConfirmar };
-        this.facturasFiltradas = [...this.facturas];
-        this.dataSourceFacturas.data = this.facturasFiltradas;
-        toast.success(
-          `Factura "${this.facturaAConfirmar.numeroFactura}" guardada correctamente.`
-        );
-        console.log(
-          `Factura "${this.facturaAConfirmar.numeroFactura}" guardada.`
-        );
+  async confirmarGuardadoFactura() {
+    const factura = this.facturaAConfirmar;
+    if (factura && factura.id) {
+      try {
+        const { id, ...cambios } = factura;
+        await this.facturaService.actualizar(id, cambios);
+        this.cargarFacturas();
+        toast.success(`Factura "${factura.numeroFactura}" guardada correctamente.`);
         this.cerrarModalConfirmacion();
         this.cerrarEditorFactura();
-      } else {
-        toast.error(`No se encontró la factura para actualizar.`);
-        console.log(
-          `No se encontró la factura con ID ${this.facturaAConfirmar.id} para actualizar.`
-        );
-        this.cerrarModalConfirmacion();
-        this.cerrarEditorFactura();
+      } catch (error) {
+        console.error('Error al actualizar factura:', error);
+        toast.error('Error al actualizar la factura: ' + (error instanceof Error ? error.message : 'Error desconocido'));
       }
     }
   }
 
-  confirmarEliminarFactura() {
-    if (this.facturaAEliminar) {
-      const index = this.facturas.findIndex(
-        (f) => f.id === this.facturaAEliminar!.id
-      );
-      if (index !== -1) {
-        this.facturas.splice(index, 1);
-        this.facturasFiltradas = [...this.facturas];
-        this.dataSourceFacturas.data = this.facturasFiltradas;
-        toast.success(
-          `Factura "${this.facturaAEliminar.numeroFactura}" eliminada correctamente.`
-        );
-        console.log(
-          `Factura "${this.facturaAEliminar.numeroFactura}" eliminada.`
-        );
+  async confirmarEliminarFactura() {
+    const factura = this.facturaAEliminar;
+    if (factura && factura.id) {
+      try {
+        await this.facturaService.eliminar(factura.id);
+        this.cargarFacturas();
+        toast.success(`Factura "${factura.numeroFactura}" eliminada correctamente.`);
+        this.cerrarModalConfirmacion();
+        this.facturaAEliminar = null;
+      } catch (error) {
+        console.error('Error al eliminar factura:', error);
+        toast.error('Error al eliminar la factura: ' + (error instanceof Error ? error.message : 'Error desconocido'));
       }
     }
-    this.cerrarModalConfirmacion();
-    this.facturaAEliminar = null;
   }
 
   cerrarModalConfirmacion() {
@@ -310,8 +336,6 @@ export class FacturasComponent implements OnInit, AfterViewInit {
     this.mensajeConfirmacion = '';
   }
 
-  // --- Funciones para el nuevo modal de Factura ---
-
   abrirModalNuevaFactura() {
     this.mostrarModalNuevaFactura = true;
     this.nuevaFactura = {
@@ -320,9 +344,15 @@ export class FacturasComponent implements OnInit, AfterViewInit {
       monto: 0,
       fechaEmision: new Date(),
       pdfUrl: undefined,
+      esVisible: true,
+      iva: 0.19,
+      idUsuario: 'usuario1',
+      totalFinal: 0,
+      totalNeto: 0
     };
     this.selectedFile = null;
     this.newFacturaValidationError = '';
+    this.actualizarTotalesNuevaFactura();
   }
 
   cerrarModalNuevaFactura() {
@@ -347,7 +377,7 @@ export class FacturasComponent implements OnInit, AfterViewInit {
     }
   }
 
-  agregarNuevaFactura() {
+  async agregarNuevaFactura() {
     this.newFacturaValidationError = '';
     if (
       !this.nuevaFactura.numeroFactura ||
@@ -371,25 +401,69 @@ export class FacturasComponent implements OnInit, AfterViewInit {
       console.log('Simulando subida de PDF:', this.selectedFile);
     }
 
-    const nuevoId =
-      this.facturas.length > 0
-        ? Math.max(...this.facturas.map((f) => f.id)) + 1
-        : 1;
+    const monto = this.nuevaFactura.monto!;
+    const iva = this.nuevaFactura.iva || 0.19;
+    const totalNeto = monto;
+    const totalFinal = monto * (1 + iva);
 
-    const nuevaFacturaCompleta: Factura = {
-      id: nuevoId,
+    const nuevaFactura: Omit<FacturaConSucursal, 'id'> = {
       numeroFactura: this.nuevaFactura.numeroFactura!,
       nombreProveedor: this.nuevaFactura.nombreProveedor!,
-      monto: this.nuevaFactura.monto!,
+      monto: monto,
       fechaEmision: new Date(this.nuevaFactura.fechaEmision!),
       pdfUrl: pdfUrl,
+      esVisible: true,
+      iva: iva,
+      idUsuario: 'usuario1',
+      totalFinal: totalFinal,
+      totalNeto: totalNeto
     };
 
-    this.facturas.push(nuevaFacturaCompleta);
-    this.facturasFiltradas = [...this.facturas];
+    try {
+      await this.facturaService.crear(nuevaFactura);
+      this.cargarFacturas();
+      this.cerrarModalNuevaFactura();
+      toast.success('¡Nueva factura agregada exitosamente!');
+    } catch (error) {
+      console.error('Error al crear factura:', error);
+      toast.error('Error al crear la factura: ' + (error instanceof Error ? error.message : 'Error desconocido'));
+    }
+  }
+
+  private cargarProveedores() {
+    this.proveedorSubscription = this.proveedorService.listar().subscribe({
+      next: (proveedores) => {
+        console.log('Proveedores cargados:', proveedores);
+        this.proveedores = proveedores;
+      },
+      error: (error) => {
+        console.error('Error al cargar proveedores:', error);
+        toast.error('Error al cargar los proveedores: ' + (error.message || 'Error desconocido'));
+      }
+    });
+  }
+
+  onSucursalChange() {
+    this.facturasFiltradas = this.filtrarFacturasPorSucursal();
     this.dataSourceFacturas.data = this.facturasFiltradas;
-    this.cerrarModalNuevaFactura();
-    toast.success('¡Nueva factura agregada exitosamente!');
-    console.log('Nueva factura agregada:', nuevaFacturaCompleta);
+    this.applyFilter(); // Mantener filtro de búsqueda si hay
+  }
+
+  private filtrarFacturasPorSucursal(): FacturaConSucursal[] {
+    if (!this.sucursalSeleccionada || this.sucursalSeleccionada === 'todas') {
+      return [...this.facturas];
+    }
+    return this.facturas.filter(f => f['sucursal'] === this.sucursalSeleccionada);
+  }
+
+  private cargarSucursales() {
+    this.sucursalService.listar().subscribe({
+      next: (sucursales) => {
+        this.sucursales = sucursales;
+      },
+      error: (error) => {
+        console.error('Error al cargar sucursales:', error);
+      }
+    });
   }
 }
