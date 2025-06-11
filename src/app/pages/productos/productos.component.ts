@@ -40,7 +40,7 @@ export class ProductosComponent implements OnInit, AfterViewInit {
   }
   productos: Producto[] = [];
   productosFiltrados: Producto[] = [...this.productos];
-  displayedColumns: string[] = ['nombre', 'categoria', 'precioUnitario', 'cantidad', 'estado', 'opciones'];
+  displayedColumns: string[] = ['nombre', 'categoria', 'precioUnitario', 'cantidadYUnidad', 'estado', 'opciones'];
   dataSource: MatTableDataSource<Producto>;
   
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -64,13 +64,39 @@ export class ProductosComponent implements OnInit, AfterViewInit {
     descripcion: '',
     estado: 'ACTIVO',
     precioUnitario: 0,
-    cantidad: 0,
+    unidadMedida: 'g',
+    cantidadUnidadMedida: 0
   };
   newProductoValidationError: string | null = null;
 
   // Filtro de búsqueda
   searchTerm: string = '';
   private subscription: Subscription = new Subscription();
+
+  // Propiedades para manejar el precio como string
+  precioUnitarioString: string = '0';
+  nuevoPrecioUnitarioString: string = '0';
+
+  // Métodos para convertir entre string y number
+  convertirPrecioAString(precio: number): string {
+    return precio.toString();
+  }
+
+  convertirStringAPrecio(precioString: string): number {
+    const precio = parseFloat(precioString.replace(/[^0-9.-]+/g, ''));
+    return isNaN(precio) ? 0 : precio;
+  }
+
+  // Métodos para manejar los cambios en el precio
+  actualizarPrecioUnitario() {
+    if (this.selectedProducto) {
+      this.selectedProducto.precioUnitario = this.convertirStringAPrecio(this.precioUnitarioString);
+    }
+  }
+
+  actualizarNuevoPrecioUnitario() {
+    this.nuevoProducto.precioUnitario = this.convertirStringAPrecio(this.nuevoPrecioUnitarioString);
+  }
 
   ngOnInit(): void {
     this.cargarProductos();
@@ -82,7 +108,7 @@ export class ProductosComponent implements OnInit, AfterViewInit {
         producto.categoria?.toLowerCase() || '',
         producto.estado?.toLowerCase() || '',
         producto.precioUnitario?.toString() || '',
-        producto.cantidad?.toString() || ''
+        producto.unidadMedida?.toLowerCase() || ''
       ];
       
       return searchableFields.some(field => field.includes(searchStr));
@@ -105,6 +131,7 @@ export class ProductosComponent implements OnInit, AfterViewInit {
 
   abrirEditor(producto: Producto) {
     this.selectedProducto = { ...producto };
+    this.precioUnitarioString = this.convertirPrecioAString(producto.precioUnitario);
     this.validationError = null;
   }
 
@@ -153,8 +180,10 @@ export class ProductosComponent implements OnInit, AfterViewInit {
       descripcion: '',
       estado: 'ACTIVO',
       precioUnitario: 0,
-      cantidad: 0,
+      unidadMedida: 'g',
+      cantidadUnidadMedida: 0
     };
+    this.nuevoPrecioUnitarioString = '0';
     this.newProductoValidationError = null;
     this.mostrarModalNuevoProducto = true;
   }
@@ -194,8 +223,12 @@ export class ProductosComponent implements OnInit, AfterViewInit {
       this.validationError = 'El precio unitario debe ser mayor a 0';
       return false;
     }
-    if (!producto.cantidad || producto.cantidad < 0) {
-      this.validationError = 'La cantidad no puede ser negativa';
+    if (!producto.cantidadUnidadMedida || producto.cantidadUnidadMedida <= 0) {
+      this.validationError = 'La cantidad de la unidad de medida debe ser mayor a 0';
+      return false;
+    }
+    if (!producto.unidadMedida) {
+      this.validationError = 'La unidad de medida es requerida';
       return false;
     }
     if (!producto.estado) {
@@ -218,8 +251,12 @@ export class ProductosComponent implements OnInit, AfterViewInit {
       this.newProductoValidationError = 'El precio unitario debe ser mayor a 0';
       return false;
     }
-    if (!producto.cantidad || producto.cantidad < 0) {
-      this.newProductoValidationError = 'La cantidad no puede ser negativa';
+    if (!producto.cantidadUnidadMedida || producto.cantidadUnidadMedida <= 0) {
+      this.newProductoValidationError = 'La cantidad de la unidad de medida debe ser mayor a 0';
+      return false;
+    }
+    if (!producto.unidadMedida) {
+      this.newProductoValidationError = 'La unidad de medida es requerida';
       return false;
     }
     if (!producto.estado) {

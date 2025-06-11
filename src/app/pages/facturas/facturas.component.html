@@ -192,7 +192,7 @@
           [(ngModel)]="selectedFactura.numeroFactura"
         />
 
-        <label class="form-label">Proveedor</label>
+        <label>Proveedor</label>
         <mat-form-field>
           <mat-select [(ngModel)]="selectedFactura.nombreProveedor" placeholder="Seleccione un proveedor">
             <mat-option *ngFor="let proveedor of proveedores" [value]="proveedor.nombreCliente">
@@ -206,6 +206,7 @@
           type="number"
           class="form-control mb-2"
           [(ngModel)]="selectedFactura.monto"
+          placeholder="0"
           (input)="actualizarTotalesEdicion()"
         />
 
@@ -319,6 +320,7 @@
           type="number"
           class="form-control mb-2"
           [(ngModel)]="nuevaFactura.monto"
+          placeholder="0"
           (input)="actualizarTotalesNuevaFactura()"
           required
         />

@@ -8,7 +8,8 @@ export interface Producto {
   estado: string;
   nombre: string;
   precioUnitario: number;
-  cantidad: number;
+  unidadMedida: 'cc' | 'g';
+  cantidadUnidadMedida: number;
 }
 @Injectable({
   providedIn: 'root'
