@@ -94,7 +94,7 @@
     transition: color 0.2s ease-in-out;
   }
   &:hover {
-    color: #0056b3; // Ya no necesita !important
+    color: #0056b3; // Ya no necesita !important si no hay conflicto
   }
 }
 
@@ -108,6 +108,92 @@
 
 .text-danger {
   color: #dc3545; /* Ya no necesita !important si no hay conflicto */
+}
+
+/* Estilos para los badges de estado */
+.badge {
+  padding: 0.5em 0.75em;
+  font-size: 0.75em;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.badge.bg-success {
+  background-color: #28a745 !important;
+  color: white;
+}
+
+.badge.bg-secondary {
+  background-color: #6c757d !important;
+  color: white;
+}
+
+/* Estilos para las alertas de stock mínimo */
+.text-muted {
+  color: #6c757d !important;
+  font-size: 0.875em;
+}
+
+/* Estilos para el stock cuando está por debajo del mínimo */
+.stock-minimo-alert {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Estilos para el input de stock editable */
+.stock-input {
+  border: none !important;
+  background: transparent !important;
+  text-align: center !important;
+  font-weight: inherit !important;
+  color: inherit !important;
+  width: 80px !important;
+  padding: 0.25rem !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease !important;
+  
+  &:focus {
+    outline: none !important;
+    background-color: rgba(40, 167, 69, 0.1) !important;
+    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25) !important;
+  }
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+  }
+  
+  &.text-danger {
+    color: #dc3545 !important;
+  }
+  
+  &.fw-bold {
+    font-weight: bold !important;
+  }
+  
+  /* Quitar flechas del input number */
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  /* Para Firefox */
+  &[type=number] {
+    -moz-appearance: textfield;
+  }
 }
 
 /* Estilos específicos para el modal de nuevo producto si difieren */

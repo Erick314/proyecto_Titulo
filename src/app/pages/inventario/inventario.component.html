@@ -6,10 +6,13 @@
       class="row justify-content-center mb-4 gap-2 px-3 flex-wrap text-center"
     >
       <div class="col-auto">
-        <button class="">
-          <span>Sucursal</span>
-          <span class="material-symbols-outlined">expand_more</span>
-        </button>
+        <mat-form-field>
+          <mat-label>Sucursal</mat-label>
+          <mat-select [(ngModel)]="sucursalSeleccionada" (selectionChange)="onSucursalChange()">
+            <mat-option value="todas">Todas</mat-option>
+            <mat-option *ngFor="let sucursal of sucursales" [value]="sucursal.nombre">{{ sucursal.nombre }}</mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
 
       <div class="col-auto">
@@ -24,7 +27,7 @@
           <input
             type="text"
             class="form-control border-start-0"
-            placeholder="Filtrar sucursal"
+            placeholder="Filtrar producto"
             [(ngModel)]="searchTerm"
             (input)="applyFilter()"
           />
@@ -45,29 +48,47 @@
 
   <div class="table-responsive px-3">
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
-      <ng-container matColumnDef="nombre">
+      <ng-container matColumnDef="sucursalNombre">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">SUCURSAL</th>
+        <td mat-cell *matCellDef="let producto" class="text-center">{{ producto.sucursalNombre }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="nombreProducto">
         <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">PRODUCTO</th>
         <td mat-cell *matCellDef="let producto" class="text-center">
           <a
             class="pdf-icon-link"
             style="cursor: pointer"
             (click)="mostrarHistorial(producto.id)"
-            >{{ producto.nombre }}</a
+            >{{ producto.nombreProducto }}</a
           >
+          <br>
+          <small class="text-muted">{{ producto.detalles }}</small>
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="stock">
+      <ng-container matColumnDef="stockActual">
         <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">STOCK</th>
         <td mat-cell *matCellDef="let producto" class="text-center">
-          <div >
+          <div [class.text-danger]="producto.stockActual <= producto.stockMinimo" 
+               [class.fw-bold]="producto.stockActual <= producto.stockMinimo"
+               [class.stock-minimo-alert]="producto.stockActual <= producto.stockMinimo">
             <span
               class="text-danger fs-4"
               style="cursor: pointer"
               (click)="decrementarStock(producto)"
               >➖</span
             >
-            {{ producto.stock }}
+            <input
+              type="number"
+              class="stock-input"
+              [(ngModel)]="producto.stockActual"
+              (blur)="actualizarStockDirecto(producto)"
+              (keyup.enter)="actualizarStockDirecto(producto)"
+              min="0"
+              [class.text-danger]="producto.stockActual <= producto.stockMinimo"
+              [class.fw-bold]="producto.stockActual <= producto.stockMinimo"
+            >
             <span
               class="text-success fs-4"
               style="cursor: pointer"
@@ -75,12 +96,19 @@
               >➕</span
             >
           </div>
+          <small *ngIf="producto.stockActual <= producto.stockMinimo" class="text-danger fw-bold">
+            ⚠️ Stock mínimo: {{ producto.stockMinimo }}
+          </small>
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="detalles">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">DETALLES</th>
-        <td mat-cell *matCellDef="let producto" class="text-center">{{ producto.detalles }}</td>
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">ESTADO</th>
+        <td mat-cell *matCellDef="let producto" class="text-center">
+          <span [class]="producto.estado === 'ACTIVO' ? 'badge bg-success' : 'badge bg-secondary'">
+            {{ producto.estado }}
+          </span>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="opciones">
@@ -153,7 +181,7 @@
         <input
           type="text"
           class="form-control mb-2"
-          [(ngModel)]="selectedProducto.nombre"
+          [(ngModel)]="selectedProducto.nombreProducto"
           required
         />
 
@@ -163,7 +191,7 @@
         <input
           type="number"
           class="form-control mb-2"
-          [(ngModel)]="selectedProducto.stock"
+          [(ngModel)]="selectedProducto.stockActual"
           required
         />
 
@@ -188,7 +216,7 @@
     (click)="$event.stopPropagation()"
   >
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <h2>{{ productoSeleccionado.nombre | uppercase }}</h2>
+      <h2>{{ productoSeleccionado.nombreProducto | uppercase }}</h2>
       <button
         type="button"
         class="btn-close"
@@ -196,7 +224,7 @@
         (click)="cerrarHistorial()"
       ></button>
     </div>
-    <p class="descripcion">{{ productoSeleccionado.descripcion }}</p>
+    <p class="descripcion">{{ productoSeleccionado.descripcionProducto }}</p>
 
     <table
       mat-table
@@ -239,37 +267,61 @@
   </div>
 </div>
 
-<div class="overlay" *ngIf="mostrarModalNuevoProducto">
-  <div class="nuevo-producto-card">
-    <h2>NUEVO PRODUCTO</h2>
-    <div class="form-group">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Nombre Producto"
-        [(ngModel)]="nuevoProducto.nombre"
-      />
+<div class="overlay" *ngIf="mostrarModalNuevoProducto" (click)="cerrarModalNuevoProducto()">
+  <div class="edit-card" (click)="$event.stopPropagation()">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="m-0">Agregar Producto al Inventario</h5>
+      <button
+        class="btn-close"
+        aria-label="Cerrar"
+        (click)="cerrarModalNuevoProducto()"
+      ></button>
     </div>
-    <div class="form-group">
+
+    <div *ngIf="validationError" class="alert alert-danger py-1">
+      {{ validationError }}
+    </div>
+
+    <div>
+      <label class="form-label">Sucursal</label>
+      <mat-form-field class="w-100 mb-2">
+        <mat-select [(ngModel)]="nuevoProducto.sucursalId" placeholder="Seleccione una sucursal">
+          <mat-option *ngFor="let sucursal of sucursales" [value]="sucursal.id">{{ sucursal.nombre }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <label class="form-label">Producto</label>
+      <mat-form-field class="w-100 mb-2">
+        <mat-select [(ngModel)]="nuevoProducto.productoId" placeholder="Seleccione un producto">
+          <mat-option *ngFor="let producto of productos" [value]="producto.id">
+            {{ producto.nombre }} - {{ producto.categoria }} ({{ producto.cantidadUnidadMedida }}{{ producto.unidadMedida }})
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <label class="form-label">Stock Actual</label>
       <input
         type="number"
-        class="form-control"
-        placeholder="Cantidad"
-        [(ngModel)]="nuevoProducto.stock"
+        class="form-control mb-2"
+        [(ngModel)]="nuevoProducto.stockActual"
+        placeholder="0"
+        min="0"
+        required
       />
+
+      <label class="form-label">Stock Mínimo</label>
+      <input
+        type="number"
+        class="form-control mb-3"
+        [(ngModel)]="nuevoProducto.stockMinimo"
+        placeholder="0"
+        min="0"
+        required
+      />
+
+      <button class="btn btn-success w-100" (click)="agregarNuevoProducto()" [disabled]="!nuevoProducto.productoId || !nuevoProducto.sucursalId">
+        Agregar al Inventario
+      </button>
     </div>
-    <div class="form-group">
-      <textarea
-        class="form-control"
-        placeholder="Descripción"
-        [(ngModel)]="nuevoProducto.descripcion"
-      ></textarea>
-    </div>
-    <button class="btn custom-button-green" (click)="agregarNuevoProducto()">
-      AGREGAR
-    </button>
-    <button class="btn custom-button-red" (click)="cerrarModalNuevoProducto()">
-      CANCELAR
-    </button>
   </div>
 </div>
