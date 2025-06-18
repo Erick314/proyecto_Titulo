@@ -142,27 +142,16 @@ tr.mat-row:hover {
 }
 
 // Estilos para el buscador
-.input-group {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border-radius: 50px;
-  overflow: hidden;
-  background-color: white;
+.input-group.rounded-pill .form-control,
+.input-group.rounded-pill .input-group-text,
+.form-control.rounded-pill {
+  border-radius: 50px !important; /* Asegura que sean realmente redondeados */
+}
 
-  .input-group-text {
-    background-color: white;
-    border: 1px solid #ced4da;
-    border-right: none;
-  }
-
-  .form-control {
-    border: 1px solid #ced4da;
-    border-left: none;
-    padding: 0.75rem 1rem;
-
-    &:focus {
-      box-shadow: none;
-    }
-  }
+.input-group-text.border-end-0 {
+  background-color: white; /* Asumiendo que quieres el fondo blanco para el ícono de búsqueda */
+  border: 1px solid #ced4da;
+  border-right: none;
 }
 
 // Estilos para los estados
@@ -234,7 +223,7 @@ tr.mat-row:hover {
 
 .mat-row {
   transition: background-color 0.2s ease;
-  
+
   &:hover {
     background-color: #f8f9fa;
   }
@@ -259,10 +248,8 @@ tr.mat-row:hover {
 
 /* Estilos para los botones de búsqueda y añadir */
 .input-group.rounded-pill {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   border-radius: 50px;
   overflow: hidden;
-  background-color: white;
 
   .input-group-text {
     background-color: white;
@@ -302,4 +289,4 @@ tr.mat-row:hover {
 /* Estilos para los estados */
 .text-center.fw-bold.mb-4 {
   color: #333;
-} 
+}
