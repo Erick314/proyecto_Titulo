@@ -30,7 +30,7 @@ import {
 } from '../../modelo/inventario/inventario.service';
 import { Subscription, firstValueFrom } from 'rxjs';
 import { toast } from 'ngx-sonner';
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 import * as FileSaver from 'file-saver';
 
 interface Movimiento {
@@ -645,17 +645,70 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
       Detalles: producto.detalles || '',
     }));
 
-    const worksheet = XLSX.utils.json_to_sheet(dataExportar);
-    const workbook = {
-      Sheets: { Inventario: worksheet },
-      SheetNames: ['Inventario'],
-    };
-    const excelBuffer: any = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Inventario');
+
+    // Definir columnas con encabezado y ancho
+    worksheet.columns = [
+      { header: 'Sucursal', key: 'Sucursal', width: 20 },
+      { header: 'Producto', key: 'Producto', width: 25 },
+      { header: 'Stock Actual', key: 'Stock Actual', width: 15 },
+      { header: 'Stock Mínimo', key: 'Stock Mínimo', width: 15 },
+      { header: 'Estado', key: 'Estado', width: 15 },
+      { header: 'Detalles', key: 'Detalles', width: 30 },
+    ];
+
+    // Agregar los datos
+    dataExportar.forEach((item) => {
+      worksheet.addRow(item);
     });
 
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    FileSaver.saveAs(blob, 'inventario.xlsx');
+    // Estilos para la cabecera
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF198754' }, // Verde Bootstrap
+      };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = {
+        top: { style: 'thin' },
+        bottom: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    });
+
+    // Bordes para todas las celdas de datos
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber > 1) {
+        row.eachCell((cell) => {
+          cell.border = {
+            top: { style: 'thin' },
+            bottom: { style: 'thin' },
+            left: { style: 'thin' },
+            right: { style: 'thin' },
+          };
+          cell.alignment = { vertical: 'middle', horizontal: 'left' };
+        });
+      }
+    });
+
+    // Generar archivo y descargar
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const nombreSucursal =
+        this.sucursalSeleccionada && this.sucursalSeleccionada !== 'todas'
+          ? this.sucursalSeleccionada.replace(/\s+/g, '_') // Reemplaza espacios por "_"
+          : 'todas';
+      const fechaActual = new Date().toISOString().split('T')[0];
+      FileSaver.saveAs(
+        blob,
+        `inventario_${nombreSucursal}_${fechaActual}.xlsx`
+      );
+    });
   }
 }
