@@ -4,6 +4,7 @@ import {
   OnInit,
   AfterViewInit,
   OnDestroy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -28,6 +29,10 @@ import {
   InventarioService,
   Inventario,
 } from '../../modelo/inventario/inventario.service';
+import {
+  MovimientosService,
+  MovimientoInventario,
+} from '../../modelo/movimientos/movimientos.service';
 import { Subscription, firstValueFrom } from 'rxjs';
 import { toast } from 'ngx-sonner';
 import * as ExcelJS from 'exceljs';
@@ -35,8 +40,9 @@ import * as FileSaver from 'file-saver';
 
 interface Movimiento {
   cantidad: number;
-  tipo: 'ENTRADA' | 'SALIDA';
+  tipo: 'ENTRADA' | 'SALIDA' | 'AJUSTE';
   fecha: Date;
+  motivo?: string;
 }
 
 interface ProductoConHistorial {
@@ -97,7 +103,7 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatSort) sort!: MatSort;
 
   // Propiedades para el historial
-  displayedColumnsHistorial: string[] = ['cantidad', 'tipo', 'fecha'];
+  displayedColumnsHistorial: string[] = ['cantidad', 'tipo', 'fecha', 'motivo'];
   dataSourceHistorial = new MatTableDataSource<Movimiento>([]);
   @ViewChild('paginatorHistorial') paginatorHistorial!: MatPaginator;
   @ViewChild('sortHistorial') sortHistorial!: MatSort;
@@ -130,11 +136,17 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
   private sucursalSubscription: Subscription | null = null;
   private inventarioSubscription: Subscription | null = null;
   private productoSubscription: Subscription | null = null;
+  private movimientosSubscription: Subscription | null = null;
+
+  // Bandera para mostrar loader en historial
+  cargandoHistorial: boolean = false;
 
   constructor(
     private sucursalService: SucursalService,
     private productoService: ProductoService,
-    private inventarioService: InventarioService
+    private inventarioService: InventarioService,
+    private movimientosService: MovimientosService,
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -158,6 +170,29 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.productoSubscription) {
       this.productoSubscription.unsubscribe();
     }
+    if (this.movimientosSubscription) {
+      this.movimientosSubscription.unsubscribe();
+    }
+  }
+
+  // Función helper para convertir fechas de Firestore
+  private convertirFechaFirestore(fechaFirestore: any): Date {
+    if (!fechaFirestore) {
+      return new Date();
+    }
+    
+    // Si es un Timestamp de Firestore
+    if (fechaFirestore.toDate && typeof fechaFirestore.toDate === 'function') {
+      return fechaFirestore.toDate();
+    }
+    
+    // Si ya es un objeto Date
+    if (fechaFirestore instanceof Date) {
+      return fechaFirestore;
+    }
+    
+    // Si es un string o número, crear nuevo Date
+    return new Date(fechaFirestore);
   }
 
   // Método para cargar sucursales
@@ -211,7 +246,7 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
       stockActual: item.cantidad,
       stockMinimo: item.stockMinimo,
       sucursalNombre: item.sucursal.nombre,
-      ultimaActualizacion: item.ultimaActualizacion,
+      ultimaActualizacion: this.convertirFechaFirestore(item.ultimaActualizacion),
       estado: item.estado,
       detalles: `${item.producto.cantidadUnidadMedida}${item.producto.unidadMedida}`,
       historialMovimientos: [], // Por ahora vacío, se puede implementar después
@@ -240,21 +275,104 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
+  // Método para actualizar automáticamente los datos del inventario
+  private actualizarInventarioEnVista(inventarioId: string) {
+    this.inventarioService.obtenerPorId(inventarioId).subscribe({
+      next: (inventarioActualizado) => {
+        if (inventarioActualizado) {
+          // Actualizar el inventario en el array principal
+          const indexInventario = this.inventario.findIndex(item => item.id === inventarioId);
+          if (indexInventario !== -1) {
+            this.inventario[indexInventario] = inventarioActualizado;
+          }
+
+          // Actualizar el inventario en el display
+          const indexDisplay = this.inventarioDisplay.findIndex(item => item.id === inventarioId);
+          if (indexDisplay !== -1) {
+            this.inventarioDisplay[indexDisplay] = {
+              id: inventarioActualizado.id,
+              nombreProducto: inventarioActualizado.producto.nombre,
+              descripcionProducto: inventarioActualizado.producto.descripcion,
+              stockActual: inventarioActualizado.cantidad,
+              stockMinimo: inventarioActualizado.stockMinimo,
+              sucursalNombre: inventarioActualizado.sucursal.nombre,
+              ultimaActualizacion: this.convertirFechaFirestore(inventarioActualizado.ultimaActualizacion),
+              estado: inventarioActualizado.estado,
+              detalles: `${inventarioActualizado.producto.cantidadUnidadMedida}${inventarioActualizado.producto.unidadMedida}`,
+              historialMovimientos: this.inventarioDisplay[indexDisplay].historialMovimientos || [],
+            };
+          }
+
+          // Actualizar el producto seleccionado si está abierto el historial
+          if (this.productoSeleccionado && this.productoSeleccionado.id === inventarioId) {
+            this.productoSeleccionado = {
+              id: inventarioActualizado.id,
+              nombreProducto: inventarioActualizado.producto.nombre,
+              descripcionProducto: inventarioActualizado.producto.descripcion,
+              stockActual: inventarioActualizado.cantidad,
+              stockMinimo: inventarioActualizado.stockMinimo,
+              sucursalNombre: inventarioActualizado.sucursal.nombre,
+              ultimaActualizacion: this.convertirFechaFirestore(inventarioActualizado.ultimaActualizacion),
+              estado: inventarioActualizado.estado,
+              detalles: `${inventarioActualizado.producto.cantidadUnidadMedida}${inventarioActualizado.producto.unidadMedida}`,
+              historialMovimientos: this.productoSeleccionado.historialMovimientos || [],
+            };
+          }
+
+          // Actualizar los datos filtrados
+          this.actualizarDatosFiltrados();
+        }
+      },
+      error: (error) => {
+        console.error('Error al actualizar inventario en vista:', error);
+      }
+    });
+  }
+
+  // Método simple para actualizar solo el stock en la vista
+  private actualizarStockEnVista(inventarioId: string, nuevoStock: number) {
+    // Actualizar en el array principal
+    const indexInventario = this.inventario.findIndex(item => item.id === inventarioId);
+    if (indexInventario !== -1) {
+      this.inventario[indexInventario].cantidad = nuevoStock;
+      this.inventario[indexInventario].ultimaActualizacion = new Date();
+    }
+
+    // Actualizar en el display
+    const indexDisplay = this.inventarioDisplay.findIndex(item => item.id === inventarioId);
+    if (indexDisplay !== -1) {
+      this.inventarioDisplay[indexDisplay].stockActual = nuevoStock;
+      this.inventarioDisplay[indexDisplay].ultimaActualizacion = new Date();
+    }
+
+    // Actualizar el producto seleccionado si está abierto el historial
+    if (this.productoSeleccionado && this.productoSeleccionado.id === inventarioId) {
+      this.productoSeleccionado.stockActual = nuevoStock;
+      this.productoSeleccionado.ultimaActualizacion = new Date();
+    }
+
+    // Actualizar los datos filtrados
+    this.actualizarDatosFiltrados();
+  }
+
   //uso de los incrementadores y decrementadores
   incrementarStock(producto: InventarioDisplay) {
     if (producto.id) {
       // Actualizar inmediatamente en la vista para mejor UX
       const stockAnterior = producto.stockActual;
-      producto.stockActual++;
+      const nuevoStock = stockAnterior + 1;
+      producto.stockActual = nuevoStock;
 
       this.inventarioService
-        .actualizarCantidad(producto.id, producto.stockActual)
+        .incrementarCantidad(producto.id, 1, 'Incremento manual desde interfaz')
         .then(() => {
           toast.success('Stock incrementado correctamente');
+          // Actualizar automáticamente el historial si está abierto
+          this.actualizarHistorialEnVista(producto.id!);
           // Verificar si ahora está por encima del mínimo
           if (
             stockAnterior <= producto.stockMinimo &&
-            producto.stockActual > producto.stockMinimo
+            nuevoStock > producto.stockMinimo
           ) {
             toast.success('¡Stock restaurado por encima del mínimo!');
           }
@@ -272,16 +390,19 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
     if (producto.stockActual > 0 && producto.id) {
       // Actualizar inmediatamente en la vista para mejor UX
       const stockAnterior = producto.stockActual;
-      producto.stockActual--;
+      const nuevoStock = stockAnterior - 1;
+      producto.stockActual = nuevoStock;
 
       this.inventarioService
-        .actualizarCantidad(producto.id, producto.stockActual)
+        .decrementarCantidad(producto.id, 1, 'Decremento manual desde interfaz')
         .then(() => {
           toast.success('Stock decrementado correctamente');
+          // Actualizar automáticamente el historial si está abierto
+          this.actualizarHistorialEnVista(producto.id!);
           // Verificar si ahora está por debajo del mínimo
           if (
             stockAnterior > producto.stockMinimo &&
-            producto.stockActual <= producto.stockMinimo
+            nuevoStock <= producto.stockMinimo
           ) {
             toast.warning('¡Atención! Stock por debajo del mínimo');
           }
@@ -300,32 +421,56 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
   // Método para actualizar stock directamente desde el input
   actualizarStockDirecto(producto: InventarioDisplay) {
     if (producto.id && producto.stockActual >= 0) {
-      const stockAnterior = producto.stockActual;
+      // Obtener el stock actual de la base de datos para comparar
+      this.inventarioService.obtenerPorId(producto.id).subscribe({
+        next: (inventario) => {
+          if (inventario) {
+            const stockAnterior = inventario.cantidad;
+            const stockNuevo = producto.stockActual;
 
-      this.inventarioService
-        .actualizarCantidad(producto.id, producto.stockActual)
-        .then(() => {
-          toast.success('Stock actualizado correctamente');
+            // Solo actualizar si realmente cambió
+            if (stockAnterior === stockNuevo) {
+              return; // No hacer nada si no hay cambio
+            }
 
-          // Verificar cambios en el estado del stock mínimo
-          if (
-            stockAnterior <= producto.stockMinimo &&
-            producto.stockActual > producto.stockMinimo
-          ) {
-            toast.success('¡Stock restaurado por encima del mínimo!');
-          } else if (
-            stockAnterior > producto.stockMinimo &&
-            producto.stockActual <= producto.stockMinimo
-          ) {
-            toast.warning('¡Atención! Stock por debajo del mínimo');
+            this.inventarioService
+              .actualizarCantidad(
+                producto.id!,
+                stockNuevo,
+                stockAnterior,
+                'Actualización manual desde interfaz'
+              )
+              .then(() => {
+                toast.success('Stock actualizado correctamente');
+                // Actualizar automáticamente el historial si está abierto
+                this.actualizarHistorialEnVista(producto.id!);
+
+                // Verificar cambios en el estado del stock mínimo
+                if (
+                  stockAnterior <= producto.stockMinimo &&
+                  stockNuevo > producto.stockMinimo
+                ) {
+                  toast.success('¡Stock restaurado por encima del mínimo!');
+                } else if (
+                  stockAnterior > producto.stockMinimo &&
+                  stockNuevo <= producto.stockMinimo
+                ) {
+                  toast.warning('¡Atención! Stock por debajo del mínimo');
+                }
+              })
+              .catch((error) => {
+                console.error('Error al actualizar stock:', error);
+                toast.error('Error al actualizar el stock');
+                // Revertir el cambio en caso de error
+                producto.stockActual = stockAnterior;
+              });
           }
-        })
-        .catch((error) => {
-          console.error('Error al actualizar stock:', error);
-          toast.error('Error al actualizar el stock');
-          // Revertir el cambio en caso de error
-          producto.stockActual = stockAnterior;
-        });
+        },
+        error: (error) => {
+          console.error('Error al obtener inventario:', error);
+          toast.error('Error al obtener información del inventario');
+        }
+      });
     } else if (producto.stockActual < 0) {
       toast.error('El stock no puede ser negativo');
       producto.stockActual = 0;
@@ -528,21 +673,50 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
 
   //Tabla de historial
   mostrarHistorial(productoId: string) {
-    this.productoSeleccionado =
-      this.inventarioDisplay.find((p) => p.id === productoId) || null;
-    if (this.productoSeleccionado?.historialMovimientos) {
-      this.dataSourceHistorial = new MatTableDataSource<Movimiento>(
-        this.productoSeleccionado.historialMovimientos
-      );
-      this.dataSourceHistorial.paginator = this.paginatorHistorial;
-      this.dataSourceHistorial.sort = this.sortHistorial;
+    this.cerrarHistorial();
+    this.productoSeleccionado = this.inventarioDisplay.find((p) => p.id === productoId) || null;
+
+    if (this.productoSeleccionado) {
+      this.cargandoHistorial = true;
+      this.movimientosSubscription = this.movimientosService
+        .obtenerPorInventario(productoId)
+        .subscribe({
+          next: (movimientos) => {
+            const movimientosOrdenados = movimientos.sort((a, b) =>
+              this.convertirFechaFirestore(b.fechaHora).getTime() - this.convertirFechaFirestore(a.fechaHora).getTime()
+            );
+            const historialMovimientos: Movimiento[] = movimientosOrdenados.map(mov => ({
+              cantidad: mov.cantidadMovida,
+              tipo: mov.tipoMovimiento as 'ENTRADA' | 'SALIDA' | 'AJUSTE',
+              fecha: this.convertirFechaFirestore(mov.fechaHora),
+              motivo: mov.motivo || 'Sin motivo especificado',
+            }));
+            this.dataSourceHistorial = new MatTableDataSource<Movimiento>(historialMovimientos);
+            this.cdRef.detectChanges();
+            this.asignarPaginadorYSortHistorial();
+            this.cargandoHistorial = false;
+          },
+          error: (error) => {
+            console.error('Error al cargar movimientos:', error);
+            this.dataSourceHistorial = new MatTableDataSource<Movimiento>([]);
+            this.cargandoHistorial = false;
+            toast.error('Error al cargar el historial de movimientos');
+          }
+        });
     } else {
       this.dataSourceHistorial = new MatTableDataSource<Movimiento>([]);
+      toast.error('No se pudo encontrar el producto seleccionado');
     }
   }
 
   cerrarHistorial() {
+    if (this.movimientosSubscription) {
+      this.movimientosSubscription.unsubscribe();
+      this.movimientosSubscription = null;
+    }
+    this.dataSourceHistorial = new MatTableDataSource<Movimiento>([]);
     this.productoSeleccionado = null;
+    this.cargandoHistorial = false;
   }
 
   applyFilter() {
@@ -619,12 +793,26 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
         };
 
         // Guardar en la base de datos
-        await this.inventarioService.crear(nuevoInventario);
+        const inventarioId = await this.inventarioService.crear(nuevoInventario);
+        
+        // Si hay stock inicial, registrar el movimiento
+        if (this.nuevoProducto.stockActual > 0) {
+          await this.movimientosService.registrarMovimiento(
+            inventarioId,
+            producto.id!,
+            sucursal.id!,
+            0, // Cantidad anterior (0 porque es nuevo)
+            this.nuevoProducto.stockActual,
+            'ENTRADA',
+            'Stock inicial al crear inventario'
+          );
+        }
+
         toast.success(
           `Producto "${producto.nombre}" agregado al inventario de "${sucursal.nombre}" correctamente`
         );
 
-        // Recargar datos desde la base de datos
+        // Recargar datos desde la base de datos y actualizar automáticamente
         this.cargarInventario();
         this.cerrarModalNuevoProducto();
       } else {
@@ -710,5 +898,59 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
         `inventario_${nombreSucursal}_${fechaActual}.xlsx`
       );
     });
+  }
+
+  // Método para actualizar automáticamente el historial
+  private actualizarHistorialEnVista(inventarioId: string) {
+    // Solo actualizar si hay un historial abierto para este inventario
+    if (this.productoSeleccionado && this.productoSeleccionado.id === inventarioId) {
+      // Limpiar la suscripción anterior si existe
+      if (this.movimientosSubscription) {
+        this.movimientosSubscription.unsubscribe();
+      }
+      this.cargandoHistorial = true;
+      this.movimientosSubscription = this.movimientosService
+        .obtenerPorInventario(inventarioId)
+        .subscribe({
+          next: (movimientos) => {
+            // Ordenar movimientos por fecha (más recientes primero)
+            const movimientosOrdenados = movimientos.sort((a, b) => 
+              this.convertirFechaFirestore(b.fechaHora).getTime() - this.convertirFechaFirestore(a.fechaHora).getTime()
+            );
+            // Convertir movimientos a formato de historial
+            const historialMovimientos: Movimiento[] = movimientosOrdenados.map(mov => ({
+              cantidad: mov.cantidadMovida,
+              tipo: mov.tipoMovimiento as 'ENTRADA' | 'SALIDA' | 'AJUSTE',
+              fecha: this.convertirFechaFirestore(mov.fechaHora),
+              motivo: mov.motivo || 'Sin motivo especificado',
+            }));
+            // Crear SIEMPRE un nuevo MatTableDataSource
+            this.dataSourceHistorial = new MatTableDataSource<Movimiento>(historialMovimientos);
+            this.cdRef.detectChanges();
+            this.asignarPaginadorYSortHistorial();
+            this.cargandoHistorial = false;
+          },
+          error: (error) => {
+            console.error('Error al actualizar historial en vista:', error);
+            this.dataSourceHistorial = new MatTableDataSource<Movimiento>([]);
+            this.cargandoHistorial = false;
+          }
+        });
+    }
+  }
+
+  private asignarPaginadorYSortHistorial() {
+    let intentos = 0;
+    const maxIntentos = 10;
+    const asignar = () => {
+      if (this.paginatorHistorial && this.sortHistorial) {
+        this.dataSourceHistorial.paginator = this.paginatorHistorial;
+        this.dataSourceHistorial.sort = this.sortHistorial;
+      } else if (intentos < maxIntentos) {
+        intentos++;
+        setTimeout(asignar, 50);
+      }
+    };
+    asignar();
   }
 }

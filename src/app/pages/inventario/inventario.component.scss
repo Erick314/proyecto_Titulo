@@ -216,9 +216,32 @@
 }
 
 .detalle-producto-card.edit-card.historial-modal-content {
-  width: 70%;
-  max-width: 800px;
+  width: 80%;
+  max-width: 1000px;
   padding: 30px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.producto-info {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #28a745;
+}
+
+.producto-info .descripcion {
+  color: #6c757d;
+  font-style: italic;
+  margin-bottom: 15px;
+}
+
+.producto-info .row {
+  margin-bottom: 10px;
+}
+
+.producto-info strong {
+  color: #495057;
 }
 
 /* Estilos para los campos de Material (fill appearance) específicos de Inventario si los necesitas */
@@ -697,4 +720,71 @@ mat-slide-toggle span {
 }
 .mdc-switch.mdc-switch--selected .mdc-switch__handle {
   background-color: #fff; /* Círculo de toggle activo (blanco) */
+}
+
+/* Estilos para la tabla de historial */
+.historial-modal-content .mat-table {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.historial-modal-content .mat-header-cell {
+  background-color: #28a745;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 12px 8px;
+}
+
+.historial-modal-content .mat-cell {
+  padding: 12px 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.historial-modal-content .mat-row:hover {
+  background-color: #f8f9fa;
+}
+
+.historial-modal-content .mat-row:last-child .mat-cell {
+  border-bottom: none;
+}
+
+/* Estilos para los íconos de tipo de movimiento */
+.historial-modal-content .fs-5 {
+  font-size: 1.25rem !important;
+}
+
+/* Estilos para el paginador del historial */
+.historial-modal-content .mat-paginator {
+  background-color: white;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para el mensaje de no hay movimientos */
+.historial-modal-content .text-muted {
+  color: #6c757d !important;
+  font-size: 1.1rem;
+}
+
+/* Responsive para el modal de historial */
+@media (max-width: 768px) {
+  .detalle-producto-card.edit-card.historial-modal-content {
+    width: 95%;
+    padding: 20px;
+  }
+  
+  .producto-info {
+    padding: 15px;
+  }
+  
+  .producto-info .row {
+    margin-bottom: 8px;
+  }
+  
+  .producto-info .col-md-6 {
+    margin-bottom: 5px;
+  }
 }
