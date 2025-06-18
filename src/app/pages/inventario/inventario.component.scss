@@ -164,34 +164,34 @@
   padding: 0.25rem !important;
   border-radius: 4px !important;
   transition: all 0.2s ease !important;
-  
+
   &:focus {
     outline: none !important;
     background-color: rgba(40, 167, 69, 0.1) !important;
     box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25) !important;
   }
-  
+
   &:hover {
     background-color: rgba(0, 0, 0, 0.05) !important;
   }
-  
+
   &.text-danger {
     color: #dc3545 !important;
   }
-  
+
   &.fw-bold {
     font-weight: bold !important;
   }
-  
+
   /* Quitar flechas del input number */
   &::-webkit-outer-spin-button,
   &::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
-  
+
   /* Para Firefox */
-  &[type=number] {
+  &[type="number"] {
     -moz-appearance: textfield;
     appearance: textfield;
   }
