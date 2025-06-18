@@ -34,7 +34,6 @@ export const routes: Routes = [
 
   // 3. Ruta para el Dashboard y sus hijos (contenido principal de la aplicación)
   {
-
     path: 'dashboard',
     // Carga perezosa del componente Dashboard (layout principal)
     loadComponent: () =>
@@ -86,16 +85,14 @@ export const routes: Routes = [
             (m) => m.ContactoComponent
           ),
       },
-      {
-        path: 'configuracion',
-        loadComponent: () =>
-          import('./pages/configuracion/configuracion.component').then(
-            (m) => m.ConfiguracionComponent
-          ),
-      },
 
       // Si quieres una página de inicio específica dentro del dashboard (por ejemplo, al entrar a /dashboard)
-      {canActivateChild: [privateGuard()], path: '', redirectTo: 'facturas', pathMatch: 'full' }, // /dashboard redirige a /dashboard/facturas
+      {
+        canActivateChild: [privateGuard()],
+        path: '',
+        redirectTo: 'facturas',
+        pathMatch: 'full',
+      }, // /dashboard redirige a /dashboard/facturas
     ],
   },
 

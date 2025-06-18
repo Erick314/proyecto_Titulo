@@ -2,11 +2,17 @@
   <div class="row">
     <h2 class="text-center fw-bold mb-4">PRODUCTOS</h2>
 
-    <div class="row justify-content-center mb-4 gap-2 px-3 flex-wrap text-center">
+    <div
+      class="row justify-content-center mb-4 gap-2 px-3 flex-wrap text-center"
+    >
       <div class="col-auto">
         <div class="input-group rounded-pill d-flex align-items-center">
           <span class="input-group-text border-end-0" style="line-height: 1">
-            <span class="material-symbols-outlined" style="font-size: 24px; vertical-align: middle">search</span>
+            <span
+              class="material-symbols-outlined"
+              style="font-size: 24px; vertical-align: middle"
+              >search</span
+            >
           </span>
           <input
             type="text"
@@ -33,33 +39,51 @@
   <div class="table-responsive px-3">
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
       <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">PRODUCTO</th>
-        <td mat-cell *matCellDef="let producto" class="text-center">{{ producto.nombre }}</td>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">
+          PRODUCTO
+        </th>
+        <td mat-cell *matCellDef="let producto" class="text-center">
+          {{ producto.nombre }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="categoria">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">CATEGORÍA</th>
-        <td mat-cell *matCellDef="let producto" class="text-center">{{ producto.categoria }}</td>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">
+          CATEGORÍA
+        </th>
+        <td mat-cell *matCellDef="let producto" class="text-center">
+          {{ producto.categoria }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="precioUnitario">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">PRECIO UNITARIO</th>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">
+          PRECIO UNITARIO
+        </th>
         <td mat-cell *matCellDef="let producto" class="text-center">
-          {{ producto.precioUnitario | currency:'CLP':'$':'1.0-0' }}
+          {{ producto.precioUnitario | currency : "CLP" : "$" : "1.0-0" }}
         </td>
-      </ng-container> 
+      </ng-container>
 
       <ng-container matColumnDef="cantidadYUnidad">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">CONTENIDO</th>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">
+          CONTENIDO
+        </th>
         <td mat-cell *matCellDef="let producto" class="text-center">
           {{ producto.cantidadUnidadMedida }} {{ producto.unidadMedida }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="estado">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">ESTADO</th>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">
+          ESTADO
+        </th>
         <td mat-cell *matCellDef="let producto" class="text-center">
-          <span [class]="producto.estado === 'ACTIVO' ? 'text-success' : 'text-danger'">
+          <span
+            [class]="
+              producto.estado === 'ACTIVO' ? 'text-success' : 'text-danger'
+            "
+          >
             {{ producto.estado }}
           </span>
         </td>
@@ -89,7 +113,10 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" showFirstLastButtons></mat-paginator>
+    <mat-paginator
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      showFirstLastButtons
+    ></mat-paginator>
   </div>
 
   <!-- Modal de Confirmación -->
@@ -97,8 +124,12 @@
     <div class="edit-card">
       <h2>{{ mensajeConfirmacion }}</h2>
       <div class="modal-buttons">
-        <button class="confirm-button" (click)="confirmarAccion()">CONFIRMAR</button>
-        <button class="cancel-button" (click)="cerrarModalConfirmacion()">CANCELAR</button>
+        <button class="confirm-button" (click)="confirmarAccion()">
+          CONFIRMAR
+        </button>
+        <button class="cancel-button" (click)="cerrarModalConfirmacion()">
+          CANCELAR
+        </button>
       </div>
     </div>
   </div>
@@ -108,7 +139,11 @@
     <div class="edit-card" (click)="$event.stopPropagation()">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="m-0">Editar Producto</h5>
-        <button class="btn-close" aria-label="Cerrar" (click)="cerrarEditor()"></button>
+        <button
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="cerrarEditor()"
+        ></button>
       </div>
 
       <div *ngIf="validationError" class="alert alert-danger py-1">
@@ -116,7 +151,9 @@
       </div>
 
       <div>
-        <label class="form-label">Nombre <span class="text-danger">*</span></label>
+        <label class="form-label"
+          >Nombre <span class="text-danger">*</span></label
+        >
         <input
           type="text"
           class="form-control mb-2"
@@ -124,7 +161,9 @@
           required
         />
 
-        <label class="form-label">Categoría <span class="text-danger">*</span></label>
+        <label class="form-label"
+          >Categoría <span class="text-danger">*</span></label
+        >
         <input
           type="text"
           class="form-control mb-2"
@@ -132,7 +171,9 @@
           required
         />
 
-        <label class="form-label">Precio Unitario <span class="text-danger">*</span></label>
+        <label class="form-label"
+          >Precio Unitario <span class="text-danger">*</span></label
+        >
         <input
           type="text"
           class="form-control mb-2"
@@ -144,7 +185,9 @@
 
         <div class="row">
           <div class="col-6">
-            <label class="form-label">Cantidad <span class="text-danger">*</span></label>
+            <label class="form-label"
+              >Cantidad <span class="text-danger">*</span></label
+            >
             <input
               type="number"
               class="form-control mb-2"
@@ -155,16 +198,28 @@
             />
           </div>
           <div class="col-6">
-            <label class="form-label">Unidad de Medida <span class="text-danger">*</span></label>
-            <select class="form-select mb-2" [(ngModel)]="selectedProducto.unidadMedida" required>
+            <label class="form-label"
+              >Unidad de Medida <span class="text-danger">*</span></label
+            >
+            <select
+              class="form-select mb-2"
+              [(ngModel)]="selectedProducto.unidadMedida"
+              required
+            >
               <option value="g">g</option>
               <option value="cc">cc</option>
             </select>
           </div>
         </div>
 
-        <label class="form-label">Estado <span class="text-danger">*</span></label>
-        <select class="form-select mb-2" [(ngModel)]="selectedProducto.estado" required>
+        <label class="form-label"
+          >Estado <span class="text-danger">*</span></label
+        >
+        <select
+          class="form-select mb-2"
+          [(ngModel)]="selectedProducto.estado"
+          required
+        >
           <option value="ACTIVO">ACTIVO</option>
           <option value="INACTIVO">INACTIVO</option>
         </select>
@@ -184,11 +239,19 @@
   </div>
 
   <!-- Modal de Nuevo Producto -->
-  <div class="overlay" *ngIf="mostrarModalNuevoProducto" (click)="cerrarModalNuevoProducto()">
+  <div
+    class="overlay"
+    *ngIf="mostrarModalNuevoProducto"
+    (click)="cerrarModalNuevoProducto()"
+  >
     <div class="edit-card" (click)="$event.stopPropagation()">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="m-0">Nuevo Producto</h5>
-        <button class="btn-close" aria-label="Cerrar" (click)="cerrarModalNuevoProducto()"></button>
+        <button
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="cerrarModalNuevoProducto()"
+        ></button>
       </div>
 
       <div *ngIf="newProductoValidationError" class="alert alert-danger py-1">
@@ -196,7 +259,9 @@
       </div>
 
       <div>
-        <label class="form-label">Nombre <span class="text-danger">*</span></label>
+        <label class="form-label"
+          >Nombre <span class="text-danger">*</span></label
+        >
         <input
           type="text"
           class="form-control mb-2"
@@ -204,7 +269,9 @@
           required
         />
 
-        <label class="form-label">Categoría <span class="text-danger">*</span></label>
+        <label class="form-label"
+          >Categoría <span class="text-danger">*</span></label
+        >
         <input
           type="text"
           class="form-control mb-2"
@@ -212,7 +279,9 @@
           required
         />
 
-        <label class="form-label">Precio Unitario <span class="text-danger">*</span></label>
+        <label class="form-label"
+          >Precio Unitario <span class="text-danger">*</span></label
+        >
         <input
           type="text"
           class="form-control mb-2"
@@ -224,7 +293,9 @@
 
         <div class="row">
           <div class="col-6">
-            <label class="form-label">Cantidad <span class="text-danger">*</span></label>
+            <label class="form-label"
+              >Cantidad <span class="text-danger">*</span></label
+            >
             <input
               type="number"
               class="form-control mb-2"
@@ -235,16 +306,28 @@
             />
           </div>
           <div class="col-6">
-            <label class="form-label">Unidad de Medida <span class="text-danger">*</span></label>
-            <select class="form-select mb-2" [(ngModel)]="nuevoProducto.unidadMedida" required>
+            <label class="form-label"
+              >Unidad de Medida <span class="text-danger">*</span></label
+            >
+            <select
+              class="form-select mb-2"
+              [(ngModel)]="nuevoProducto.unidadMedida"
+              required
+            >
               <option value="g">g</option>
               <option value="cc">cc</option>
             </select>
           </div>
         </div>
 
-        <label class="form-label">Estado <span class="text-danger">*</span></label>
-        <select class="form-select mb-2" [(ngModel)]="nuevoProducto.estado" required>
+        <label class="form-label"
+          >Estado <span class="text-danger">*</span></label
+        >
+        <select
+          class="form-select mb-2"
+          [(ngModel)]="nuevoProducto.estado"
+          required
+        >
           <option value="ACTIVO">ACTIVO</option>
           <option value="INACTIVO">INACTIVO</option>
         </select>
@@ -262,4 +345,4 @@
       </div>
     </div>
   </div>
-</div> 
+</div>

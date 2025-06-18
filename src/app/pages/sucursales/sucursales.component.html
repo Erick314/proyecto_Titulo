@@ -30,7 +30,8 @@
       <div class="col-auto">
         <button
           class="form-control rounded-pill px-4 py-2 d-flex align-items-center gap-2 bg-success-subtle"
-          (click)="abrirModalNuevaSucursal()">
+          (click)="abrirModalNuevaSucursal()"
+        >
           <span class="material-symbols-outlined text-success">add</span>
           Nueva Sucursal
         </button>
@@ -39,38 +40,52 @@
   </div>
 
   <div class="table-responsive px-3">
-    <table mat-table [dataSource]="dataSourceSucursales" class="mat-elevation-z8" matSort>
-
+    <table
+      mat-table
+      [dataSource]="dataSourceSucursales"
+      class="mat-elevation-z8"
+      matSort
+    >
       <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Sucursal</th>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">
+          Sucursal
+        </th>
         <td mat-cell *matCellDef="let sucursal" class="text-center">
           {{ sucursal.nombre }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="direccion">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Direccion</th>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">
+          Direccion
+        </th>
         <td mat-cell *matCellDef="let sucursal" class="text-center">
           {{ sucursal.direccion }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="numContacto">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Numero de Contacto</th>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">
+          Numero de Contacto
+        </th>
         <td mat-cell *matCellDef="let sucursal" class="text-center">
           {{ sucursal.numContacto }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="ventas">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Ventas</th>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">
+          Ventas
+        </th>
         <td mat-cell *matCellDef="let sucursal" class="text-center">
           {{ sucursal.ventas | currency : "CLP" : "$" : "1.0-0" }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="ultimoPedido">
-        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">Último pedido</th>
+        <th mat-header-cell *matHeaderCellDef matSortHeader class="text-center">
+          Último pedido
+        </th>
         <td mat-cell *matCellDef="let sucursal" class="text-center">
           {{ sucursal.ultimoPedido | date : "dd-MM-yyyy" }}
         </td>
@@ -97,7 +112,9 @@
       </ng-container>
 
       <ng-container matColumnDef="movimientos">
-        <th mat-header-cell *matHeaderCellDef class="text-center">MOVIMIENTOS</th>
+        <th mat-header-cell *matHeaderCellDef class="text-center">
+          MOVIMIENTOS
+        </th>
         <td mat-cell *matCellDef="let sucursal" class="text-center">
           <button
             class="btn btn-sm btn-info text-dark rounded-pill"
@@ -261,15 +278,14 @@
   <div
     class="overlay"
     *ngIf="mostrarModalMovimientos"
-    (click)="cerrarModalMovimientos()">
-
+    (click)="cerrarModalMovimientos()"
+  >
     <div
       class="edit-card"
       style="max-width: 800px; width: 95%"
-      (click)="$event.stopPropagation()">
-
+      (click)="$event.stopPropagation()"
+    >
       <div class="d-flex justify-content-between align-items-center mb-3">
-
         <h5 class="m-0">
           Movimientos de Sucursal:
           <span class="text-success fw-bold">{{
@@ -350,15 +366,6 @@
           [pageSizeOptions]="[5, 10, 20]"
           showFirstLastButtons
         ></mat-paginator>
-      </div>
-
-      <div class="d-flex justify-content-end mt-3">
-        <button
-          class="btn btn-success px-4 py-2"
-          (click)="exportarMovimientosAExcel()"
-        >
-          Exportar en Excel
-        </button>
       </div>
     </div>
   </div>

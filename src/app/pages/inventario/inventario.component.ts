@@ -1,4 +1,10 @@
-import { Component, ViewChild, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  OnInit,
+  AfterViewInit,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -10,11 +16,22 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { SucursalService, Sucursal } from '../../modelo/sucursal/sucursal.service';
-import { ProductoService, Producto } from '../../modelo/producto/producto.service';
-import { InventarioService, Inventario } from '../../modelo/inventario/inventario.service';
+import {
+  SucursalService,
+  Sucursal,
+} from '../../modelo/sucursal/sucursal.service';
+import {
+  ProductoService,
+  Producto,
+} from '../../modelo/producto/producto.service';
+import {
+  InventarioService,
+  Inventario,
+} from '../../modelo/inventario/inventario.service';
 import { Subscription, firstValueFrom } from 'rxjs';
 import { toast } from 'ngx-sonner';
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
 
 interface Movimiento {
   cantidad: number;
@@ -68,7 +85,13 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
   inventario: Inventario[] = [];
   inventarioDisplay: InventarioDisplay[] = [];
   inventarioFiltrado: InventarioDisplay[] = [];
-  displayedColumns: string[] = ['sucursalNombre', 'nombreProducto', 'stockActual', 'estado', 'opciones'];
+  displayedColumns: string[] = [
+    'sucursalNombre',
+    'nombreProducto',
+    'stockActual',
+    'estado',
+    'opciones',
+  ];
   dataSource = new MatTableDataSource<InventarioDisplay>([]);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -86,7 +109,7 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
   validationError = '';
   mensajeConfirmacion = '';
   productoAEliminar: any = null;
-  nuevoProducto: { 
+  nuevoProducto: {
     productoId: string;
     stockActual: number;
     stockMinimo: number;
@@ -95,7 +118,7 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
     productoId: '',
     stockActual: 0,
     stockMinimo: 0,
-    sucursalId: ''
+    sucursalId: '',
   };
   mostrarModalNuevoProducto = false;
   searchTerm: string = '';
@@ -146,7 +169,7 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error al cargar sucursales:', error);
-      }
+      },
     });
   }
 
@@ -160,7 +183,7 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
       error: (error) => {
         console.error('Error al cargar productos:', error);
         toast.error('Error al cargar los productos');
-      }
+      },
     });
   }
 
@@ -176,12 +199,12 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
       error: (error) => {
         console.error('Error al cargar inventario:', error);
         toast.error('Error al cargar el inventario');
-      }
+      },
     });
   }
 
   private convertirInventarioADisplay() {
-    this.inventarioDisplay = this.inventario.map(item => ({
+    this.inventarioDisplay = this.inventario.map((item) => ({
       id: item.id,
       nombreProducto: item.producto.nombre,
       descripcionProducto: item.producto.descripcion,
@@ -191,7 +214,7 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
       ultimaActualizacion: item.ultimaActualizacion,
       estado: item.estado,
       detalles: `${item.producto.cantidadUnidadMedida}${item.producto.unidadMedida}`,
-      historialMovimientos: [] // Por ahora vacío, se puede implementar después
+      historialMovimientos: [], // Por ahora vacío, se puede implementar después
     }));
   }
 
@@ -205,12 +228,16 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applyFilter(); // Aplicar filtro combinado de búsqueda y sucursal
   }
 
-  private filtrarInventarioPorSucursal(inventarioAFiltrar?: InventarioDisplay[]): InventarioDisplay[] {
+  private filtrarInventarioPorSucursal(
+    inventarioAFiltrar?: InventarioDisplay[]
+  ): InventarioDisplay[] {
     const inventarioBase = inventarioAFiltrar || this.inventarioDisplay;
     if (!this.sucursalSeleccionada || this.sucursalSeleccionada === 'todas') {
       return [...inventarioBase];
     }
-    return inventarioBase.filter(p => p.sucursalNombre === this.sucursalSeleccionada);
+    return inventarioBase.filter(
+      (p) => p.sucursalNombre === this.sucursalSeleccionada
+    );
   }
 
   //uso de los incrementadores y decrementadores
@@ -219,16 +246,20 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
       // Actualizar inmediatamente en la vista para mejor UX
       const stockAnterior = producto.stockActual;
       producto.stockActual++;
-      
-      this.inventarioService.actualizarCantidad(producto.id, producto.stockActual)
+
+      this.inventarioService
+        .actualizarCantidad(producto.id, producto.stockActual)
         .then(() => {
           toast.success('Stock incrementado correctamente');
           // Verificar si ahora está por encima del mínimo
-          if (stockAnterior <= producto.stockMinimo && producto.stockActual > producto.stockMinimo) {
+          if (
+            stockAnterior <= producto.stockMinimo &&
+            producto.stockActual > producto.stockMinimo
+          ) {
             toast.success('¡Stock restaurado por encima del mínimo!');
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error al incrementar stock:', error);
           toast.error('Error al incrementar el stock');
           // Revertir el cambio en caso de error
@@ -242,16 +273,20 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
       // Actualizar inmediatamente en la vista para mejor UX
       const stockAnterior = producto.stockActual;
       producto.stockActual--;
-      
-      this.inventarioService.actualizarCantidad(producto.id, producto.stockActual)
+
+      this.inventarioService
+        .actualizarCantidad(producto.id, producto.stockActual)
         .then(() => {
           toast.success('Stock decrementado correctamente');
           // Verificar si ahora está por debajo del mínimo
-          if (stockAnterior > producto.stockMinimo && producto.stockActual <= producto.stockMinimo) {
+          if (
+            stockAnterior > producto.stockMinimo &&
+            producto.stockActual <= producto.stockMinimo
+          ) {
             toast.warning('¡Atención! Stock por debajo del mínimo');
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error al decrementar stock:', error);
           toast.error('Error al decrementar el stock');
           // Revertir el cambio en caso de error
@@ -266,19 +301,26 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
   actualizarStockDirecto(producto: InventarioDisplay) {
     if (producto.id && producto.stockActual >= 0) {
       const stockAnterior = producto.stockActual;
-      
-      this.inventarioService.actualizarCantidad(producto.id, producto.stockActual)
+
+      this.inventarioService
+        .actualizarCantidad(producto.id, producto.stockActual)
         .then(() => {
           toast.success('Stock actualizado correctamente');
-          
+
           // Verificar cambios en el estado del stock mínimo
-          if (stockAnterior <= producto.stockMinimo && producto.stockActual > producto.stockMinimo) {
+          if (
+            stockAnterior <= producto.stockMinimo &&
+            producto.stockActual > producto.stockMinimo
+          ) {
             toast.success('¡Stock restaurado por encima del mínimo!');
-          } else if (stockAnterior > producto.stockMinimo && producto.stockActual <= producto.stockMinimo) {
+          } else if (
+            stockAnterior > producto.stockMinimo &&
+            producto.stockActual <= producto.stockMinimo
+          ) {
             toast.warning('¡Atención! Stock por debajo del mínimo');
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error al actualizar stock:', error);
           toast.error('Error al actualizar el stock');
           // Revertir el cambio en caso de error
@@ -351,7 +393,9 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
       if (index !== -1) {
         this.inventarioDisplay[index] = { ...this.productoAConfirmar };
         this.actualizarDatosFiltrados();
-        console.log(`Producto "${this.productoAConfirmar.nombreProducto}" guardado.`);
+        console.log(
+          `Producto "${this.productoAConfirmar.nombreProducto}" guardado.`
+        );
         this.cerrarModalConfirmacion();
       } else {
         console.log(
@@ -379,7 +423,8 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
 
   confirmarEliminar() {
     if (this.productoAEliminar && this.productoAEliminar.id) {
-      this.inventarioService.eliminar(this.productoAEliminar.id)
+      this.inventarioService
+        .eliminar(this.productoAEliminar.id)
         .then(() => {
           const index = this.inventarioDisplay.findIndex(
             (p) => p.id === this.productoAEliminar.id
@@ -387,14 +432,16 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
           if (index !== -1) {
             this.inventarioDisplay.splice(index, 1);
             this.actualizarDatosFiltrados();
-            console.log(`Producto "${this.productoAEliminar.nombreProducto}" eliminado.`);
+            console.log(
+              `Producto "${this.productoAEliminar.nombreProducto}" eliminado.`
+            );
             if (this.productoSeleccionado?.id === this.productoAEliminar.id) {
               this.cerrarHistorial();
             }
           }
           toast.success('Producto eliminado correctamente');
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error al eliminar producto:', error);
           toast.error('Error al eliminar el producto');
         });
@@ -411,7 +458,9 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
       if (index !== -1) {
         this.inventarioDisplay[index] = { ...this.productoAConfirmar };
         this.actualizarDatosFiltrados();
-        console.log(`Producto "${this.productoAConfirmar.nombreProducto}" guardado.`);
+        console.log(
+          `Producto "${this.productoAConfirmar.nombreProducto}" guardado.`
+        );
         this.cerrarModalConfirmacion();
       }
     }
@@ -419,7 +468,8 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
 
   eliminarProductoConfirmado() {
     if (this.productoAEliminar && this.productoAEliminar.id) {
-      this.inventarioService.eliminar(this.productoAEliminar.id)
+      this.inventarioService
+        .eliminar(this.productoAEliminar.id)
         .then(() => {
           const index = this.inventarioDisplay.findIndex(
             (p) => p.id === this.productoAEliminar.id
@@ -427,14 +477,16 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
           if (index !== -1) {
             this.inventarioDisplay.splice(index, 1);
             this.actualizarDatosFiltrados();
-            console.log(`Producto "${this.productoAEliminar.nombreProducto}" eliminado.`);
+            console.log(
+              `Producto "${this.productoAEliminar.nombreProducto}" eliminado.`
+            );
             if (this.productoSeleccionado?.id === this.productoAEliminar.id) {
               this.cerrarHistorial();
             }
           }
           toast.success('Producto eliminado correctamente');
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error al eliminar producto:', error);
           toast.error('Error al eliminar el producto');
         });
@@ -444,7 +496,8 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
 
   eliminarProducto(productoAEliminar: InventarioDisplay) {
     if (productoAEliminar.id) {
-      this.inventarioService.eliminar(productoAEliminar.id)
+      this.inventarioService
+        .eliminar(productoAEliminar.id)
         .then(() => {
           const index = this.inventarioDisplay.findIndex(
             (p) => p.id === productoAEliminar.id
@@ -452,14 +505,16 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
           if (index !== -1) {
             this.inventarioDisplay.splice(index, 1);
             this.actualizarDatosFiltrados();
-            console.log(`Producto "${productoAEliminar.nombreProducto}" eliminado.`);
+            console.log(
+              `Producto "${productoAEliminar.nombreProducto}" eliminado.`
+            );
             if (this.productoSeleccionado?.id === productoAEliminar.id) {
               this.cerrarHistorial();
             }
           }
           toast.success('Producto eliminado correctamente');
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error al eliminar producto:', error);
           toast.error('Error al eliminar el producto');
         });
@@ -494,13 +549,22 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
     // Primero aplicar el filtro de búsqueda
     let inventarioFiltradoPorBusqueda = this.inventarioDisplay.filter(
       (producto) =>
-        producto.nombreProducto.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        (producto.detalles?.toLowerCase().includes(this.searchTerm.toLowerCase()) || false) ||
-        producto.descripcionProducto.toLowerCase().includes(this.searchTerm.toLowerCase())
+        producto.nombreProducto
+          .toLowerCase()
+          .includes(this.searchTerm.toLowerCase()) ||
+        producto.detalles
+          ?.toLowerCase()
+          .includes(this.searchTerm.toLowerCase()) ||
+        false ||
+        producto.descripcionProducto
+          .toLowerCase()
+          .includes(this.searchTerm.toLowerCase())
     );
 
     // Luego aplicar el filtro de sucursal sobre el resultado de la búsqueda
-    this.inventarioFiltrado = this.filtrarInventarioPorSucursal(inventarioFiltradoPorBusqueda);
+    this.inventarioFiltrado = this.filtrarInventarioPorSucursal(
+      inventarioFiltradoPorBusqueda
+    );
     this.dataSource.data = this.inventarioFiltrado;
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
@@ -509,7 +573,12 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
 
   abrirModalNuevoProducto() {
     this.mostrarModalNuevoProducto = true;
-    this.nuevoProducto = { productoId: '', stockActual: 0, stockMinimo: 0, sucursalId: '' };
+    this.nuevoProducto = {
+      productoId: '',
+      stockActual: 0,
+      stockMinimo: 0,
+      sucursalId: '',
+    };
   }
 
   cerrarModalNuevoProducto() {
@@ -517,18 +586,26 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async agregarNuevoProducto() {
-    if (!this.nuevoProducto.productoId || 
-        this.nuevoProducto.stockActual < 0 || 
-        this.nuevoProducto.stockMinimo < 0 ||
-        !this.nuevoProducto.sucursalId) {
-      toast.error('Por favor, complete todos los campos obligatorios correctamente.');
+    if (
+      !this.nuevoProducto.productoId ||
+      this.nuevoProducto.stockActual < 0 ||
+      this.nuevoProducto.stockMinimo < 0 ||
+      !this.nuevoProducto.sucursalId
+    ) {
+      toast.error(
+        'Por favor, complete todos los campos obligatorios correctamente.'
+      );
       return;
     }
 
     try {
       // Obtener el producto y sucursal desde la base de datos
-      const producto = await firstValueFrom(this.productoService.obtenerPorId(this.nuevoProducto.productoId));
-      const sucursal = await firstValueFrom(this.sucursalService.obtenerPorId(this.nuevoProducto.sucursalId));
+      const producto = await firstValueFrom(
+        this.productoService.obtenerPorId(this.nuevoProducto.productoId)
+      );
+      const sucursal = await firstValueFrom(
+        this.sucursalService.obtenerPorId(this.nuevoProducto.sucursalId)
+      );
 
       if (producto && sucursal) {
         // Crear el registro de inventario
@@ -538,12 +615,14 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
           cantidad: this.nuevoProducto.stockActual,
           stockMinimo: this.nuevoProducto.stockMinimo,
           ultimaActualizacion: new Date(),
-          estado: 'ACTIVO'
+          estado: 'ACTIVO',
         };
 
         // Guardar en la base de datos
         await this.inventarioService.crear(nuevoInventario);
-        toast.success(`Producto "${producto.nombre}" agregado al inventario de "${sucursal.nombre}" correctamente`);
+        toast.success(
+          `Producto "${producto.nombre}" agregado al inventario de "${sucursal.nombre}" correctamente`
+        );
 
         // Recargar datos desde la base de datos
         this.cargarInventario();
@@ -555,5 +634,28 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
       console.error('Error al crear inventario:', error);
       toast.error('Error al agregar el producto al inventario');
     }
+  }
+  exportarMovimientosAExcel(): void {
+    const dataExportar = this.dataSource.filteredData.map((producto) => ({
+      Sucursal: producto.sucursalNombre,
+      Producto: producto.nombreProducto,
+      'Stock Actual': producto.stockActual,
+      'Stock Mínimo': producto.stockMinimo,
+      Estado: producto.estado,
+      Detalles: producto.detalles || '',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataExportar);
+    const workbook = {
+      Sheets: { Inventario: worksheet },
+      SheetNames: ['Inventario'],
+    };
+    const excelBuffer: any = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array',
+    });
+
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    FileSaver.saveAs(blob, 'inventario.xlsx');
   }
 }
