@@ -16,8 +16,9 @@ describe('InventarioService', () => {
     descripcion: 'Descripción test',
     categoria: 'Test',
     precioUnitario: 100,
-    cantidad: 10,
-    estado: 'ACTIVO'
+    unidadMedida: 'g',
+    cantidadUnidadMedida: 100,
+    estado: 'ACTIVO',
   };
 
   const mockSucursal: Sucursal = {
@@ -26,7 +27,7 @@ describe('InventarioService', () => {
     direccion: 'Dirección test',
     numContacto: '123456789',
     ventas: 0,
-    ultimoPedido: new Date()
+    ultimoPedido: new Date(),
   };
 
   const mockInventario: Inventario = {
@@ -36,7 +37,7 @@ describe('InventarioService', () => {
     cantidad: 10,
     stockMinimo: 5,
     ultimaActualizacion: new Date(),
-    estado: 'ACTIVO'
+    estado: 'ACTIVO',
   };
 
   beforeEach(() => {
@@ -45,18 +46,17 @@ describe('InventarioService', () => {
       'getById',
       'create',
       'update',
-      'delete'
+      'delete',
     ]);
 
     TestBed.configureTestingModule({
-      providers: [
-        InventarioService,
-        { provide: CrudService, useValue: spy }
-      ]
+      providers: [InventarioService, { provide: CrudService, useValue: spy }],
     });
 
     service = TestBed.inject(InventarioService);
-    crudServiceSpy = TestBed.inject(CrudService) as jasmine.SpyObj<CrudService<any>>;
+    crudServiceSpy = TestBed.inject(CrudService) as jasmine.SpyObj<
+      CrudService<any>
+    >;
   });
 
   it('should be created', () => {
@@ -67,7 +67,7 @@ describe('InventarioService', () => {
     const mockData: Inventario[] = [mockInventario];
     crudServiceSpy.getAll.and.returnValue(of(mockData));
 
-    service.listar().subscribe(data => {
+    service.listar().subscribe((data) => {
       expect(data).toEqual(mockData);
       expect(crudServiceSpy.getAll).toHaveBeenCalledWith('Inventario');
     });
@@ -77,7 +77,7 @@ describe('InventarioService', () => {
     const mockId = '123';
     crudServiceSpy.getById.and.returnValue(of(mockInventario));
 
-    service.obtenerPorId(mockId).subscribe(data => {
+    service.obtenerPorId(mockId).subscribe((data) => {
       expect(data).toEqual(mockInventario);
       expect(crudServiceSpy.getById).toHaveBeenCalledWith('Inventario', mockId);
     });
@@ -90,14 +90,17 @@ describe('InventarioService', () => {
       cantidad: 10,
       stockMinimo: 5,
       ultimaActualizacion: new Date(),
-      estado: 'ACTIVO'
+      estado: 'ACTIVO',
     };
     const mockId = '123';
     crudServiceSpy.create.and.returnValue(Promise.resolve(mockId));
 
     const result = await service.crear(newInventario);
     expect(result).toBe(mockId);
-    expect(crudServiceSpy.create).toHaveBeenCalledWith('Inventario', newInventario);
+    expect(crudServiceSpy.create).toHaveBeenCalledWith(
+      'Inventario',
+      newInventario
+    );
   });
 
   it('should call update when actualizar is called', async () => {
@@ -105,7 +108,11 @@ describe('InventarioService', () => {
     const updateData: Partial<Inventario> = { cantidad: 20 };
 
     await service.actualizar(mockId, updateData);
-    expect(crudServiceSpy.update).toHaveBeenCalledWith('Inventario', mockId, updateData);
+    expect(crudServiceSpy.update).toHaveBeenCalledWith(
+      'Inventario',
+      mockId,
+      updateData
+    );
   });
 
   it('should call delete when eliminar is called', async () => {
@@ -119,7 +126,7 @@ describe('InventarioService', () => {
     const inventario: Inventario = {
       ...mockInventario,
       cantidad: 5,
-      stockMinimo: 10
+      stockMinimo: 10,
     };
 
     expect(service.verificarStockMinimo(inventario)).toBeTrue();

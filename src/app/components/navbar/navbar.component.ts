@@ -19,7 +19,11 @@ export class NavbarComponent implements OnInit {
   // Renombramos el EventEmitter para que coincida con lo que el DashboardComponent espera escuchar
   @Output() menuToggle = new EventEmitter<boolean>();
 
-  constructor(private router: Router, private authService: AuthService, private auth: Auth) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private auth: Auth
+  ) {}
   ngOnInit(): void {
     // Emite el estado inicial del menú cuando el componente se inicializa
     // Esto asegura que el DashboardComponent reciba el estado inicial del sidebar
@@ -31,16 +35,20 @@ export class NavbarComponent implements OnInit {
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
+    console.log('Estado del menú:', this.menuOpen);
     this.menuToggle.emit(this.menuOpen); // Emite el nuevo estado a través del EventEmitter
   }
 
-  cerrarSesion() {
+  async cerrarSesion() {
     console.log('Cerrando sesión...');
-    this.authService.logout().then(() => {
-        console.log(this.auth.currentUser);
-        if (this.auth.currentUser == null) {
-          this.router.navigate(['/login']);
-        }
-    });
-}
+    try {
+      await this.authService.logout();
+      console.log(this.auth.currentUser);
+      if (this.auth.currentUser == null) {
+        this.router.navigate(['/login']);
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  }
 }
