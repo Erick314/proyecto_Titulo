@@ -105,8 +105,9 @@
               class="text-danger fs-4"
               style="cursor: pointer"
               (click)="decrementarStock(producto)"
-              >➖</span
-            >
+              [class.disabled]="cargandoStock[producto.id]"
+              [style.pointer-events]="cargandoStock[producto.id] ? 'none' : 'auto'"
+            >➖</span>
             <input
               type="number"
               class="stock-input"
@@ -116,13 +117,15 @@
               min="0"
               [class.text-danger]="producto.stockActual <= producto.stockMinimo"
               [class.fw-bold]="producto.stockActual <= producto.stockMinimo"
+              [disabled]="cargandoStock[producto.id]"
             />
             <span
               class="text-success fs-4"
               style="cursor: pointer"
               (click)="incrementarStock(producto)"
-              >➕</span
-            >
+              [class.disabled]="cargandoStock[producto.id]"
+              [style.pointer-events]="cargandoStock[producto.id] ? 'none' : 'auto'"
+            >➕</span>
           </div>
           <small
             *ngIf="producto.stockActual <= producto.stockMinimo"

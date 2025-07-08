@@ -140,6 +140,7 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Bandera para mostrar loader en historial
   cargandoHistorial: boolean = false;
+  cargandoStock: { [id: string]: boolean } = {};
 
   constructor(
     private sucursalService: SucursalService,
@@ -357,7 +358,8 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
 
   //uso de los incrementadores y decrementadores
   incrementarStock(producto: InventarioDisplay) {
-    if (producto.id) {
+    if (producto.id && !this.cargandoStock[producto.id]) {
+      this.cargandoStock[producto.id] = true;
       // Actualizar inmediatamente en la vista para mejor UX
       const stockAnterior = producto.stockActual;
       const nuevoStock = stockAnterior + 1;
@@ -382,12 +384,16 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
           toast.error('Error al incrementar el stock');
           // Revertir el cambio en caso de error
           producto.stockActual = stockAnterior;
+        })
+        .finally(() => {
+          this.cargandoStock[producto.id!] = false;
         });
     }
   }
 
   decrementarStock(producto: InventarioDisplay) {
-    if (producto.stockActual > 0 && producto.id) {
+    if (producto.stockActual > 0 && producto.id && !this.cargandoStock[producto.id]) {
+      this.cargandoStock[producto.id] = true;
       // Actualizar inmediatamente en la vista para mejor UX
       const stockAnterior = producto.stockActual;
       const nuevoStock = stockAnterior - 1;
@@ -412,6 +418,9 @@ export class InventarioComponent implements OnInit, AfterViewInit, OnDestroy {
           toast.error('Error al decrementar el stock');
           // Revertir el cambio en caso de error
           producto.stockActual = stockAnterior;
+        })
+        .finally(() => {
+          this.cargandoStock[producto.id!] = false;
         });
     } else if (producto.stockActual <= 0) {
       toast.warning('No se puede decrementar más el stock');
